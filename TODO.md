@@ -61,6 +61,7 @@ Document version: `2026-04-22`
 - `rich-text-*` helper 群を Java へ移植した
 - `SheetMarkdown` の cell display rendering を `RichTextRenderer` へ委譲した
 - table cell pipe escaping を rich-text renderer 経由でも二重エスケープしないよう調整した
+- `SheetMarkdownTest` に GitHub hyperlink rendering 時の underline suppression coverage を追加した
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - formula basic / chart basic fixture を使う workbook-to-markdown focused regression を追加した
