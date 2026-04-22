@@ -515,6 +515,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsIncludeShapeDetailsAsCompatibilityAliasWhenUsingUpstreamShapeFixture`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamImageFixtureSample02WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
@@ -525,6 +527,8 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
@@ -544,6 +548,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample02WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
@@ -555,6 +561,8 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
