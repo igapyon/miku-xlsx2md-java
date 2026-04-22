@@ -31,7 +31,7 @@ public final class MarkdownNormalize {
   }
 
   public static String escapeMarkdownPipes(final String text) {
-    return (text == null ? "" : text).replace("|", "\\|");
+    return (text == null ? "" : text).replaceAll("(?<!\\\\)\\|", "\\\\|");
   }
 
   public static String normalizeMarkdownTableCell(final String text) {

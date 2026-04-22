@@ -30,6 +30,7 @@ class MarkdownNormalizeTest {
   void escapesPipesInTableCells() {
     assertEquals("A\\| B", MarkdownNormalize.normalizeMarkdownTableCell("A|\nB"));
     assertEquals("  A \\| B  ", MarkdownNormalize.normalizeMarkdownTableCell("  A\t|\tB  "));
+    assertEquals("A\\|B", MarkdownNormalize.normalizeMarkdownTableCell("A\\|B"));
   }
 
   @Test

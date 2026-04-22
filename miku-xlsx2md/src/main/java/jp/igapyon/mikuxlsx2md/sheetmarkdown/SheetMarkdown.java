@@ -18,11 +18,9 @@ import java.util.regex.Pattern;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
 import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
-import jp.igapyon.mikuxlsx2md.markdownnormalize.MarkdownNormalize;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructure;
-import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
-import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
+import jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 
@@ -54,8 +52,8 @@ public final class SheetMarkdown {
       return "";
     }
     final MarkdownOptions.ResolvedMarkdownOptions resolvedOptions = MarkdownOptions.resolveMarkdownOptions(options);
-    final String displayValue = compactText(cell.getOutputValue());
-    final String rawValue = compactText(cell.getRawValue());
+    final String displayValue = RichTextRenderer.compactText(cell.getOutputValue());
+    final String rawValue = RichTextRenderer.compactText(cell.getRawValue());
     final String displayMarkdown = renderCellDisplayText(cell, resolvedOptions.getFormattingMode());
     if ("raw".equals(resolvedOptions.getOutputMode())) {
       return renderCellWithHyperlink(cell, rawValue.isEmpty() ? displayValue : rawValue, workbook, sheet, options);
@@ -376,27 +374,7 @@ public final class SheetMarkdown {
   }
 
   private static String renderCellDisplayText(final WorksheetParser.ParsedCell cell, final String formattingMode) {
-    if (!"github".equals(formattingMode)) {
-      return compactText(cell.getOutputValue());
-    }
-    if (cell.getRichTextRuns() != null && !cell.getRichTextRuns().isEmpty()
-        && compactText(joinRunText(cell.getRichTextRuns())).equals(compactText(cell.getOutputValue()))) {
-      final List<String> parts = new ArrayList<String>();
-      for (final SharedStrings.RichTextRun run : cell.getRichTextRuns()) {
-        parts.add(applyTextStyle(MarkdownNormalize.normalizeMarkdownText(run.getText()), run.isBold(), run.isItalic(), run.isStrike(), run.isUnderline()));
-      }
-      return join(parts, "");
-    }
-    final StylesParser.TextStyle style = cell.getTextStyle();
-    if (style == null) {
-      return MarkdownNormalize.normalizeMarkdownText(cell.getOutputValue());
-    }
-    return applyTextStyle(
-        MarkdownNormalize.normalizeMarkdownText(cell.getOutputValue()),
-        style.isBold(),
-        style.isItalic(),
-        style.isStrike(),
-        cell.getHyperlink() == null && style.isUnderline());
+    return RichTextRenderer.renderCellDisplayText(cell, formattingMode, cell.getHyperlink() != null);
   }
 
   private static String renderCellWithHyperlink(
@@ -766,31 +744,6 @@ public final class SheetMarkdown {
     return lines;
   }
 
-  private static String applyTextStyle(
-      final String text,
-      final boolean bold,
-      final boolean italic,
-      final boolean strike,
-      final boolean underline) {
-    String result = stringValue(text);
-    if (result.isEmpty()) {
-      return result;
-    }
-    if (underline) {
-      result = "<ins>" + result + "</ins>";
-    }
-    if (strike) {
-      result = "~~" + result + "~~";
-    }
-    if (italic) {
-      result = "*" + result + "*";
-    }
-    if (bold) {
-      result = "**" + result + "**";
-    }
-    return result;
-  }
-
   private static boolean isIsoDateToken(final String value) {
     return ISO_DATE_PATTERN.matcher(stringValue(value).trim()).matches();
   }
@@ -813,14 +766,6 @@ public final class SheetMarkdown {
       }
     }
     return null;
-  }
-
-  private static String joinRunText(final List<SharedStrings.RichTextRun> runs) {
-    final StringBuilder builder = new StringBuilder();
-    for (final SharedStrings.RichTextRun run : runs) {
-      builder.append(run.getText());
-    }
-    return builder.toString();
   }
 
   private static List<String> getNarrativeValues(final ContentSection section) {
@@ -867,10 +812,6 @@ public final class SheetMarkdown {
 
   private static List<TableCandidate> safeTableCandidates(final List<TableCandidate> tables) {
     return tables == null ? Collections.<TableCandidate>emptyList() : tables;
-  }
-
-  private static String compactText(final String value) {
-    return MarkdownNormalize.normalizeMarkdownText(value).replaceAll(" {2,}", " ").trim();
   }
 
   private static String stringValue(final String value) {
