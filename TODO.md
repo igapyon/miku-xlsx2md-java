@@ -12,7 +12,7 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- `sheet-markdown.ts` と `worksheet-tables.ts` の最小移植を進める
+- `sheet-markdown.ts` の最小移植を進める
 - markdown export を core facade へ接続する
 - workbook-to-markdown conversion の focused fixture regression を追加する
 
@@ -42,6 +42,7 @@ Document version: `2026-04-22`
 - `markdown-table-escape.ts` を Java へ移植した
 - `markdown-export.ts` を Java へ移植した
 - `cell-format.ts` を Java へ移植した
+- `worksheet-tables.ts` を Java へ移植した
 - `WorksheetParser` の display value formatting を `CellFormat` へ委譲した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した

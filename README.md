@@ -36,6 +36,8 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `markdown-export.ts`
 - Display-value formatting helper is implemented:
   - `cell-format.ts`
+- Worksheet table metadata helper is implemented:
+  - `worksheet-tables.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
 - Java CLI skeleton is implemented with Node-compatible option vocabulary

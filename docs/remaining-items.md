@@ -29,6 +29,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `markdown-table-escape`
   - `markdown-export` helper layer
   - `cell-format`
+  - `worksheet-tables`
   - CLI option vocabulary skeleton
   - Maven plugin skeleton
 - 保守確認
@@ -57,6 +58,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 - `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
+- `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
 - `mvn -pl miku-xlsx2md-maven-plugin -Dtest=MikuXlsx2mdMojoTest test`
 
@@ -66,6 +68,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Port `worksheet-tables.ts` and `sheet-markdown.ts`
+- Port `sheet-markdown.ts`
 - Connect markdown export helpers to the runtime core facade once workbook-to-markdown conversion becomes available
 - Connect Maven plugin to runtime core API once workbook conversion becomes available

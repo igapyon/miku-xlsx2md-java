@@ -214,6 +214,18 @@ notes:
 - Java-side extension: display formatting is wired from `WorkbookLoader` into `WorksheetParser` through dependency injection
 
 ### upstream file:
+`src/ts/worksheet-tables.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTables`
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTables.ParsedTable`
+
+notes:
+- facade: static worksheet table parsing helpers
+- helper split: relationship/path resolution is delegated to existing `RelsParser`, range normalization is delegated to `AddressUtils`
+- Java-side extension: currently kept as an independent helper module and not yet connected into sheet-to-markdown conversion
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -238,5 +250,4 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/worksheet-tables.ts`
 - `src/ts/sheet-markdown.ts`
