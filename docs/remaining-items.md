@@ -24,6 +24,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `shared-strings`
   - `styles-parser`
   - worksheet parser minimum scope
+  - `WorksheetParser` richTextRuns / formula metadata coverage subset
   - connected workbook parse facade
   - workbook parse fixture regression
   - `markdown-table-escape`
@@ -96,4 +97,5 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 ## Next Unit
 
 - Expand advanced `sheet-markdown` parity coverage beyond the current subset
+- Expand worksheet parser coverage beyond the current subset
 - Add broader CLI / Maven plugin fixture coverage

@@ -165,8 +165,8 @@ java classes:
 
 notes:
 - facade: static worksheet parsing helpers
-- helper split: hyperlink parsing and shared-formula translation kept in same class
-- Java-side extension: current scope is the minimum range covered by upstream unit tests
+- helper split: hyperlink parsing, shared-formula translation, inline rich text run extraction, and styled run merging kept in same class
+- Java-side extension: parsed cell getters expose formula metadata needed by downstream diagnostics/tests
 
 ### upstream file:
 `src/ts/core.ts`

@@ -12,6 +12,7 @@ import java.util.Objects;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
 import jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets;
@@ -89,26 +90,37 @@ public final class WorksheetParser {
           null,
           null,
           null,
-          sharedEntry.getRuns());
+          sharedEntry.getRuns() == null
+              ? createStyledRuns(sharedEntry.getText(), cellStyle.getTextStyle())
+              : mergeAdjacentRuns(mergeTextStyleIntoRuns(sharedEntry.getRuns(), cellStyle.getTextStyle())));
     }
     if ("inlineStr".equals(type)) {
       final String inlineText = collectInlineText(cellElement, deps);
-      return new ExtractedCellOutput(type, inlineText, inlineText, "", null, null, null, null);
+      final List<SharedStrings.RichTextRun> inlineRuns = parseInlineRichTextRuns(cellElement, cellStyle.getTextStyle(), deps);
+      return new ExtractedCellOutput(
+          type,
+          inlineText,
+          inlineText,
+          "",
+          null,
+          null,
+          null,
+          inlineRuns == null ? createStyledRuns(inlineText, cellStyle.getTextStyle()) : inlineRuns);
     }
     if ("b".equals(type)) {
       final String boolText = "1".equals(valueText) ? "TRUE" : "FALSE";
-      return new ExtractedCellOutput(type, valueText, boolText, "", null, null, null, null);
+      return new ExtractedCellOutput(type, valueText, boolText, "", null, null, null, createStyledRuns(boolText, cellStyle.getTextStyle()));
     }
     if ("str".equals(type) || "e".equals(type)) {
-      return new ExtractedCellOutput(type, valueText, valueText, "", null, null, null, null);
+      return new ExtractedCellOutput(type, valueText, valueText, "", null, null, null, createStyledRuns(valueText, cellStyle.getTextStyle()));
     }
     if (!valueText.isEmpty()) {
       final String formattedValue = deps.formatCellDisplayValue(valueText, cellStyle);
       if (formattedValue != null) {
-        return new ExtractedCellOutput(type, valueText, formattedValue, "", null, null, null, null);
+        return new ExtractedCellOutput(type, valueText, formattedValue, "", null, null, null, createStyledRuns(formattedValue, cellStyle.getTextStyle()));
       }
     }
-    return new ExtractedCellOutput(type, valueText, valueText, "", null, null, null, null);
+    return new ExtractedCellOutput(type, valueText, valueText, "", null, null, null, createStyledRuns(valueText, cellStyle.getTextStyle()));
   }
 
   public static List<String> expandRangeAddresses(final String ref) {
@@ -327,6 +339,116 @@ public final class WorksheetParser {
       inlineText.append(deps.getTextContent(textNode));
     }
     return inlineText.toString();
+  }
+
+  private static List<SharedStrings.RichTextRun> parseInlineRichTextRuns(
+      final Element cellElement,
+      final StylesParser.TextStyle cellStyle,
+      final WorksheetParserDependencies deps) {
+    final Element inlineStringElement = getFirstTag(cellElement, "is");
+    if (inlineStringElement == null) {
+      return null;
+    }
+    final List<SharedStrings.RichTextRun> runs = new ArrayList<SharedStrings.RichTextRun>();
+    for (int index = 0; index < inlineStringElement.getChildNodes().getLength(); index += 1) {
+      final Node node = inlineStringElement.getChildNodes().item(index);
+      if (node.getNodeType() != Node.ELEMENT_NODE || !"r".equals(node.getLocalName())) {
+        continue;
+      }
+      final Element runElement = (Element) node;
+      final StringBuilder text = new StringBuilder();
+      for (final Element textNode : XmlUtils.getElementsByLocalName(runElement, "t")) {
+        text.append(deps.getTextContent(textNode));
+      }
+      runs.add(new SharedStrings.RichTextRun(
+          text.toString(),
+          cellStyle.isBold() || hasEnabledBooleanValue(getNestedFirst(getFirstTag(runElement, "rPr"), "b")),
+          cellStyle.isItalic() || hasEnabledBooleanValue(getNestedFirst(getFirstTag(runElement, "rPr"), "i")),
+          cellStyle.isStrike() || hasEnabledBooleanValue(getNestedFirst(getFirstTag(runElement, "rPr"), "strike")),
+          cellStyle.isUnderline() || hasEnabledBooleanValue(getNestedFirst(getFirstTag(runElement, "rPr"), "u"))));
+    }
+    return mergeAdjacentRuns(runs);
+  }
+
+  private static List<SharedStrings.RichTextRun> mergeTextStyleIntoRuns(
+      final List<SharedStrings.RichTextRun> runs,
+      final StylesParser.TextStyle cellStyle) {
+    final List<SharedStrings.RichTextRun> result = new ArrayList<SharedStrings.RichTextRun>();
+    for (final SharedStrings.RichTextRun run : runs == null ? new ArrayList<SharedStrings.RichTextRun>() : runs) {
+      result.add(new SharedStrings.RichTextRun(
+          run.getText(),
+          cellStyle.isBold() || run.isBold(),
+          cellStyle.isItalic() || run.isItalic(),
+          cellStyle.isStrike() || run.isStrike(),
+          cellStyle.isUnderline() || run.isUnderline()));
+    }
+    return result;
+  }
+
+  private static List<SharedStrings.RichTextRun> mergeAdjacentRuns(final List<SharedStrings.RichTextRun> runs) {
+    final List<SharedStrings.RichTextRun> merged = new ArrayList<SharedStrings.RichTextRun>();
+    for (final SharedStrings.RichTextRun run : runs == null ? new ArrayList<SharedStrings.RichTextRun>() : runs) {
+      if (run.getText() == null || run.getText().isEmpty()) {
+        continue;
+      }
+      final SharedStrings.RichTextRun previous = merged.isEmpty() ? null : merged.get(merged.size() - 1);
+      if (previous != null
+          && previous.isBold() == run.isBold()
+          && previous.isItalic() == run.isItalic()
+          && previous.isStrike() == run.isStrike()
+          && previous.isUnderline() == run.isUnderline()) {
+        merged.set(merged.size() - 1, new SharedStrings.RichTextRun(
+            previous.getText() + run.getText(),
+            previous.isBold(),
+            previous.isItalic(),
+            previous.isStrike(),
+            previous.isUnderline()));
+      } else {
+        merged.add(new SharedStrings.RichTextRun(run.getText(), run.isBold(), run.isItalic(), run.isStrike(), run.isUnderline()));
+      }
+    }
+    if (merged.isEmpty()) {
+      return null;
+    }
+    for (final SharedStrings.RichTextRun run : merged) {
+      if (hasTextStyle(run)) {
+        return merged;
+      }
+    }
+    return null;
+  }
+
+  private static List<SharedStrings.RichTextRun> createStyledRuns(final String text, final StylesParser.TextStyle style) {
+    if (text == null || text.isEmpty() || !hasTextStyle(style)) {
+      return null;
+    }
+    final List<SharedStrings.RichTextRun> runs = new ArrayList<SharedStrings.RichTextRun>();
+    runs.add(new SharedStrings.RichTextRun(text, style.isBold(), style.isItalic(), style.isStrike(), style.isUnderline()));
+    return runs;
+  }
+
+  private static boolean hasTextStyle(final StylesParser.TextStyle style) {
+    return style != null && (style.isBold() || style.isItalic() || style.isStrike() || style.isUnderline());
+  }
+
+  private static boolean hasTextStyle(final SharedStrings.RichTextRun run) {
+    return run != null && (run.isBold() || run.isItalic() || run.isStrike() || run.isUnderline());
+  }
+
+  private static Element getNestedFirst(final Element root, final String localName) {
+    if (root == null) {
+      return null;
+    }
+    final List<Element> elements = XmlUtils.getElementsByLocalName(root, localName);
+    return elements.isEmpty() ? null : elements.get(0);
+  }
+
+  private static boolean hasEnabledBooleanValue(final Element node) {
+    if (node == null) {
+      return false;
+    }
+    final String value = node.getAttribute("val") == null ? "" : node.getAttribute("val").trim().toLowerCase();
+    return !"false".equals(value) && !"0".equals(value) && !"none".equals(value);
   }
 
   private static Element getFirstTag(final Element root, final String localName) {
@@ -596,6 +718,10 @@ public final class WorksheetParser {
       return resolutionSource;
     }
 
+    public String getCachedValueState() {
+      return cachedValueState;
+    }
+
     public int getStyleIndex() {
       return styleIndex;
     }
@@ -618,6 +744,14 @@ public final class WorksheetParser {
 
     public List<SharedStrings.RichTextRun> getRichTextRuns() {
       return richTextRuns;
+    }
+
+    public String getFormulaType() {
+      return formulaType;
+    }
+
+    public String getSpillRef() {
+      return spillRef;
     }
 
     public Hyperlink getHyperlink() {
