@@ -1,6 +1,6 @@
 # TODO
 
-Document version: `2026-04-22`
+Document version: `2026-04-23`
 
 ## Fixed Direction
 
@@ -15,7 +15,8 @@ Document version: `2026-04-22`
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
   - rich text / markdown escape fixture coverage は追加済み
   - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
-  - xlsx2md-basic / shape-flowchart / shape-block-arrow fixture coverage は追加済み
+  - xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout fixture coverage は追加済み
+  - table-basic-sample01 / table-basic-sample02 / table-basic-sample03 fixture coverage は追加済み
   - table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage は追加済み
   - table-basic-sample13 / table-basic-sample15 / grid-layout / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
 - worksheet parser の shared / cross-sheet formula fixture coverage を upstream fixture focused regression からさらに広げる
@@ -32,7 +33,8 @@ Document version: `2026-04-22`
 ## Restart Memo
 
 - 次回の再開点は `advanced sheet-markdown parity coverage` の続き
-- まず候補にする fixture は `table-basic-sample11` / `table-basic-sample12` / `table-basic-sample14` / `table-basic-sample16` / `shape-callout-sample01`
+- `table-basic` / shape 系の `SheetMarkdownTest` coverage は sample01-03 / sample11-16 / `shape-basic-sample01` / `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` まで追加済み
+- 次の候補は `display-format-sample01` / `hyperlink-basic-sample01` / `rich-usecase-sample01` などの sheet-markdown fixture parity 横展開
 - CLI / Maven plugin 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` を優先
 - CLI / Maven plugin 側の `shape-flowchart-sample01` / `shape-block-arrow-sample01` は追加済み
 - CLI / Maven plugin 側の `shape-callout-sample01` は追加済み
@@ -85,6 +87,8 @@ Document version: `2026-04-22`
 - `SheetMarkdownTest` に consecutive SVG-backed shape items の spacing coverage を追加した
 - `SheetMarkdownTest` に table detection compatibility alias coverage を追加した
 - `SheetMarkdownTest` に upstream xlsx2md-basic / shape-flowchart / shape-block-arrow fixture coverage を追加した
+- `SheetMarkdownTest` に upstream shape-basic / shape-callout fixture coverage を追加した
+- `SheetMarkdownTest` に upstream table-basic-sample01 / table-basic-sample02 / table-basic-sample03 fixture coverage を追加した
 - `SheetMarkdownTest` に upstream table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage を追加した
 - `SheetMarkdownTest` に upstream table-basic-sample13 / table-basic-sample15 / grid-layout / image-basic-sample02 / weird-sheetname fixture coverage を追加した
 - `WorksheetParserTest` に upstream formula-crosssheet / formula-shared fixture coverage を追加した
