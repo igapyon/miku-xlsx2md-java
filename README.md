@@ -19,12 +19,25 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `address-utils.ts`
   - `markdown-normalize.ts`
   - `markdown-escape.ts`
+  - `markdown-table-escape.ts`
 - Additional option / encoding modules implemented:
   - `markdown-options.ts`
   - `text-encoding.ts`
+- Workbook parsing minimum path is implemented:
+  - `xml-utils.ts`
+  - `zip-io.ts`
+  - `rels-parser.ts`
+  - `workbook-loader.ts`
+  - `shared-strings.ts`
+  - `styles-parser.ts`
+  - `worksheet-parser.ts`
+  - `core.ts`
+- Markdown export helper layer is implemented:
+  - `markdown-export.ts`
+- Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Java CLI skeleton is implemented with Node-compatible option vocabulary
 - Maven plugin skeleton is implemented
-- Workbook parsing / conversion / ZIP export are not implemented yet
+- Sheet-to-markdown conversion pipeline and end-to-end CLI / Maven plugin conversion are still pending
 
 ## Build
 
@@ -46,7 +59,7 @@ Current entrypoint:
 java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar --help
 ```
 
-The CLI already validates the main option set used by the upstream Node.js CLI, but workbook conversion is still pending.
+The CLI already validates the main option set used by the upstream Node.js CLI, but end-to-end workbook conversion is still pending.
 
 ## Documents
 

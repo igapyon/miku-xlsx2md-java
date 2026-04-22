@@ -18,6 +18,8 @@ upstream file:
 - `src/ts/styles-parser.ts`
 - `src/ts/worksheet-parser.ts`
 - `src/ts/core.ts`
+- `src/ts/markdown-table-escape.ts`
+- `src/ts/markdown-export.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -34,6 +36,8 @@ java classes:
 - `StylesParser`
 - `WorksheetParser`
 - `Core`
+- `MarkdownTableEscape`
+- `MarkdownExport`
 - `CliOptions`
 - `MikuXlsx2mdCli`
 - `MikuXlsx2mdMojo`
@@ -52,6 +56,8 @@ tests:
 - `StylesParserTest`
 - `WorksheetParserTest`
 - `CoreTest`
+- `CoreFixtureRegressionTest`
+- `MarkdownExportTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
 
@@ -62,9 +68,9 @@ diff summary:
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
-  - workbook parse fixture coverage
   - worksheet parse coverage expansion
-  - markdown export
+  - `cell-format` と display value formatting
+  - `sheet-markdown` / workbook-to-markdown conversion
   - zip export
   - summary output
   - Maven plugin からの実変換実行
@@ -79,8 +85,9 @@ follow-up:
   - Java 17 + Maven 3.9 on source/target 1.8
   - `mvn -o test` pass
 - fixture:
-  - none
+  - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
 - 次回の確認観点:
-  - fixture を使う workbook parse regression を追加する
-  - markdown export の最小 round-trip へ進む
+  - `cell-format`, `worksheet-tables`, `sheet-markdown` を追加する
+  - markdown export helper を core facade に接続する
   - Maven plugin を core API へ接続する
