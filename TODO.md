@@ -12,15 +12,14 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- markdown export を core facade へ接続する
-- workbook-to-markdown conversion の focused fixture regression を追加する
+- advanced `sheet-markdown` parity coverage を広げる
+- worksheet parser の coverage を広げる
 
 ## Next Queue
 
-- CLI と Maven plugin の接続先となる core API facade をさらに広げる
-- sheet / workbook artifact 組み立てを進める
-- worksheet parser の coverage を広げる
-- Maven plugin を runtime core に接続する
+- table detector / narrative structure / rich text / sheet assets の分割移植を検討する
+- CLI / Maven plugin の fixture coverage を広げる
+- Maven plugin smoke 実行の確認方法を固定する
 
 ## Done In This Step
 
@@ -45,6 +44,9 @@ Document version: `2026-04-22`
 - `WorksheetParser` の display value formatting を `CellFormat` へ委譲した
 - `sheet-markdown.ts` の最小範囲を Java へ移植した
 - markdown conversion を core facade へ接続した
+- workbook-to-markdown conversion の focused fixture regression を追加した
+- CLI を runtime core conversion に接続した
+- Maven plugin を runtime core conversion に接続した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した

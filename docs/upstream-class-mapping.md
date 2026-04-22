@@ -253,7 +253,7 @@ java classes:
 notes:
 - facade: `main(String[] args)` delegates to `run(String[] args, PrintStream out, PrintStream err)`
 - helper split: option parsing isolated in `CliOptions`
-- Java-side extension: current implementation stops after validation because workbook conversion is still pending
+- Java-side extension: file I/O and diagnostics are kept in the CLI layer; conversion delegates to the runtime core facade
 
 ### upstream file:
 Maven plugin implementation target for Java distribution
@@ -262,9 +262,9 @@ java classes:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojo`
 
 notes:
-- facade: Maven goal skeleton
+- facade: Maven `convert` goal delegates to runtime core conversion
 - helper split: parameter mapping kept inside mojo
-- Java-side extension: plugin currently fails fast until workbook conversion core is implemented
+- Java-side extension: Maven plugin writes combined Markdown output through the Java runtime core
 
 ## Next Candidates
 

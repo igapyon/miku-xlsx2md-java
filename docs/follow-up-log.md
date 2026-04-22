@@ -72,17 +72,16 @@ tests:
 
 diff summary:
 - 挙動差分:
-  - CLI は option validation と help まで実装し、workbook conversion は未移植
-  - Maven plugin は skeleton のみで、runtime core 接続は未移植
+  - CLI は option validation / help / initial workbook conversion を実装
+  - Maven plugin は runtime core conversion へ接続済み
   - `sheet-markdown` は最小変換導線を実装し、advanced table detector / rich text split / shape block grouping は未移植
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
   - worksheet parse coverage expansion
   - advanced `sheet-markdown` parity coverage
-  - zip export
-  - summary output
-  - Maven plugin からの実変換実行
+  - broader CLI / Maven plugin fixture coverage
+  - Maven plugin smoke execution command
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
 
@@ -94,11 +93,15 @@ follow-up:
   - Java 17 + Maven 3.9 on source/target 1.8
   - `mvn -o test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - 次回の確認観点:
-  - workbook-to-markdown fixture regression を追加する
-  - CLI を core conversion facade に接続する
-  - Maven plugin を core API へ接続する
+  - advanced `sheet-markdown` parity coverage を広げる
+  - table detector / narrative structure / rich text / sheet assets helper の分割移植を検討する
+  - CLI / Maven plugin の fixture coverage を広げる

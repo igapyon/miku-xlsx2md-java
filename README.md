@@ -42,9 +42,10 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
-- Java CLI skeleton is implemented with Node-compatible option vocabulary
-- Maven plugin skeleton is implemented
-- End-to-end CLI / Maven plugin conversion wiring is still pending
+- Focused workbook-to-markdown fixture regression is in place for upstream `display-format` and `hyperlink` fixtures
+- Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
+- Maven plugin is connected to runtime core conversion
+- Advanced sheet-markdown parity and broader fixture coverage are still pending
 
 ## Build
 
@@ -66,7 +67,7 @@ Current entrypoint:
 java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar --help
 ```
 
-The CLI already validates the main option set used by the upstream Node.js CLI, but end-to-end workbook conversion is still pending.
+The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
 
 ## Documents
 

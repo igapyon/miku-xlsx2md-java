@@ -4,7 +4,18 @@
  */
 package jp.igapyon.mikuxlsx2md.cli;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import jp.igapyon.mikuxlsx2md.core.Core;
+import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
+import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
+import jp.igapyon.mikuxlsx2md.textencoding.TextEncoding;
+import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 
 public final class MikuXlsx2mdCli {
   private MikuXlsx2mdCli() {
@@ -23,13 +34,104 @@ public final class MikuXlsx2mdCli {
         return options.isHelp() ? 0 : 1;
       }
 
-      err.println("Workbook conversion is not implemented yet in the Java port.");
-      err.println("Validated input: " + options.getInputPath());
-      return 1;
+      convertWorkbook(options, out);
+      return 0;
     } catch (final IllegalArgumentException ex) {
       err.println(ex.getMessage());
       return 1;
+    } catch (final IOException ex) {
+      err.println(ex.getMessage());
+      return 1;
     }
+  }
+
+  private static void convertWorkbook(final CliOptions options, final PrintStream out) throws IOException {
+    final Path inputPath = Paths.get(options.getInputPath()).toAbsolutePath();
+    final String workbookName = inputPath.getFileName() == null ? "workbook.xlsx" : inputPath.getFileName().toString();
+    final byte[] workbookBytes;
+    try {
+      workbookBytes = Files.readAllBytes(inputPath);
+    } catch (final IOException ex) {
+      throw new IOException(formatWorkbookError(workbookName, "read failed", ex));
+    }
+
+    final WorkbookLoader.ParsedWorkbook workbook;
+    try {
+      workbook = Core.parseWorkbook(workbookBytes, workbookName);
+    } catch (final RuntimeException ex) {
+      throw new IOException(formatWorkbookError(workbookName, "parse failed", ex));
+    }
+
+    final List<MarkdownExport.MarkdownFile> files;
+    try {
+      files = Core.convertWorkbookToMarkdownFiles(workbook, createMarkdownOptions(options));
+    } catch (final RuntimeException ex) {
+      throw new IOException(formatWorkbookError(workbookName, "convert failed", ex));
+    }
+
+    if (options.isSummary()) {
+      printWorkbookSummary(out, workbookName, files);
+    }
+
+    final TextEncoding.MarkdownEncodingOptions encodingOptions =
+        new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom());
+    if (options.getZipPath() != null) {
+      try {
+        final byte[] archive = MarkdownExport.createWorkbookExportArchive(Core.toExportWorkbook(workbook), files, encodingOptions);
+        writeBinaryFile(Paths.get(options.getZipPath()).toAbsolutePath(), archive);
+      } catch (final RuntimeException ex) {
+        throw new IOException(formatWorkbookError(workbookName, "zip write failed", ex));
+      }
+    }
+
+    if (options.getZipPath() == null || options.getOutPath() != null) {
+      final MarkdownExport.CombinedMarkdownExportPayload combined =
+          MarkdownExport.createCombinedMarkdownExportPayload(Core.toExportWorkbook(workbook), files, encodingOptions);
+      final Path outputPath = options.getOutPath() == null
+          ? Paths.get(combined.getFileName()).toAbsolutePath()
+          : Paths.get(options.getOutPath()).toAbsolutePath();
+      try {
+        writeBinaryFile(outputPath, combined.getData());
+      } catch (final IOException ex) {
+        throw new IOException(formatWorkbookError(workbookName, "markdown write failed", ex));
+      }
+    }
+  }
+
+  private static MarkdownOptions createMarkdownOptions(final CliOptions options) {
+    return new MarkdownOptions(
+        Boolean.valueOf(options.isTreatFirstRowAsHeader()),
+        Boolean.valueOf(options.isTrimText()),
+        Boolean.valueOf(options.isRemoveEmptyRows()),
+        Boolean.valueOf(options.isRemoveEmptyColumns()),
+        Boolean.valueOf(options.isIncludeShapeDetails()),
+        options.getOutputMode(),
+        options.getFormattingMode(),
+        options.getTableDetectionMode());
+  }
+
+  private static void printWorkbookSummary(
+      final PrintStream out,
+      final String workbookName,
+      final List<MarkdownExport.MarkdownFile> files) {
+    out.println("[workbook] " + workbookName);
+    for (final MarkdownExport.MarkdownFile file : files) {
+      out.println(MarkdownExport.createSummaryText(file));
+      out.println();
+    }
+  }
+
+  private static void writeBinaryFile(final Path outputPath, final byte[] data) throws IOException {
+    final Path parent = outputPath.getParent();
+    if (parent != null) {
+      Files.createDirectories(parent);
+    }
+    Files.write(outputPath, data);
+  }
+
+  private static String formatWorkbookError(final String workbookName, final String stage, final Throwable error) {
+    final String message = error.getMessage() == null ? String.valueOf(error) : error.getMessage();
+    return "[" + workbookName + "] " + stage + ": " + message;
   }
 
   static void printHelp(final PrintStream out) {

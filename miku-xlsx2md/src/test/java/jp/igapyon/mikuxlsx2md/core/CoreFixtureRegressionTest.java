@@ -18,6 +18,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
+import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
+import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 
@@ -90,6 +92,41 @@ class CoreFixtureRegressionTest {
     assertEquals("1023456", findCell(sheet.getCells(), "D11").getOutputValue());
     assertEquals("1023456", findCell(sheet.getCells(), "D12").getOutputValue());
     assertEquals("令和8年3月17日", findCell(sheet.getCells(), "D13").getOutputValue());
+  }
+
+  @Test
+  void convertsUpstreamDisplayFormatFixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("display", "display-format-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "display-format-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals(1, files.size());
+    assertEquals("display-format-sample01_001_display-format.md", files.get(0).getFileName());
+    assertEquals("display-format", files.get(0).getSheetName());
+    assertTrue(files.get(0).getMarkdown().contains("# Book: display-format-sample01.xlsx"));
+    assertTrue(files.get(0).getMarkdown().contains("## Sheet: display-format"));
+    assertTrue(files.get(0).getMarkdown().contains("1,024,768"));
+    assertTrue(files.get(0).getMarkdown().contains("令和8年3月17日"));
+    assertEquals("display", files.get(0).getSummary().getOutputMode());
+    assertEquals("plain", files.get(0).getSummary().getFormattingMode());
+    assertEquals(65, files.get(0).getSummary().getCells());
+  }
+
+  @Test
+  void convertsUpstreamHyperlinkFixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("link", "hyperlink-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "hyperlink-basic-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals(2, files.size());
+    assertEquals("Summary", files.get(0).getSheetName());
+    assertEquals("Other", files.get(1).getSheetName());
+    assertTrue(files.get(0).getMarkdown().contains("[Open example](https://example.com/)"));
+    assertTrue(files.get(0).getMarkdown().contains("[Jump to Other](#other)"));
   }
 
   private static WorksheetParser.ParsedCell findCell(final List<WorksheetParser.ParsedCell> cells, final String address) {
