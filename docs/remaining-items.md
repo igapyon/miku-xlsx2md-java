@@ -57,7 +57,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - edge fixture regression now includes weird sheet name filename sanitization coverage
   - CLI option vocabulary and initial conversion
   - Maven plugin initial conversion
-  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow
+  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command
 - 保守確認
   - help text compatibility
