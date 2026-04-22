@@ -12,7 +12,9 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -57,6 +59,24 @@ class MikuXlsx2mdMojoTest {
     assertTrue(new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8).contains("Hello [raw=0]"));
   }
 
+  @Test
+  void convertsUpstreamHyperlinkFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("link", "hyperlink-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("hyperlink.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+    mojo.setFormattingMode("github");
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: hyperlink-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("[Open example](https://example.com/)"));
+    assertTrue(markdown.contains("[Jump to Other](#other)"));
+  }
+
   private static byte[] createWorkbookBytes() {
     return ZipIo.createStoredZip(new ZipIo.ExportEntry[] {
         entry("xl/workbook.xml",
@@ -91,5 +111,13 @@ class MikuXlsx2mdMojoTest {
 
   private static ZipIo.ExportEntry entry(final String name, final String text) {
     return new ZipIo.ExportEntry(name, text.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private static Path resolveFixturePath(final String group, final String fileName) {
+    final Path local = Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    if (Files.isRegularFile(local)) {
+      return local;
+    }
+    return Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
   }
 }

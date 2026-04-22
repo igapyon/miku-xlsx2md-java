@@ -12,7 +12,9 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -124,6 +126,33 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stderr).contains("BOM cannot be enabled for shift_jis."));
   }
 
+  @Test
+  void convertsUpstreamShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("shape.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--shape-details", "include",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] shape-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: shape-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001"));
+    assertTrue(markdown.contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
+  }
+
   private static PrintStream asPrintStream(final ByteArrayOutputStream buffer) {
     try {
       return new PrintStream(buffer, true, StandardCharsets.UTF_8.name());
@@ -170,5 +199,13 @@ class MikuXlsx2mdCliTest {
 
   private static ZipIo.ExportEntry entry(final String name, final String text) {
     return new ZipIo.ExportEntry(name, text.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private static Path resolveFixturePath(final String group, final String fileName) {
+    final Path local = Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    if (Files.isRegularFile(local)) {
+      return local;
+    }
+    return Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
   }
 }
