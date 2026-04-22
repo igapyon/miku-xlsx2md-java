@@ -96,10 +96,10 @@ diff summary:
   - CLI は option validation / help / initial workbook conversion を実装
   - Maven plugin は runtime core conversion へ接続済み
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
-  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
+  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済みで、`xlsx2md-basic` / `image-basic-sample02` / weird-sheetname まで横展開済み
   - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline / narrative / edge-empty / edge-weird-sheetname / border-priority / table-basic / grid-layout / image-basic-sample02 fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
@@ -161,6 +161,8 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after sheet-markdown / worksheet parser coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich-text / merge-multiline / weird-sheetname / image-basic-sample02 fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after xlsx2md-basic / shape-flowchart / shape-block-arrow / formula fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass after broader sheet-markdown / CLI fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage expansion
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`

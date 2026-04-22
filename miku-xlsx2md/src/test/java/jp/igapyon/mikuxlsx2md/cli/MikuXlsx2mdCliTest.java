@@ -280,6 +280,87 @@ class MikuXlsx2mdCliTest {
     assertTrue(markdown.contains("### Table: 001 (B8-F11)"));
   }
 
+  @Test
+  void convertsUpstreamBasicFixtureInBothModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("", "xlsx2md-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("xlsx2md-basic-both.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--output-mode", "both",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] xlsx2md-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: xlsx2md-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("### Table: 004 (B33-F46)"));
+    assertTrue(markdown.contains("1 0 2 3 4 5 6 [raw=1023456]"));
+    assertTrue(markdown.contains("令和8年3月17日 [raw=46098]"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample02WhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample02.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("image-basic-sample02.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] image-basic-sample02.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: image-basic-sample02.xlsx"));
+    assertTrue(markdown.contains("| 2024年 | 13,568 | 9,072 |"));
+    assertTrue(markdown.contains("### Chart: 001 (B9)"));
+    assertTrue(markdown.contains("### Image: 001 (H3)"));
+  }
+
+  @Test
+  void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("edge-weird-sheetname.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] edge-weird-sheetname-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: edge-weird-sheetname-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: A B-東京&大阪.01"));
+    assertTrue(markdown.contains("| 3 | 登録日 | 3月13日 | 何かの登録日 |"));
+  }
+
   private static PrintStream asPrintStream(final ByteArrayOutputStream buffer) {
     try {
       return new PrintStream(buffer, true, StandardCharsets.UTF_8.name());
