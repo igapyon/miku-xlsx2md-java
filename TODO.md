@@ -13,7 +13,7 @@ Document version: `2026-04-22`
 ## Current Queue
 
 - advanced `sheet-markdown` parity coverage をさらに広げる
-- worksheet parser の coverage を広げる
+- worksheet parser の coverage をさらに広げる
 
 ## Next Queue
 
@@ -35,6 +35,7 @@ Document version: `2026-04-22`
 - `shared-strings.ts` を Java へ移植した
 - `styles-parser.ts` を Java へ移植した
 - `worksheet-parser.ts` の最小範囲を Java へ移植した
+- `WorksheetParser` の richTextRuns / formula metadata coverage を広げた
 - `core.ts` の最小 facade を Java へ追加した
 - `markdown-table-escape.ts` を Java へ移植した
 - `markdown-export.ts` を Java へ移植した

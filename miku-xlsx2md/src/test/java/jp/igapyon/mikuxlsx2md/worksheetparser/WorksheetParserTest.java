@@ -5,6 +5,7 @@
 package jp.igapyon.mikuxlsx2md.worksheetparser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -51,6 +52,10 @@ class WorksheetParserTest {
   @Test
   void translatesSharedFormulasAcrossRelativeReferences() {
     assertEquals("=A3+$B$1", WorksheetParser.translateSharedFormula("=A1+$B$1", "C1", "C3"));
+    assertEquals("=B3+$B$1+'Other Sheet'!D3", WorksheetParser.translateSharedFormula(
+        "=A1+$B$1+'Other Sheet'!C1",
+        "C1",
+        "D3"));
   }
 
   @Test
@@ -134,6 +139,110 @@ class WorksheetParserTest {
     assertEquals(
         new WorksheetParser.Hyperlink("internal", "'Other Sheet'!C3", "'Other Sheet'!C3", "go", ""),
         findCell(sheet, "B1").getHyperlink());
+  }
+
+  @Test
+  void attachesCellTextStyleToSharedInlineBooleanAndFormattedValues() {
+    final WorksheetParser.WorksheetParserDependencies deps = createDeps();
+    final StylesParser.CellStyleInfo boldStyle =
+        new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", new StylesParser.TextStyle(true, false, false, false));
+    final StylesParser.CellStyleInfo underlineStyle =
+        new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", new StylesParser.TextStyle(false, false, false, true));
+    final StylesParser.CellStyleInfo strikePercentStyle =
+        new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 10, "0.0%", new StylesParser.TextStyle(false, false, true, false));
+
+    final Element sharedCell = XmlUtils.xmlToDocument("<c t=\"s\"><v>0</v></c>").getDocumentElement();
+    final WorksheetParser.ExtractedCellOutput sharedResult = WorksheetParser.extractCellOutputValue(
+        sharedCell,
+        Arrays.asList(new SharedStrings.SharedStringEntry("Styled", Arrays.asList(
+            new SharedStrings.RichTextRun("Sty", false, true, false, false),
+            new SharedStrings.RichTextRun("led", false, true, false, false)))),
+        boldStyle,
+        deps,
+        "");
+
+    assertEquals(Arrays.asList(new SharedStrings.RichTextRun("Styled", true, true, false, false)), sharedResult.getRichTextRuns());
+
+    final Element inlineCell = XmlUtils.xmlToDocument(
+        "<c t=\"inlineStr\"><is>"
+            + "<r><rPr><i/></rPr><t>In</t></r>"
+            + "<r><rPr><i/></rPr><t>line</t></r>"
+            + "</is></c>").getDocumentElement();
+    final WorksheetParser.ExtractedCellOutput inlineResult =
+        WorksheetParser.extractCellOutputValue(inlineCell, new ArrayList<SharedStrings.SharedStringEntry>(), underlineStyle, deps, "");
+
+    assertEquals("Inline", inlineResult.getOutputValue());
+    assertEquals(Arrays.asList(new SharedStrings.RichTextRun("Inline", false, true, false, true)), inlineResult.getRichTextRuns());
+
+    final Element boolCell = XmlUtils.xmlToDocument("<c t=\"b\"><v>1</v></c>").getDocumentElement();
+    final WorksheetParser.ExtractedCellOutput boolResult =
+        WorksheetParser.extractCellOutputValue(boolCell, new ArrayList<SharedStrings.SharedStringEntry>(), strikePercentStyle, deps, "");
+
+    assertEquals(Arrays.asList(new SharedStrings.RichTextRun("TRUE", false, false, true, false)), boolResult.getRichTextRuns());
+
+    final Element formattedCell = XmlUtils.xmlToDocument("<c><v>0.125</v></c>").getDocumentElement();
+    final WorksheetParser.ExtractedCellOutput formattedResult =
+        WorksheetParser.extractCellOutputValue(formattedCell, new ArrayList<SharedStrings.SharedStringEntry>(), strikePercentStyle, deps, "");
+
+    assertEquals("12.5%", formattedResult.getOutputValue());
+    assertEquals(Arrays.asList(new SharedStrings.RichTextRun("12.5%", false, false, true, false)), formattedResult.getRichTextRuns());
+  }
+
+  @Test
+  void exposesFormulaCachedStateTypeAndSpillRef() {
+    final WorksheetParser.WorksheetParserDependencies deps = createDeps();
+    final StylesParser.CellStyleInfo cellStyle =
+        new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", StylesParser.EMPTY_TEXT_STYLE);
+
+    final WorksheetParser.ExtractedCellOutput fallback = WorksheetParser.extractCellOutputValue(
+        XmlUtils.xmlToDocument("<c><f>A1</f></c>").getDocumentElement(),
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        cellStyle,
+        deps,
+        "");
+    assertEquals("fallback_formula", fallback.getResolutionStatus());
+    assertEquals("formula_text", fallback.getResolutionSource());
+    assertEquals("absent", fallback.getCachedValueState());
+
+    final WorksheetParser.ExtractedCellOutput emptyCached = WorksheetParser.extractCellOutputValue(
+        XmlUtils.xmlToDocument("<c><f>A1</f><v/></c>").getDocumentElement(),
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        cellStyle,
+        deps,
+        "");
+    assertEquals("resolved", emptyCached.getResolutionStatus());
+    assertEquals("cached_value", emptyCached.getResolutionSource());
+    assertEquals("present_empty", emptyCached.getCachedValueState());
+
+    final WorksheetParser.ExtractedCellOutput external = WorksheetParser.extractCellOutputValue(
+        XmlUtils.xmlToDocument("<c><f>'[other.xlsx]Sheet1'!A1</f></c>").getDocumentElement(),
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        cellStyle,
+        deps,
+        "");
+    assertEquals("unsupported_external", external.getResolutionStatus());
+    assertEquals("external_unsupported", external.getResolutionSource());
+    assertEquals("='[other.xlsx]Sheet1'!A1", external.getFormulaText());
+
+    final String worksheetXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+        + "<sheetData><row r=\"1\"><c r=\"A1\"><f t=\"array\" ref=\"A1:B2\">SUM(A1:B1)</f><v>3</v></c></row></sheetData>"
+        + "</worksheet>";
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    files.put("xl/worksheets/sheet1.xml", worksheetXml.getBytes(StandardCharsets.UTF_8));
+    final WorksheetParser.ParsedSheet sheet = WorksheetParser.parseWorksheet(
+        files,
+        "Sheet1",
+        "xl/worksheets/sheet1.xml",
+        1,
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        Arrays.asList(cellStyle),
+        deps);
+
+    assertEquals("array", findCell(sheet, "A1").getFormulaType());
+    assertEquals("A1:B2", findCell(sheet, "A1").getSpillRef());
+    assertEquals("present_nonempty", findCell(sheet, "A1").getCachedValueState());
+    assertNull(findCell(sheet, "A1").getRichTextRuns());
   }
 
   private static WorksheetParser.ParsedCell findCell(final WorksheetParser.ParsedSheet sheet, final String address) {
