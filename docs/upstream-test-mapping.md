@@ -78,6 +78,67 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=TextEncodingTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-xml-utils.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.xmlutils.XmlUtilsTest.findsElementsByLocalNameAcrossNamespaces`
+- `jp.igapyon.mikuxlsx2md.xmlutils.XmlUtilsTest.findsOnlyDirectChildrenForALocalName`
+- `jp.igapyon.mikuxlsx2md.xmlutils.XmlUtilsTest.decodesUtf8BytesAndNormalizesCrLfTextContent`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=XmlUtilsTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-zip-io.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.roundTripsStoredZipEntries`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.supportsEmptyFilePayloads`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.writesAFixedReproducibleZipEntryTimestamp`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.doesNotMarkAsciiOnlyFileNamesWithTheUtf8Flag`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.marksUtf8FileNamesSoNonAsciiEntriesUnzipCorrectly`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.throwsForInvalidZipInput`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIoTest.inflatesDeflatedEntries`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=ZipIoTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-rels-parser.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParserTest.normalizesZipPathsRelativeToTheSourcePath`
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParserTest.buildsRelsPathsNextToTheSourceFile`
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParserTest.parsesRelationshipTargetsIntoAMap`
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParserTest.keepsExternalRelationshipTargetsAsIs`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=RelsParserTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-workbook-loader.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoaderTest.parsesDefinedNamesAndSkipsXlnmEntries`
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoaderTest.loadsWorkbookPartsAndInvokesWorksheetParsingAndPostProcessing`
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoaderTest.throwsWhenWorkbookXmlIsMissing`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=WorkbookLoaderTest test`
+
+### upstream test / intent:
 Node CLI option compatibility and help text shape
 
 java tests:
