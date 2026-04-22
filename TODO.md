@@ -12,13 +12,12 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- `sheet-markdown.ts` の最小移植を進める
 - markdown export を core facade へ接続する
 - workbook-to-markdown conversion の focused fixture regression を追加する
 
 ## Next Queue
 
-- CLI と Maven plugin の接続先となる core API facade を広げる
+- CLI と Maven plugin の接続先となる core API facade をさらに広げる
 - sheet / workbook artifact 組み立てを進める
 - worksheet parser の coverage を広げる
 - Maven plugin を runtime core に接続する
@@ -44,6 +43,8 @@ Document version: `2026-04-22`
 - `cell-format.ts` を Java へ移植した
 - `worksheet-tables.ts` を Java へ移植した
 - `WorksheetParser` の display value formatting を `CellFormat` へ委譲した
+- `sheet-markdown.ts` の最小範囲を Java へ移植した
+- markdown conversion を core facade へ接続した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した

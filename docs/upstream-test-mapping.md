@@ -275,6 +275,25 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-sheet-markdown.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.extractsNarrativeBlocksOutsideTables`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetToMarkdownWithDetectedTableAndSummary`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.formatsHyperlinksRawAndBothModes`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsWorkbookThroughCoreFacadeShape`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
+
+notes:
+- Current Java coverage is a minimum conversion regression for the new facade.
+- Upstream advanced table detection, rich text formatting, calendar grouping, and asset grouping cases remain follow-up coverage.
+
+### upstream test / intent:
 Node CLI option compatibility and help text shape
 
 java tests:
