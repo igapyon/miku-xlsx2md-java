@@ -43,6 +43,8 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Table detection helper layer is implemented:
   - `border-grid.ts`
   - `table-detector.ts`
+- Sheet asset rendering / grouping helper layer is partially implemented:
+  - `sheet-assets.ts`
 - Rich text rendering helper layer is implemented:
   - `rich-text-parser.ts`
   - `rich-text-plain-formatter.ts`

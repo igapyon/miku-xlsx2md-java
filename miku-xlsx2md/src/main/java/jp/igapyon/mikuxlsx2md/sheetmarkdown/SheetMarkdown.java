@@ -17,6 +17,7 @@ import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructure;
 import jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer;
+import jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets;
 import jp.igapyon.mikuxlsx2md.tabledetector.TableDetector;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
@@ -269,9 +270,9 @@ public final class SheetMarkdown {
         formulaDiagnostics,
         sections,
         body,
-        renderImageSection(sheet),
-        renderChartSection(safeCharts(sheet)),
-        renderShapeSection(safeShapes(sheet), resolvedOptions.isIncludeShapeDetails()));
+        SheetAssets.renderImageSection(sheet),
+        SheetAssets.renderChartSection(safeCharts(sheet)),
+        SheetAssets.renderShapeSection(safeShapes(sheet), resolvedOptions.isIncludeShapeDetails()));
   }
 
   public static String createSheetMarkdownText(
@@ -534,78 +535,6 @@ public final class SheetMarkdown {
       }
     }
     return joinParagraphs(entries).trim();
-  }
-
-  private static String renderImageSection(final WorksheetParser.ParsedSheet sheet) {
-    final List<String> entries = new ArrayList<String>();
-    int index = 0;
-    for (final WorksheetParser.ParsedImageAsset image : safeImages(sheet)) {
-      entries.add(joinLines(asList(
-          "### Image: " + leftPad(index + 1, 3) + " (" + image.getAnchor() + ")",
-          "- File: " + image.getPath(),
-          "",
-          "![" + image.getFilename() + "](" + image.getPath() + ")")));
-      index += 1;
-    }
-    return entries.isEmpty() ? "" : "\n\n" + joinParagraphs(entries);
-  }
-
-  private static String renderChartSection(final List<WorksheetParser.ParsedChartAsset> charts) {
-    final List<String> entries = new ArrayList<String>();
-    int index = 0;
-    for (final WorksheetParser.ParsedChartAsset chart : charts) {
-      final List<String> lines = new ArrayList<String>();
-      lines.add("### Chart: " + leftPad(index + 1, 3) + " (" + chart.getAnchor() + ")");
-      lines.add("- Title: " + (stringValue(chart.getTitle()).isEmpty() ? "(none)" : chart.getTitle()));
-      lines.add("- Type: " + chart.getChartType());
-      if (!chart.getSeries().isEmpty()) {
-        lines.add("- Series:");
-        for (final WorksheetParser.ParsedChartSeries series : chart.getSeries()) {
-          lines.add("  - " + series.getName());
-          if ("secondary".equals(series.getAxis())) {
-            lines.add("    - Axis: secondary");
-          }
-          if (!stringValue(series.getCategoriesRef()).isEmpty()) {
-            lines.add("    - categories: " + series.getCategoriesRef());
-          }
-          if (!stringValue(series.getValuesRef()).isEmpty()) {
-            lines.add("    - values: " + series.getValuesRef());
-          }
-        }
-      }
-      entries.add(joinLines(lines));
-      index += 1;
-    }
-    return entries.isEmpty() ? "" : "\n\n" + joinParagraphs(entries);
-  }
-
-  private static String renderShapeSection(final List<WorksheetParser.ParsedShapeAsset> shapes, final boolean includeShapeDetails) {
-    if (!includeShapeDetails || shapes.isEmpty()) {
-      return "";
-    }
-    final List<String> entries = new ArrayList<String>();
-    int index = 0;
-    for (final WorksheetParser.ParsedShapeAsset shape : shapes) {
-      final List<String> lines = new ArrayList<String>();
-      lines.add("#### Shape: " + leftPad(index + 1, 3) + " (" + shape.getAnchor() + ")");
-      lines.addAll(renderHierarchicalRawEntries(shape.getRawEntries()));
-      if (shape.getSvgPath() != null) {
-        lines.add("- SVG: " + shape.getSvgPath());
-        lines.add("");
-        lines.add("![" + (shape.getSvgFilename() == null ? "shape_" + leftPad(index + 1, 3) + ".svg" : shape.getSvgFilename()) + "](" + shape.getSvgPath() + ")");
-      }
-      entries.add(joinLines(lines));
-      index += 1;
-    }
-    return "\n\n" + joinParagraphs(entries);
-  }
-
-  private static List<String> renderHierarchicalRawEntries(final List<WorksheetParser.ParsedShapeRawEntry> entries) {
-    final List<String> lines = new ArrayList<String>();
-    for (final WorksheetParser.ParsedShapeRawEntry entry : entries == null ? Collections.<WorksheetParser.ParsedShapeRawEntry>emptyList() : entries) {
-      lines.add("- " + entry.getKey() + ": " + entry.getValue());
-    }
-    return lines;
   }
 
   private static boolean isIsoDateToken(final String value) {
