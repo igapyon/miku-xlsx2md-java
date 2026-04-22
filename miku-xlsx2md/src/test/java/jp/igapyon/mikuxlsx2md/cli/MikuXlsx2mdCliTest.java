@@ -392,6 +392,34 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void convertsUpstreamCalloutShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-callout-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("shape-callout.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--shape-details", "include",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] shape-callout-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: shape-callout-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: shape-callout"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `wedgeRoundRectCallout`"));
+    assertTrue(markdown.contains("- `a:t#text`: `角四角`"));
+  }
+
+  @Test
   void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");

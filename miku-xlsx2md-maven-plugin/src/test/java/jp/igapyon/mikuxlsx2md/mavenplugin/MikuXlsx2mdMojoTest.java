@@ -237,6 +237,24 @@ class MikuXlsx2mdMojoTest {
   }
 
   @Test
+  void convertsUpstreamCalloutShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-callout-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("shape-callout.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: shape-callout-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: shape-callout"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `wedgeRoundRectCallout`"));
+    assertTrue(markdown.contains("- `a:t#text`: `角四角`"));
+  }
+
+  @Test
   void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");

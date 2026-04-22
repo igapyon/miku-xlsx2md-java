@@ -475,8 +475,12 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFlowchartShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBlockArrowShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample11FixtureIntoGridHeavyMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample12FixtureIntoTwoSectionGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample13FixtureIntoDenseMultiTableMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample14FixtureIntoSparseMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample15FixtureIntoMergedGridMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample16FixtureIntoMultiValueMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamGridLayoutFixtureIntoWideGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample02IntoImageAndChartMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamWeirdSheetNameFixtureIntoSanitizedMarkdownFileWhenAvailable`
@@ -485,8 +489,12 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
@@ -517,6 +525,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamImageFixtureSample02WhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
@@ -529,6 +538,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
@@ -550,6 +560,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample02WhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
@@ -563,6 +574,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
