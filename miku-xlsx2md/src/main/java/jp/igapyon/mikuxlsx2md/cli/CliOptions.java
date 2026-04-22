@@ -8,13 +8,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
+import jp.igapyon.mikuxlsx2md.textencoding.TextEncoding;
+
 final class CliOptions {
   private static final String[] SHAPE_DETAILS_MODES = {"include", "exclude"};
-  private static final String[] ENCODINGS = {"utf-8", "shift_jis", "utf-16le", "utf-16be", "utf-32le", "utf-32be"};
-  private static final String[] BOM_MODES = {"off", "on"};
-  private static final String[] OUTPUT_MODES = {"display", "raw", "both"};
-  private static final String[] FORMATTING_MODES = {"plain", "github"};
-  private static final String[] TABLE_DETECTION_MODES = {"balanced", "border"};
 
   private String inputPath;
   private String outPath;
@@ -89,15 +87,16 @@ final class CliOptions {
       } else if ("--output-mode".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
-        options.outputMode = normalizeEnumOption(value, OUTPUT_MODES, "output mode", null);
+        options.outputMode = normalizeEnumOption(value, MarkdownOptions.OUTPUT_MODES.toArray(new String[0]), "output mode", null);
       } else if ("--formatting-mode".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
-        options.formattingMode = normalizeEnumOption(value, FORMATTING_MODES, "formatting mode", null);
+        options.formattingMode = normalizeEnumOption(value, MarkdownOptions.FORMATTING_MODES.toArray(new String[0]), "formatting mode", null);
       } else if ("--table-detection-mode".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
-        options.tableDetectionMode = normalizeEnumOption(value, TABLE_DETECTION_MODES, "table detection mode", aliases);
+        options.tableDetectionMode =
+            normalizeEnumOption(value, MarkdownOptions.TABLE_DETECTION_MODES.toArray(new String[0]), "table detection mode", aliases);
       } else if ("--shape-details".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
@@ -105,11 +104,11 @@ final class CliOptions {
       } else if ("--encoding".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
-        options.encoding = normalizeEnumOption(value, ENCODINGS, "encoding", null);
+        options.encoding = normalizeEnumOption(value, TextEncoding.ENCODINGS.toArray(new String[0]), "encoding", null);
       } else if ("--bom".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
-        options.bom = normalizeEnumOption(value, BOM_MODES, "BOM mode", null);
+        options.bom = normalizeEnumOption(value, TextEncoding.BOM_MODES.toArray(new String[0]), "BOM mode", null);
       } else {
         throw new IllegalArgumentException("Unknown option: " + arg);
       }

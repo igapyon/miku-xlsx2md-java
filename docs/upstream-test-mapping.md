@@ -49,6 +49,35 @@ focused regression:
 - `mvn -Dtest=MarkdownEscapeTest test`
 
 ### upstream test / intent:
+`src/ts/markdown-options.ts` option normalization behavior
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.normalizesModesAndBooleanDefaults`
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.keepsCompatibilityAliasForBorderPriority`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-text-encoding.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncodingTest.encodesUtf8WithoutBomByDefault`
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncodingTest.encodesUtf16LeWithBomWhenRequested`
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncodingTest.encodesUtf32BeWithoutBom`
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncodingTest.encodesShiftJisWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncodingTest.rejectsBomForShiftJis`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=TextEncodingTest test`
+
+### upstream test / intent:
 Node CLI option compatibility and help text shape
 
 java tests:
@@ -62,3 +91,16 @@ fixtures:
 
 focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
+
+### upstream test / intent:
+Maven plugin skeleton option mapping and skip behavior
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.failsFastUntilCoreConversionIsImplemented`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md-maven-plugin -Dtest=MikuXlsx2mdMojoTest test`

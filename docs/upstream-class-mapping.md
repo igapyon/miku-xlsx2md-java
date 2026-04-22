@@ -42,6 +42,30 @@ notes:
 - Java-side extension: value object for literal parts
 
 ### upstream file:
+`src/ts/markdown-options.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions`
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions.ResolvedMarkdownOptions`
+
+notes:
+- facade: static normalization methods plus immutable option holders
+- helper split: none
+- Java-side extension: immutable builders replaced optional object literals
+
+### upstream file:
+`src/ts/text-encoding.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncoding`
+- `jp.igapyon.mikuxlsx2md.textencoding.TextEncoding.MarkdownEncodingOptions`
+
+notes:
+- facade: static encoding helpers
+- helper split: UTF-16 / UTF-32 byte encoders kept in same class
+- Java-side extension: Java runtime charset lookup for `shift_jis`
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -53,10 +77,19 @@ notes:
 - helper split: option parsing isolated in `CliOptions`
 - Java-side extension: current implementation stops after validation because workbook conversion is still pending
 
+### upstream file:
+Maven plugin implementation target for Java distribution
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojo`
+
+notes:
+- facade: Maven goal skeleton
+- helper split: parameter mapping kept inside mojo
+- Java-side extension: plugin currently fails fast until workbook conversion core is implemented
+
 ## Next Candidates
 
-- `src/ts/markdown-options.ts`
-- `src/ts/text-encoding.ts`
 - `src/ts/xml-utils.ts`
 - `src/ts/zip-io.ts`
 - `src/ts/shared-strings.ts`
