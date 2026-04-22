@@ -24,7 +24,8 @@ Document version: `2026-04-22`
 
 - CLI / Maven plugin の fixture coverage をさらに広げる
   - xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
-  - 次の候補は shape-flowchart / shape-block-arrow / shape-callout fixture の横展開
+  - shape-flowchart / shape-block-arrow fixture coverage は追加済み
+  - 次の候補は shape-callout fixture の横展開
 - Maven plugin smoke coverage を必要に応じて広げる
 
 ## Restart Memo
@@ -32,6 +33,8 @@ Document version: `2026-04-22`
 - 次回の再開点は `advanced sheet-markdown parity coverage` の続き
 - まず候補にする fixture は `table-basic-sample11` / `table-basic-sample12` / `table-basic-sample14` / `table-basic-sample16` / `shape-callout-sample01`
 - CLI / Maven plugin 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` を優先
+- CLI / Maven plugin 側の `shape-flowchart-sample01` / `shape-block-arrow-sample01` は追加済み
+- 次の横展開候補は `shape-callout-sample01`
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の focused regression をさらに具体 assertion で広げる余地あり
 - 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
 
@@ -101,10 +104,12 @@ Document version: `2026-04-22`
 - CLI に upstream shape fixture を使う `--include-shape-details` alias coverage を追加した
 - CLI に upstream display / named-range / narrative fixture conversion coverage を追加した
 - CLI に upstream xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture conversion coverage を追加した
+- CLI に upstream shape-flowchart / shape-block-arrow fixture conversion coverage を追加した
 - Maven plugin に upstream shape fixture conversion coverage を追加した
 - Maven plugin に upstream table fixture を使う `border-priority` coverage を追加した
 - Maven plugin に upstream display / named-range / narrative fixture conversion coverage を追加した
 - Maven plugin に upstream xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture conversion coverage を追加した
+- Maven plugin に upstream shape-flowchart / shape-block-arrow fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した

@@ -201,6 +201,42 @@ class MikuXlsx2mdMojoTest {
   }
 
   @Test
+  void convertsUpstreamFlowchartShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-flowchart-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("shape-flowchart.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: shape-flowchart-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001 (K3-AB7)"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `flowChartTerminator`"));
+    assertTrue(markdown.contains("![shape_005.svg](assets/shape-flowchart/shape_005.svg)"));
+  }
+
+  @Test
+  void convertsUpstreamBlockArrowShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-block-arrow-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("shape-block-arrow.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: shape-block-arrow-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001 (K3-AA14)"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `rightArrow`"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `quadArrow`"));
+  }
+
+  @Test
   void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
