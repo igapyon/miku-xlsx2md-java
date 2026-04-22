@@ -70,11 +70,14 @@ Document version: `2026-04-22`
 - formula cross-sheet / shared fixture を使う workbook-to-markdown focused regression を追加した
 - formula spill / chart mixed fixture を使う workbook-to-markdown focused regression を追加した
 - rich usecase / merge pattern fixture を使う workbook-to-markdown focused regression を追加した
+- narrative / edge-empty / table border-priority fixture を使う workbook-to-markdown focused regression を追加した
 - CLI を runtime core conversion に接続した
 - Maven plugin を runtime core conversion に接続した
 - CLI / Maven plugin の upstream fixture conversion coverage を追加した
 - CLI に upstream table fixture を使う `border-priority` alias coverage を追加した
+- CLI に upstream shape fixture を使う `--include-shape-details` alias coverage を追加した
 - Maven plugin に upstream shape fixture conversion coverage を追加した
+- Maven plugin に upstream table fixture を使う `border-priority` coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した

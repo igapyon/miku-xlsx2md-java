@@ -94,6 +94,24 @@ class MikuXlsx2mdMojoTest {
     assertTrue(markdown.contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
   }
 
+  @Test
+  void convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("border-priority.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+    mojo.setTableDetectionMode("border-priority");
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: table-border-priority-sample01.xlsx"));
+    assertTrue(markdown.contains("※罫線優先モード確認用"));
+    assertTrue(!markdown.contains("### Table: 001"));
+  }
+
   private static byte[] createWorkbookBytes() {
     return ZipIo.createStoredZip(new ZipIo.ExportEntry[] {
         entry("xl/workbook.xml",
