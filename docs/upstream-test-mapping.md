@@ -227,6 +227,11 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamRichUsecaseFixtureToGithubMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamNarrativeFixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamEdgeEmptyFixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample01FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample02FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample11FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample16FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamGridLayoutFixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamMergePatternFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamFormulaBasicFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamFormulaCrossSheetFixtureWorkbookWhenAvailable`
@@ -245,6 +250,11 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
@@ -447,7 +457,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority table parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / table-basic / grid-layout parity checks.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
@@ -476,11 +486,17 @@ Maven plugin option mapping, skip behavior, and initial conversion I/O
 java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.writesMarkdownThroughCoreConversion`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamDisplayFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamNamedRangeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamNarrativeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamHyperlinkFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable`
 
 fixtures:
+- `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`

@@ -97,9 +97,9 @@ diff summary:
   - Maven plugin は runtime core conversion へ接続済み
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
-  - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / merge pattern / narrative / edge-empty / border-priority fixture coverage subset を追加済み
+  - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / merge pattern / narrative / edge-empty / border-priority / table-basic / grid-layout fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / table-basic / grid-layout cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
@@ -145,12 +145,14 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula cross-sheet / shared fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula spill / chart mixed fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after narrative / edge-empty / border-priority fixture parity coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after table-basic / grid-layout fixture parity coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI table fixture alias coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI shape details alias coverage expansion
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin shape fixture coverage expansion
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin border-priority fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin display / named-range / narrative fixture coverage expansion
   - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
   - `mvn test` pass
   - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
@@ -161,6 +163,11 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
