@@ -100,6 +100,45 @@ class WorksheetParserTest {
   }
 
   @Test
+  void parsesSharedFormulasWithCrossSheetAndAbsoluteReferences() {
+    final WorksheetParser.WorksheetParserDependencies deps = createDeps();
+    final String worksheetXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+        + "<sheetData>"
+        + "<row r=\"1\">"
+        + "<c r=\"C1\"><f t=\"shared\" si=\"2\">A1+Sheet2!B1+'Other Sheet'!$C1+$D$1</f><v>10</v></c>"
+        + "<c r=\"D1\"><f t=\"shared\" si=\"2\"/><v>11</v></c>"
+        + "</row>"
+        + "<row r=\"3\">"
+        + "<c r=\"C3\"><f t=\"shared\" si=\"2\"/><v>12</v></c>"
+        + "<c r=\"D3\"><f t=\"shared\" si=\"2\"/><v>13</v></c>"
+        + "</row>"
+        + "</sheetData>"
+        + "</worksheet>";
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    files.put("xl/worksheets/sheet1.xml", worksheetXml.getBytes(StandardCharsets.UTF_8));
+    final List<StylesParser.CellStyleInfo> cellStyles = Arrays.asList(
+        new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", StylesParser.EMPTY_TEXT_STYLE));
+
+    final WorksheetParser.ParsedSheet sheet = WorksheetParser.parseWorksheet(
+        files,
+        "Sheet1",
+        "xl/worksheets/sheet1.xml",
+        1,
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        cellStyles,
+        deps);
+
+    assertEquals("=A1+Sheet2!B1+'Other Sheet'!$C1+$D$1", findCell(sheet, "C1").getFormulaText());
+    assertEquals("=B1+Sheet2!C1+'Other Sheet'!$C1+$D$1", findCell(sheet, "D1").getFormulaText());
+    assertEquals("=A3+Sheet2!B3+'Other Sheet'!$C3+$D$1", findCell(sheet, "C3").getFormulaText());
+    assertEquals("=B3+Sheet2!C3+'Other Sheet'!$C3+$D$1", findCell(sheet, "D3").getFormulaText());
+    assertEquals("13", findCell(sheet, "D3").getOutputValue());
+    assertEquals(3, sheet.getMaxRow());
+    assertEquals(4, sheet.getMaxCol());
+  }
+
+  @Test
   void parsesWorksheetHyperlinksFromLocalRefsAndExternalRelationships() {
     final WorksheetParser.WorksheetParserDependencies deps = createDeps();
     final String worksheetXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
