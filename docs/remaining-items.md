@@ -50,6 +50,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
   - formula basic / chart basic workbook-to-markdown fixture regression
+  - formula spill / chart mixed workbook-to-markdown fixture regression
   - rich usecase / merge pattern workbook-to-markdown fixture regression
   - image / shape workbook parse fixture regression
   - CLI option vocabulary and initial conversion
@@ -61,7 +62,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
-  - broader worksheet parser formula / chart fixture coverage beyond the basic subset
+  - broader worksheet parser shared / cross-sheet formula fixture coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 
@@ -103,5 +104,5 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 ## Next Unit
 
 - Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
-- Expand worksheet parser formula / chart fixture coverage beyond the basic subset
+- Expand worksheet parser shared / cross-sheet formula fixture coverage beyond the current subset
 - Add broader CLI / Maven plugin fixture coverage beyond the current subset

@@ -226,7 +226,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamRichUsecaseFixtureToGithubMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamMergePatternFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamFormulaBasicFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamFormulaSpillFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamChartBasicFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamChartMixedFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamImageFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamShapeFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamCalloutShapeFixtureWithoutSvgAssetsWhenAvailable`
@@ -238,7 +240,9 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`

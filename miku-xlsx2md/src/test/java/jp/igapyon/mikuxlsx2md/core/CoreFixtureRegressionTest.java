@@ -196,6 +196,30 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void parsesUpstreamFormulaSpillFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-spill-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-spill-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("spill-sample", sheet.getName());
+    assertEquals("1", findCell(sheet.getCells(), "A4").getOutputValue());
+    assertEquals("3", findCell(sheet.getCells(), "A6").getOutputValue());
+    assertEquals("=_xlfn.SEQUENCE(3)", findCell(sheet.getCells(), "C4").getFormulaText());
+    assertEquals("1", findCell(sheet.getCells(), "C4").getOutputValue());
+    assertEquals("resolved", findCell(sheet.getCells(), "C4").getResolutionStatus());
+    assertEquals("2", findCell(sheet.getCells(), "C5").getOutputValue());
+    assertEquals("3", findCell(sheet.getCells(), "C6").getOutputValue());
+    assertEquals("=SUM(_xlfn.ANCHORARRAY(C4))", findCell(sheet.getCells(), "E4").getFormulaText());
+    assertEquals("6", findCell(sheet.getCells(), "E4").getOutputValue());
+    assertEquals(2, files.get(0).getSummary().getFormulaDiagnostics().size());
+    assertTrue(files.get(0).getMarkdown().contains("spill サンプル"));
+    assertTrue(files.get(0).getMarkdown().contains("1 1 6"));
+  }
+
+  @Test
   void parsesUpstreamChartBasicFixtureWorkbookWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("chart", "chart-basic-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -219,6 +243,32 @@ class CoreFixtureRegressionTest {
     assertTrue(files.get(0).getMarkdown().contains("### Chart: 001 (B10)"));
     assertTrue(files.get(0).getMarkdown().contains("- Title: 棒グラフのグラフ"));
     assertTrue(files.get(0).getMarkdown().contains("    - values: 'chart-basic'!$D$4:$D$7"));
+  }
+
+  @Test
+  void parsesUpstreamChartMixedFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("chart", "chart-mixed-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "chart-mixed-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+    final WorksheetParser.ParsedChartAsset chart = sheet.getCharts().get(0);
+
+    assertEquals("chart-mixed", sheet.getName());
+    assertEquals(1, sheet.getCharts().size());
+    assertEquals("B10", chart.getAnchor());
+    assertEquals("棒と折れ線", chart.getTitle());
+    assertEquals("Bar Chart + Line Chart (Combined)", chart.getChartType());
+    assertEquals(3, chart.getSeries().size());
+    assertEquals("利益率", chart.getSeries().get(2).getName());
+    assertEquals("'chart-mixed'!$B$4:$B$8", chart.getSeries().get(2).getCategoriesRef());
+    assertEquals("'chart-mixed'!$E$4:$E$8", chart.getSeries().get(2).getValuesRef());
+    assertEquals("secondary", chart.getSeries().get(2).getAxis());
+    assertEquals(1, files.get(0).getSummary().getCharts());
+    assertTrue(files.get(0).getMarkdown().contains("- Type: Bar Chart + Line Chart (Combined)"));
+    assertTrue(files.get(0).getMarkdown().contains("  - 利益率"));
+    assertTrue(files.get(0).getMarkdown().contains("    - Axis: secondary"));
   }
 
   @Test
