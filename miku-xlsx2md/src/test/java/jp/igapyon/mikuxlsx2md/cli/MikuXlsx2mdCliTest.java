@@ -153,6 +153,32 @@ class MikuXlsx2mdCliTest {
     assertTrue(markdown.contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
   }
 
+  @Test
+  void keepsBorderPriorityAsCompatibilityAliasWhenUsingUpstreamTableFixture() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("border-priority.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--table-detection-mode", "border-priority",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] table-border-priority-sample01.xlsx"));
+    assertTrue(asString(stdout).contains("Table detection mode: border"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: table-border-priority-sample01.xlsx"));
+  }
+
   private static PrintStream asPrintStream(final ByteArrayOutputStream buffer) {
     try {
       return new PrintStream(buffer, true, StandardCharsets.UTF_8.name());

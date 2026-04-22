@@ -77,6 +77,23 @@ class MikuXlsx2mdMojoTest {
     assertTrue(markdown.contains("[Jump to Other](#other)"));
   }
 
+  @Test
+  void convertsUpstreamShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("shape.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: shape-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001"));
+    assertTrue(markdown.contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
+  }
+
   private static byte[] createWorkbookBytes() {
     return ZipIo.createStoredZip(new ZipIo.ExportEntry[] {
         entry("xl/workbook.xml",

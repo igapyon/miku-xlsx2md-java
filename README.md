@@ -62,9 +62,11 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - `WorksheetParserTest` includes shared formula translation coverage with sheet-qualified and absolute references
 - `SheetMarkdownTest` includes GitHub hyperlink rendering coverage that suppresses underline markup on linked cells
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered
+- `SheetMarkdownTest` includes table detection compatibility alias coverage for `border-priority`
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion
+- CLI / Maven plugin fixture coverage includes upstream table alias and shape fixture cases
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
 - Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending
 
