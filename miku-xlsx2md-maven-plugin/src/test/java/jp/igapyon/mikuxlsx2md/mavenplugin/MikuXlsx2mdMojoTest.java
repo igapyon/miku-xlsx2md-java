@@ -95,6 +95,57 @@ class MikuXlsx2mdMojoTest {
   }
 
   @Test
+  void convertsUpstreamDisplayFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("display", "display-format-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("display.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: display-format-sample01.xlsx"));
+    assertTrue(markdown.contains("1,024,768"));
+    assertTrue(markdown.contains("令和8年3月17日"));
+  }
+
+  @Test
+  void convertsUpstreamNamedRangeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("named-range", "named-range-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("named-range.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: named-range-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: Summary"));
+    assertTrue(markdown.contains("| BaseName元 | Base |"));
+  }
+
+  @Test
+  void convertsUpstreamNarrativeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("narrative", "narrative-vs-table-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("narrative.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: narrative-vs-table-sample01.xlsx"));
+    assertTrue(markdown.contains("地の文と表の判定"));
+    assertTrue(markdown.contains("### Table: 001 (B8-F11)"));
+  }
+
+  @Test
   void convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
