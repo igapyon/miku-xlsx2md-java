@@ -12,14 +12,13 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- CLI と Maven plugin の接続先となる core API facade を整える
 - fixture を使う workbook parse 単位の focused regression を追加する
 - markdown export の最小 round-trip を作る
-- workbook loader に worksheet parser を実接続する
+- workbook loader に shared strings / styles / worksheet parser を実接続する
 
 ## Next Queue
 
-- workbook loader に shared strings / styles / worksheet parser を組み込む
+- CLI と Maven plugin の接続先となる core API facade を広げる
 - sheet / workbook artifact 組み立てを進める
 - worksheet parser の coverage を広げる
 - Maven plugin を runtime core に接続する
@@ -39,6 +38,7 @@ Document version: `2026-04-22`
 - `shared-strings.ts` を Java へ移植した
 - `styles-parser.ts` を Java へ移植した
 - `worksheet-parser.ts` の最小範囲を Java へ移植した
+- `core.ts` の最小 facade を Java へ追加した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した
 - `mvn -o test` を通した

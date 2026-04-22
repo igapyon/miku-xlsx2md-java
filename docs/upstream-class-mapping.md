@@ -158,6 +158,17 @@ notes:
 - Java-side extension: current scope is the minimum range covered by upstream unit tests
 
 ### upstream file:
+`src/ts/core.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.core.Core`
+
+notes:
+- facade: minimum public runtime entrypoint
+- helper split: workbook loading delegates to `WorkbookLoader`
+- Java-side extension: current scope exposes only the connected workbook parsing path
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:

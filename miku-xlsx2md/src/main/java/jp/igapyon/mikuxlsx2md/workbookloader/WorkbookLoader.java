@@ -5,16 +5,26 @@
 package jp.igapyon.mikuxlsx2md.workbookloader;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import jp.igapyon.mikuxlsx2md.relsparser.RelsParser;
+import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
+import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
+import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 import jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils;
+import jp.igapyon.mikuxlsx2md.zipio.ZipIo;
 
 public final class WorkbookLoader {
   private WorkbookLoader() {
+  }
+
+  public static ParsedWorkbook parseWorkbook(final byte[] workbookBytes, final String workbookName) {
+    return parseWorkbook(workbookBytes, workbookName, createDefaultDependencies());
   }
 
   public static List<DefinedName> parseDefinedNames(
@@ -55,8 +65,8 @@ public final class WorkbookLoader {
     if (workbookXmlBytes == null) {
       throw new IllegalArgumentException("xl/workbook.xml was not found.");
     }
-    final List<SharedStringEntry> sharedStrings = deps.parseSharedStrings(files);
-    final List<CellStyleInfo> cellStyles = deps.parseCellStyles(files);
+    final List<SharedStrings.SharedStringEntry> sharedStrings = deps.parseSharedStrings(files);
+    final List<StylesParser.CellStyleInfo> cellStyles = deps.parseCellStyles(files);
     final Map<String, String> rels = deps.parseRelationships(files, "xl/_rels/workbook.xml.rels", "xl/workbook.xml");
     final Document workbookDoc = deps.xmlToDocument(deps.decodeXmlText(workbookXmlBytes));
     final List<Element> sheetNodes = XmlUtils.getElementsByLocalName(workbookDoc, "sheet");
@@ -66,7 +76,7 @@ public final class WorkbookLoader {
       sheetNames.add(name == null || name.isEmpty() ? "Sheet" + (index + 1) : name);
     }
     final List<DefinedName> definedNames = parseDefinedNames(workbookDoc, sheetNames);
-    final List<Object> sheets = new ArrayList<Object>();
+    final List<WorksheetParser.ParsedSheet> sheets = new ArrayList<WorksheetParser.ParsedSheet>();
     for (int index = 0; index < sheetNodes.size(); index += 1) {
       final Element sheetNode = sheetNodes.get(index);
       final String name = sheetNode.getAttribute("name") == null || sheetNode.getAttribute("name").isEmpty()
@@ -80,33 +90,140 @@ public final class WorkbookLoader {
     return workbook;
   }
 
+  private static WorkbookLoaderDependencies createDefaultDependencies() {
+    return new WorkbookLoaderDependencies() {
+      @Override
+      public Map<String, byte[]> unzipEntries(final byte[] workbookBytes) {
+        return ZipIo.unzipEntries(workbookBytes);
+      }
+
+      @Override
+      public List<SharedStrings.SharedStringEntry> parseSharedStrings(final Map<String, byte[]> files) {
+        return SharedStrings.parseSharedStrings(files);
+      }
+
+      @Override
+      public List<StylesParser.CellStyleInfo> parseCellStyles(final Map<String, byte[]> files) {
+        return StylesParser.parseCellStyles(files);
+      }
+
+      @Override
+      public Map<String, String> parseRelationships(final Map<String, byte[]> files, final String relsPath, final String sourcePath) {
+        return RelsParser.parseRelationships(files, relsPath, sourcePath);
+      }
+
+      @Override
+      public Document xmlToDocument(final String xmlText) {
+        return XmlUtils.xmlToDocument(xmlText);
+      }
+
+      @Override
+      public String decodeXmlText(final byte[] bytes) {
+        return XmlUtils.decodeXmlText(bytes);
+      }
+
+      @Override
+      public WorksheetParser.ParsedSheet parseWorksheet(
+          final Map<String, byte[]> files,
+          final String sheetName,
+          final String sheetPath,
+          final int sheetIndex,
+          final List<SharedStrings.SharedStringEntry> sharedStrings,
+          final List<StylesParser.CellStyleInfo> cellStyles) {
+        return WorksheetParser.parseWorksheet(files, sheetName, sheetPath, sheetIndex, sharedStrings, cellStyles, createWorksheetParserDependencies());
+      }
+
+      @Override
+      public void postProcessWorkbook(final ParsedWorkbook workbook) {
+      }
+    };
+  }
+
+  private static WorksheetParser.WorksheetParserDependencies createWorksheetParserDependencies() {
+    return new WorksheetParser.WorksheetParserDependencies() {
+      @Override
+      public Document xmlToDocument(final String xmlText) {
+        return XmlUtils.xmlToDocument(xmlText);
+      }
+
+      @Override
+      public String decodeXmlText(final byte[] bytes) {
+        return XmlUtils.decodeXmlText(bytes);
+      }
+
+      @Override
+      public String getTextContent(final Element node) {
+        return XmlUtils.getTextContent(node);
+      }
+
+      @Override
+      public Map<String, WorksheetParser.RelationshipEntryLike> parseRelationshipEntries(
+          final Map<String, byte[]> files,
+          final String relsPath,
+          final String sourcePath) {
+        final Map<String, WorksheetParser.RelationshipEntryLike> result = new LinkedHashMap<String, WorksheetParser.RelationshipEntryLike>();
+        for (final Map.Entry<String, RelsParser.RelationshipEntry> entry :
+            RelsParser.parseRelationshipEntries(files, relsPath, sourcePath).entrySet()) {
+          final RelsParser.RelationshipEntry relationshipEntry = entry.getValue();
+          result.put(entry.getKey(), new WorksheetParser.RelationshipEntryLike() {
+            @Override
+            public String getTarget() {
+              return relationshipEntry.getTarget();
+            }
+
+            @Override
+            public String getTargetMode() {
+              return relationshipEntry.getTargetMode();
+            }
+
+            @Override
+            public String getType() {
+              return relationshipEntry.getType();
+            }
+          });
+        }
+        return result;
+      }
+
+      @Override
+      public String buildRelsPath(final String sourcePath) {
+        return RelsParser.buildRelsPath(sourcePath);
+      }
+
+      @Override
+      public String formatCellDisplayValue(final String rawValue, final StylesParser.CellStyleInfo style) {
+        return null;
+      }
+    };
+  }
+
   public interface WorkbookLoaderDependencies {
     Map<String, byte[]> unzipEntries(byte[] workbookBytes);
-    List<SharedStringEntry> parseSharedStrings(Map<String, byte[]> files);
-    List<CellStyleInfo> parseCellStyles(Map<String, byte[]> files);
+    List<SharedStrings.SharedStringEntry> parseSharedStrings(Map<String, byte[]> files);
+    List<StylesParser.CellStyleInfo> parseCellStyles(Map<String, byte[]> files);
     Map<String, String> parseRelationships(Map<String, byte[]> files, String relsPath, String sourcePath);
     Document xmlToDocument(String xmlText);
     String decodeXmlText(byte[] bytes);
-    Object parseWorksheet(
+    WorksheetParser.ParsedSheet parseWorksheet(
         Map<String, byte[]> files,
         String sheetName,
         String sheetPath,
         int sheetIndex,
-        List<SharedStringEntry> sharedStrings,
-        List<CellStyleInfo> cellStyles);
+        List<SharedStrings.SharedStringEntry> sharedStrings,
+        List<StylesParser.CellStyleInfo> cellStyles);
     void postProcessWorkbook(ParsedWorkbook workbook);
   }
 
   public static final class ParsedWorkbook {
     private final String name;
-    private final List<Object> sheets;
-    private final List<SharedStringEntry> sharedStrings;
+    private final List<WorksheetParser.ParsedSheet> sheets;
+    private final List<SharedStrings.SharedStringEntry> sharedStrings;
     private final List<DefinedName> definedNames;
 
     public ParsedWorkbook(
         final String name,
-        final List<Object> sheets,
-        final List<SharedStringEntry> sharedStrings,
+        final List<WorksheetParser.ParsedSheet> sheets,
+        final List<SharedStrings.SharedStringEntry> sharedStrings,
         final List<DefinedName> definedNames) {
       this.name = name;
       this.sheets = sheets;
@@ -118,11 +235,11 @@ public final class WorkbookLoader {
       return name;
     }
 
-    public List<Object> getSheets() {
+    public List<WorksheetParser.ParsedSheet> getSheets() {
       return sheets;
     }
 
-    public List<SharedStringEntry> getSharedStrings() {
+    public List<SharedStrings.SharedStringEntry> getSharedStrings() {
       return sharedStrings;
     }
 
@@ -171,69 +288,6 @@ public final class WorkbookLoader {
     @Override
     public int hashCode() {
       return java.util.Objects.hash(name, formulaText, localSheetName);
-    }
-  }
-
-  public static final class SharedStringEntry {
-    private final String text;
-
-    public SharedStringEntry(final String text) {
-      this.text = text;
-    }
-
-    public String getText() {
-      return text;
-    }
-
-    @Override
-    public boolean equals(final Object other) {
-      if (this == other) {
-        return true;
-      }
-      if (!(other instanceof SharedStringEntry)) {
-        return false;
-      }
-      return java.util.Objects.equals(text, ((SharedStringEntry) other).text);
-    }
-
-    @Override
-    public int hashCode() {
-      return java.util.Objects.hash(text);
-    }
-  }
-
-  public static final class CellStyleInfo {
-    private final int numFmtId;
-    private final String formatCode;
-
-    public CellStyleInfo(final int numFmtId, final String formatCode) {
-      this.numFmtId = numFmtId;
-      this.formatCode = formatCode;
-    }
-
-    public int getNumFmtId() {
-      return numFmtId;
-    }
-
-    public String getFormatCode() {
-      return formatCode;
-    }
-
-    @Override
-    public boolean equals(final Object other) {
-      if (this == other) {
-        return true;
-      }
-      if (!(other instanceof CellStyleInfo)) {
-        return false;
-      }
-      final CellStyleInfo that = (CellStyleInfo) other;
-      return numFmtId == that.numFmtId && java.util.Objects.equals(formatCode, that.formatCode);
-    }
-
-    @Override
-    public int hashCode() {
-      return java.util.Objects.hash(Integer.valueOf(numFmtId), formatCode);
     }
   }
 }

@@ -17,6 +17,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 
+import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
+import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
+import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 import jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils;
 
 class WorkbookLoaderTest {
@@ -61,13 +64,13 @@ class WorkbookLoaderTest {
       }
 
       @Override
-      public List<WorkbookLoader.SharedStringEntry> parseSharedStrings(final Map<String, byte[]> inputFiles) {
-        return Arrays.asList(new WorkbookLoader.SharedStringEntry("A"));
+      public List<SharedStrings.SharedStringEntry> parseSharedStrings(final Map<String, byte[]> inputFiles) {
+        return Arrays.asList(new SharedStrings.SharedStringEntry("A", null));
       }
 
       @Override
-      public List<WorkbookLoader.CellStyleInfo> parseCellStyles(final Map<String, byte[]> inputFiles) {
-        return Arrays.asList(new WorkbookLoader.CellStyleInfo(0, "General"));
+      public List<StylesParser.CellStyleInfo> parseCellStyles(final Map<String, byte[]> inputFiles) {
+        return Arrays.asList(new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", StylesParser.EMPTY_TEXT_STYLE));
       }
 
       @Override
@@ -89,15 +92,15 @@ class WorkbookLoaderTest {
       }
 
       @Override
-      public Object parseWorksheet(
+      public WorksheetParser.ParsedSheet parseWorksheet(
           final Map<String, byte[]> inputFiles,
           final String sheetName,
           final String sheetPath,
           final int sheetIndex,
-          final List<WorkbookLoader.SharedStringEntry> sharedStrings,
-          final List<WorkbookLoader.CellStyleInfo> cellStyles) {
+          final List<SharedStrings.SharedStringEntry> sharedStrings,
+          final List<StylesParser.CellStyleInfo> cellStyles) {
         seen.add(sheetName + "|" + sheetPath + "|" + sheetIndex);
-        return sheetName;
+        return new WorksheetParser.ParsedSheet(sheetName, sheetIndex, sheetPath, new ArrayList<WorksheetParser.ParsedCell>(), new ArrayList<jp.igapyon.mikuxlsx2md.addressutils.AddressUtils.MergeRange>(), 0, 0);
       }
 
       @Override
@@ -107,7 +110,7 @@ class WorkbookLoaderTest {
     });
 
     assertEquals("book.xlsx", workbook.getName());
-    assertEquals(Arrays.asList(new WorkbookLoader.SharedStringEntry("A")), workbook.getSharedStrings());
+    assertEquals(Arrays.asList(new SharedStrings.SharedStringEntry("A", null)), workbook.getSharedStrings());
     assertEquals(2, workbook.getSheets().size());
     assertEquals(Arrays.asList(
         "First|xl/worksheets/sheet1.xml|1",
@@ -126,13 +129,13 @@ class WorkbookLoaderTest {
           }
 
           @Override
-          public List<WorkbookLoader.SharedStringEntry> parseSharedStrings(final Map<String, byte[]> files) {
-            return new ArrayList<WorkbookLoader.SharedStringEntry>();
+          public List<SharedStrings.SharedStringEntry> parseSharedStrings(final Map<String, byte[]> files) {
+            return new ArrayList<SharedStrings.SharedStringEntry>();
           }
 
           @Override
-          public List<WorkbookLoader.CellStyleInfo> parseCellStyles(final Map<String, byte[]> files) {
-            return new ArrayList<WorkbookLoader.CellStyleInfo>();
+          public List<StylesParser.CellStyleInfo> parseCellStyles(final Map<String, byte[]> files) {
+            return new ArrayList<StylesParser.CellStyleInfo>();
           }
 
           @Override
@@ -151,14 +154,14 @@ class WorkbookLoaderTest {
           }
 
           @Override
-          public Object parseWorksheet(
+          public WorksheetParser.ParsedSheet parseWorksheet(
               final Map<String, byte[]> files,
               final String sheetName,
               final String sheetPath,
               final int sheetIndex,
-              final List<WorkbookLoader.SharedStringEntry> sharedStrings,
-              final List<WorkbookLoader.CellStyleInfo> cellStyles) {
-            return new Object();
+              final List<SharedStrings.SharedStringEntry> sharedStrings,
+              final List<StylesParser.CellStyleInfo> cellStyles) {
+            return new WorksheetParser.ParsedSheet(sheetName, sheetIndex, sheetPath, new ArrayList<WorksheetParser.ParsedCell>(), new ArrayList<jp.igapyon.mikuxlsx2md.addressutils.AddressUtils.MergeRange>(), 0, 0);
           }
 
           @Override
