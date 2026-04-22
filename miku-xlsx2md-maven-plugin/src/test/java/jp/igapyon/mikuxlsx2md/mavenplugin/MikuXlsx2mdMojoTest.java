@@ -163,6 +163,60 @@ class MikuXlsx2mdMojoTest {
     assertTrue(!markdown.contains("### Table: 001"));
   }
 
+  @Test
+  void convertsUpstreamBasicFixtureInBothModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("", "xlsx2md-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("xlsx2md-basic-both.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+    mojo.setOutputMode("both");
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: xlsx2md-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("### Table: 004 (B33-F46)"));
+    assertTrue(markdown.contains("1 0 2 3 4 5 6 [raw=1023456]"));
+    assertTrue(markdown.contains("令和8年3月17日 [raw=46098]"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample02WhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample02.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("image-basic-sample02.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: image-basic-sample02.xlsx"));
+    assertTrue(markdown.contains("| 2024年 | 13,568 | 9,072 |"));
+    assertTrue(markdown.contains("### Chart: 001 (B9)"));
+    assertTrue(markdown.contains("### Image: 001 (H3)"));
+  }
+
+  @Test
+  void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("edge-weird-sheetname.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: edge-weird-sheetname-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: A B-東京&大阪.01"));
+    assertTrue(markdown.contains("| 3 | 登録日 | 3月13日 | 何かの登録日 |"));
+  }
+
   private static byte[] createWorkbookBytes() {
     return ZipIo.createStoredZip(new ZipIo.ExportEntry[] {
         entry("xl/workbook.xml",
@@ -200,10 +254,14 @@ class MikuXlsx2mdMojoTest {
   }
 
   private static Path resolveFixturePath(final String group, final String fileName) {
-    final Path local = Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    final Path local = group.isEmpty()
+        ? Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", fileName)
+        : Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
     if (Files.isRegularFile(local)) {
       return local;
     }
-    return Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    return group.isEmpty()
+        ? Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", fileName)
+        : Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
   }
 }

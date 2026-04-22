@@ -456,6 +456,103 @@ class SheetMarkdownTest {
     assertFalse(file.getMarkdown().contains("### Chart:"));
   }
 
+  @Test
+  void convertsUpstreamTableBasicSample13FixtureIntoDenseMultiTableMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample13.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample13.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("table-basic-sample13_001_table-basic.md", file.getFileName());
+    assertEquals(4, file.getSummary().getTables());
+    assertTrue(file.getMarkdown().contains("## Sheet: table-basic"));
+    assertTrue(file.getMarkdown().contains("### Table: 001 (B3-T7)"));
+    assertTrue(file.getMarkdown().contains("### Table: 004 (V10-AN14)"));
+    assertTrue(file.getMarkdown().contains("| 2 | 名前 | name | Sabro | 何かの名前 |"));
+    assertTrue(file.getMarkdown().contains("| 2 | 名前 | name | Jiro | 何かの名前 |"));
+    assertFalse(file.getMarkdown().contains("### Table: 005"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicSample15FixtureIntoMergedGridMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample15.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample15.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("table-basic-sample15_001_table-basic.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(19, file.getSummary().getMerges());
+    assertTrue(file.getMarkdown().contains("### Table: 001 (B3-T7)"));
+    assertTrue(file.getMarkdown().contains("| 3 | 登録日 | entrydate | 3月13日 | 登録および更新日 |"));
+    assertTrue(file.getMarkdown().contains("| 4 | 更新日 | updatedate | 3月14日 | [↑M↑] |"));
+    assertTrue(file.getMarkdown().contains("※方眼紙＋結合＋さらに縦結合"));
+  }
+
+  @Test
+  void convertsUpstreamGridLayoutFixtureIntoWideGridMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "grid-layout-sample-01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "grid-layout-sample-01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("grid-layout-sample-01_001_grid-layout.md", file.getFileName());
+    assertEquals(2, file.getSummary().getTables());
+    assertEquals(70, file.getSummary().getMerges());
+    assertTrue(file.getMarkdown().contains("## Sheet: grid-layout"));
+    assertTrue(file.getMarkdown().contains("### Table: 001 (B2-U6)"));
+    assertTrue(file.getMarkdown().contains("### Table: 002 (C8-V16)"));
+    assertTrue(file.getMarkdown().contains("| 8 | 更新日 | updatedate |  | システムへの更新日 |"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample02IntoImageAndChartMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample02.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "image-basic-sample02.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("image-basic-sample02_001_image.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(1, file.getSummary().getImages());
+    assertEquals(1, file.getSummary().getCharts());
+    assertTrue(file.getMarkdown().contains("## Sheet: image"));
+    assertTrue(file.getMarkdown().contains("| 2024年 | 13,568 | 9,072 |"));
+    assertTrue(file.getMarkdown().contains("### Chart: 001 (B9)"));
+    assertTrue(file.getMarkdown().contains("- Type: Line Chart"));
+    assertTrue(file.getMarkdown().contains("### Image: 001 (H3)"));
+  }
+
+  @Test
+  void convertsUpstreamWeirdSheetNameFixtureIntoSanitizedMarkdownFileWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "edge-weird-sheetname-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("edge-weird-sheetname-sample01_001_A_B-東京_大阪.01.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertTrue(file.getMarkdown().contains("## Sheet: A B-東京&大阪.01"));
+    assertTrue(file.getMarkdown().contains("### Table: 001 (A1-D4)"));
+    assertTrue(file.getMarkdown().contains("| 1 | コード | 101 | 何かのコード |"));
+    assertTrue(file.getMarkdown().contains("| 3 | 登録日 | 3月13日 | 何かの登録日 |"));
+  }
+
   private static WorkbookLoader.ParsedWorkbook workbook(final WorksheetParser.ParsedSheet sheet) {
     return new WorkbookLoader.ParsedWorkbook(
         "book.xlsx",
