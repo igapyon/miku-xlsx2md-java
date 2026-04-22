@@ -226,6 +226,24 @@ notes:
 - Java-side extension: currently kept as an independent helper module and not yet connected into sheet-to-markdown conversion
 
 ### upstream file:
+`src/ts/sheet-markdown.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.TableCandidate`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.NarrativeRowSegment`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.NarrativeItem`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.NarrativeBlock`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.SheetRenderState`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdown.ContentSection`
+
+notes:
+- facade: static sheet / workbook markdown conversion helpers
+- helper split: current Java minimum keeps narrative rendering, simple table candidate detection, hyperlink formatting, and asset section rendering inside the same class
+- Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
+- remaining parity gap: upstream advanced table detector / rich text module split / shape block grouping are not yet fully ported
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -250,4 +268,7 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/sheet-markdown.ts`
+- `src/ts/table-detector.ts`
+- `src/ts/narrative-structure.ts`
+- `src/ts/rich-text-*`
+- `src/ts/sheet-assets.ts`

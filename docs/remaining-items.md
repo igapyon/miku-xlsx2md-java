@@ -4,7 +4,7 @@ Document version: `2026-04-22`
 
 ## Current Position
 
-Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, and markdown export helper functions are straight-converted. The project is not yet able to run end-to-end sheet-to-markdown conversion from the CLI or Maven plugin.
+Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. The project is not yet able to run end-to-end conversion from the CLI or Maven plugin.
 
 ## Status
 
@@ -30,13 +30,16 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `markdown-export` helper layer
   - `cell-format`
   - `worksheet-tables`
+  - `sheet-markdown` minimum conversion layer
+  - core markdown conversion facade
   - CLI option vocabulary skeleton
   - Maven plugin skeleton
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
-  - `sheet-markdown` / workbook-to-markdown conversion pipeline
+  - advanced `sheet-markdown` parity coverage
+  - workbook-to-markdown fixture regression
   - end-to-end CLI conversion
 
 ## Focused Regression
@@ -59,6 +62,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 - `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
+- `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
 - `mvn -pl miku-xlsx2md-maven-plugin -Dtest=MikuXlsx2mdMojoTest test`
 
@@ -68,6 +72,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Port `sheet-markdown.ts`
-- Connect markdown export helpers to the runtime core facade once workbook-to-markdown conversion becomes available
+- Add workbook-to-markdown fixture regression through the runtime core facade
+- Connect CLI to runtime core conversion
 - Connect Maven plugin to runtime core API once workbook conversion becomes available

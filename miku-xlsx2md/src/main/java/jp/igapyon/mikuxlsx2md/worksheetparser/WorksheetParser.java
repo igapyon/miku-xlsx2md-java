@@ -572,8 +572,48 @@ public final class WorksheetParser {
       return outputValue;
     }
 
+    public String getRawValue() {
+      return rawValue;
+    }
+
+    public String getValueType() {
+      return valueType;
+    }
+
     public String getFormulaText() {
       return formulaText;
+    }
+
+    public String getResolutionStatus() {
+      return resolutionStatus;
+    }
+
+    public String getResolutionSource() {
+      return resolutionSource;
+    }
+
+    public int getStyleIndex() {
+      return styleIndex;
+    }
+
+    public StylesParser.BorderFlags getBorders() {
+      return borders;
+    }
+
+    public int getNumFmtId() {
+      return numFmtId;
+    }
+
+    public String getFormatCode() {
+      return formatCode;
+    }
+
+    public StylesParser.TextStyle getTextStyle() {
+      return textStyle;
+    }
+
+    public List<SharedStrings.RichTextRun> getRichTextRuns() {
+      return richTextRuns;
     }
 
     public Hyperlink getHyperlink() {
@@ -587,6 +627,9 @@ public final class WorksheetParser {
     private final String path;
     private final List<ParsedCell> cells;
     private final List<AddressUtils.MergeRange> merges;
+    private final List<ParsedImageAsset> images;
+    private final List<ParsedChartAsset> charts;
+    private final List<ParsedShapeAsset> shapes;
     private final int maxRow;
     private final int maxCol;
 
@@ -598,11 +641,28 @@ public final class WorksheetParser {
         final List<AddressUtils.MergeRange> merges,
         final int maxRow,
         final int maxCol) {
+      this(name, index, path, cells, merges, new ArrayList<ParsedImageAsset>(), new ArrayList<ParsedChartAsset>(), new ArrayList<ParsedShapeAsset>(), maxRow, maxCol);
+    }
+
+    public ParsedSheet(
+        final String name,
+        final int index,
+        final String path,
+        final List<ParsedCell> cells,
+        final List<AddressUtils.MergeRange> merges,
+        final List<ParsedImageAsset> images,
+        final List<ParsedChartAsset> charts,
+        final List<ParsedShapeAsset> shapes,
+        final int maxRow,
+        final int maxCol) {
       this.name = name;
       this.index = index;
       this.path = path;
       this.cells = cells;
       this.merges = merges;
+      this.images = images;
+      this.charts = charts;
+      this.shapes = shapes;
       this.maxRow = maxRow;
       this.maxCol = maxCol;
     }
@@ -627,12 +687,173 @@ public final class WorksheetParser {
       return merges;
     }
 
+    public List<ParsedImageAsset> getImages() {
+      return images;
+    }
+
+    public List<ParsedChartAsset> getCharts() {
+      return charts;
+    }
+
+    public List<ParsedShapeAsset> getShapes() {
+      return shapes;
+    }
+
     public int getMaxRow() {
       return maxRow;
     }
 
     public int getMaxCol() {
       return maxCol;
+    }
+  }
+
+  public static final class ParsedImageAsset {
+    private final String anchor;
+    private final String filename;
+    private final String path;
+    private final byte[] data;
+
+    public ParsedImageAsset(final String anchor, final String filename, final String path, final byte[] data) {
+      this.anchor = anchor;
+      this.filename = filename;
+      this.path = path;
+      this.data = data;
+    }
+
+    public String getAnchor() {
+      return anchor;
+    }
+
+    public String getFilename() {
+      return filename;
+    }
+
+    public String getPath() {
+      return path;
+    }
+
+    public byte[] getData() {
+      return data;
+    }
+  }
+
+  public static final class ParsedChartSeries {
+    private final String name;
+    private final String categoriesRef;
+    private final String valuesRef;
+    private final String axis;
+
+    public ParsedChartSeries(final String name, final String categoriesRef, final String valuesRef, final String axis) {
+      this.name = name;
+      this.categoriesRef = categoriesRef;
+      this.valuesRef = valuesRef;
+      this.axis = axis;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getCategoriesRef() {
+      return categoriesRef;
+    }
+
+    public String getValuesRef() {
+      return valuesRef;
+    }
+
+    public String getAxis() {
+      return axis;
+    }
+  }
+
+  public static final class ParsedChartAsset {
+    private final String anchor;
+    private final String title;
+    private final String chartType;
+    private final List<ParsedChartSeries> series;
+
+    public ParsedChartAsset(final String anchor, final String title, final String chartType, final List<ParsedChartSeries> series) {
+      this.anchor = anchor;
+      this.title = title;
+      this.chartType = chartType;
+      this.series = series;
+    }
+
+    public String getAnchor() {
+      return anchor;
+    }
+
+    public String getTitle() {
+      return title;
+    }
+
+    public String getChartType() {
+      return chartType;
+    }
+
+    public List<ParsedChartSeries> getSeries() {
+      return series;
+    }
+  }
+
+  public static final class ParsedShapeRawEntry {
+    private final String key;
+    private final String value;
+
+    public ParsedShapeRawEntry(final String key, final String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    public String getKey() {
+      return key;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
+
+  public static final class ParsedShapeAsset {
+    private final String anchor;
+    private final List<ParsedShapeRawEntry> rawEntries;
+    private final String svgFilename;
+    private final String svgPath;
+    private final byte[] svgData;
+
+    public ParsedShapeAsset(
+        final String anchor,
+        final List<ParsedShapeRawEntry> rawEntries,
+        final String svgFilename,
+        final String svgPath,
+        final byte[] svgData) {
+      this.anchor = anchor;
+      this.rawEntries = rawEntries;
+      this.svgFilename = svgFilename;
+      this.svgPath = svgPath;
+      this.svgData = svgData;
+    }
+
+    public String getAnchor() {
+      return anchor;
+    }
+
+    public List<ParsedShapeRawEntry> getRawEntries() {
+      return rawEntries;
+    }
+
+    public String getSvgFilename() {
+      return svgFilename;
+    }
+
+    public String getSvgPath() {
+      return svgPath;
+    }
+
+    public byte[] getSvgData() {
+      return svgData;
     }
   }
 }

@@ -38,11 +38,13 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `cell-format.ts`
 - Worksheet table metadata helper is implemented:
   - `worksheet-tables.ts`
+- Initial sheet-to-markdown conversion layer is implemented:
+  - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
 - Java CLI skeleton is implemented with Node-compatible option vocabulary
 - Maven plugin skeleton is implemented
-- Sheet-to-markdown conversion pipeline and end-to-end CLI / Maven plugin conversion are still pending
+- End-to-end CLI / Maven plugin conversion wiring is still pending
 
 ## Build
 
