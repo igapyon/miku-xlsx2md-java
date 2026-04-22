@@ -399,6 +399,12 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.formatsHyperlinksRawAndBothModes`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsWorkbookThroughCoreFacadeShape`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetWithShapeBlocks`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.createsEmptyBodyFallbackSummary`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesPlainAndGithubLineBreakDifferences`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsMarkdownMarkersLiteralInNarrativeOutput`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.rendersExternalAndWorkbookHyperlinksAsMarkdownLinks`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode`
 
 fixtures:
 - none
@@ -407,8 +413,8 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path and shape block rendering connection.
-- Upstream calendar grouping cases remain follow-up coverage.
+- Current Java coverage includes the core facade path, shape block rendering connection, calendar narrative grouping, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, and hyperlink output modes.
+- More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
 Node CLI option compatibility, help text shape, and initial conversion I/O
