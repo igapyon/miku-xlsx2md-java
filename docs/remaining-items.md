@@ -52,8 +52,9 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - formula basic / chart basic workbook-to-markdown fixture regression
   - formula cross-sheet / shared workbook-to-markdown fixture regression
   - formula spill / chart mixed workbook-to-markdown fixture regression
-  - rich usecase / merge pattern workbook-to-markdown fixture regression
-  - image / shape workbook parse fixture regression
+  - rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline workbook-to-markdown fixture regression
+  - image fixture regression now includes `image-basic-sample02`
+  - edge fixture regression now includes weird sheet name filename sanitization coverage
   - CLI option vocabulary and initial conversion
   - Maven plugin initial conversion
   - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative

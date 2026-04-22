@@ -57,9 +57,9 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
 - Focused workbook fixture regression includes upstream formula and chart fixtures, including cross-sheet, shared, spill, and mixed chart cases
-- Focused workbook fixture regression includes upstream rich text and merge fixtures
-- Focused workbook fixture regression includes upstream image and shape fixtures
-- Focused workbook fixture regression includes upstream narrative, edge-empty, table border-priority, full table-basic parity subset, and grid-layout parity cases
+- Focused workbook fixture regression includes upstream rich text and merge fixtures, including `rich-text-github`, `rich-markdown-escape`, and `merge-multiline`
+- Focused workbook fixture regression includes upstream image and shape fixtures, including `image-basic-sample02`
+- Focused workbook fixture regression includes upstream narrative, edge-empty, weird-sheetname, table border-priority, full table-basic parity subset, and grid-layout parity cases
 - `WorksheetParserTest` includes shared formula translation coverage with sheet-qualified and absolute references
 - `SheetMarkdownTest` includes GitHub hyperlink rendering coverage that suppresses underline markup on linked cells
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered

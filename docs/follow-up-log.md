@@ -97,7 +97,7 @@ diff summary:
   - Maven plugin は runtime core conversion へ接続済み
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
-  - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / merge pattern / narrative / edge-empty / border-priority / table-basic / grid-layout fixture coverage subset を追加済み
+  - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline / narrative / edge-empty / edge-weird-sheetname / border-priority / table-basic / grid-layout / image-basic-sample02 fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
   - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
@@ -159,12 +159,14 @@ follow-up:
   - `mvn test` pass
   - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after sheet-markdown / worksheet parser coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich-text / merge-multiline / weird-sheetname / image-basic-sample02 fixture coverage expansion
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
@@ -175,6 +177,8 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-text-github-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
@@ -182,8 +186,10 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
