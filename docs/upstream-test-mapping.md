@@ -257,6 +257,39 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-border-grid.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.bordergrid.BorderGridTest.returnsFalseWhenNeitherAdjacentCellOwnsTheQueriedEdge`
+- `jp.igapyon.mikuxlsx2md.bordergrid.BorderGridTest.normalizesBordersFromAdjacentCells`
+- `jp.igapyon.mikuxlsx2md.bordergrid.BorderGridTest.collectsRowStatsWithNormalizedAndRawBorderCountsSeparately`
+- `jp.igapyon.mikuxlsx2md.bordergrid.BorderGridTest.countsNormalizedBorderedCellsAcrossACandidateRange`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=BorderGridTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-table-detector.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.collectsSeedCellsFromValuesOrBorders`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.trimsBorderedTableBeforeFollowingBorderlessNoteRow`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.normalizesCandidateMatricesWithMergeTokensAndEmptyTrimming`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.detectsBorderedDenseGridAsTableCandidate`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.prunesRedundantAndCalendarLikeCandidates`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.borderModeExcludesDenseBorderlessBlocksButKeepsBorderedTables`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.doesNotTreatMergeHeavyFormBlocksAsTables`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=TableDetectorTest test`
+
+### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
 
 java tests:
@@ -334,7 +367,7 @@ focused regression:
 
 notes:
 - Current Java coverage is a minimum conversion regression for the new facade.
-- Upstream advanced table detection, calendar grouping, and asset grouping cases remain follow-up coverage.
+- Upstream calendar grouping and asset grouping cases remain follow-up coverage.
 
 ### upstream test / intent:
 Node CLI option compatibility, help text shape, and initial conversion I/O

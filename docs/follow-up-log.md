@@ -23,6 +23,8 @@ upstream file:
 - `src/ts/cell-format.ts`
 - `src/ts/worksheet-tables.ts`
 - `src/ts/narrative-structure.ts`
+- `src/ts/border-grid.ts`
+- `src/ts/table-detector.ts`
 - `src/ts/rich-text-parser.ts`
 - `src/ts/rich-text-plain-formatter.ts`
 - `src/ts/rich-text-github-formatter.ts`
@@ -49,6 +51,8 @@ java classes:
 - `CellFormat`
 - `WorksheetTables`
 - `NarrativeStructure`
+- `BorderGrid`
+- `TableDetector`
 - `RichTextRenderer`
 - `SheetMarkdown`
 - `CliOptions`
@@ -74,6 +78,8 @@ tests:
 - `CellFormatTest`
 - `WorksheetTablesTest`
 - `NarrativeStructureTest`
+- `BorderGridTest`
+- `TableDetectorTest`
 - `RichTextRendererTest`
 - `SheetMarkdownTest`
 - `MikuXlsx2mdCliTest`
@@ -83,7 +89,8 @@ diff summary:
 - 挙動差分:
   - CLI は option validation / help / initial workbook conversion を実装
   - Maven plugin は runtime core conversion へ接続済み
-  - `sheet-markdown` は最小変換導線を実装し、advanced table detector / sheet assets / shape block grouping は未移植
+  - `sheet-markdown` は最小変換導線を実装し、sheet assets / shape block grouping は未移植
+  - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
@@ -103,6 +110,7 @@ follow-up:
   - Java 17 + Maven 3.9 on source/target 1.8
   - `mvn -o test` pass
   - `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest,SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=BorderGridTest,TableDetectorTest,SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
@@ -115,5 +123,5 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - 次回の確認観点:
   - advanced `sheet-markdown` parity coverage を広げる
-  - table detector / sheet assets helper の分割移植を検討する
+  - sheet assets helper の分割移植を検討する
   - CLI / Maven plugin の fixture coverage を広げる

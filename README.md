@@ -40,6 +40,9 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `worksheet-tables.ts`
 - Narrative structure helper is implemented:
   - `narrative-structure.ts`
+- Table detection helper layer is implemented:
+  - `border-grid.ts`
+  - `table-detector.ts`
 - Rich text rendering helper layer is implemented:
   - `rich-text-parser.ts`
   - `rich-text-plain-formatter.ts`
