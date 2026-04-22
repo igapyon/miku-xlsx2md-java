@@ -144,6 +144,29 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void keepsBlankLineBetweenShapeItemsWhenSvgOutputIsPresent() {
+    final List<WorksheetParser.ParsedShapeAsset> shapes = Arrays.asList(
+        shapeWithSvg("H3", "shape_001.svg", "assets/Shapes/shape_001.svg"),
+        shapeWithSvg("K3", "shape_002.svg", "assets/Shapes/shape_002.svg"));
+    final WorksheetParser.ParsedSheet sheet = new WorksheetParser.ParsedSheet(
+        "Shapes",
+        1,
+        "xl/worksheets/sheet1.xml",
+        Collections.<WorksheetParser.ParsedCell>emptyList(),
+        Collections.<AddressUtils.MergeRange>emptyList(),
+        Collections.<WorksheetParser.ParsedImageAsset>emptyList(),
+        Collections.<WorksheetParser.ParsedChartAsset>emptyList(),
+        shapes,
+        10,
+        11);
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertTrue(file.getMarkdown().contains("![shape_001.svg](assets/Shapes/shape_001.svg)\n\n#### Shape: 002 (K3)"));
+  }
+
+  @Test
   void keepsNearbyCalendarRowsInOneNarrativeBlock() {
     final WorksheetParser.ParsedSheet sheet = sheet("Calendar", Arrays.asList(
         cell("A1", 1, 1, "2021-01-03"),
@@ -396,5 +419,22 @@ class SheetMarkdownTest {
         "xdr:sp",
         "xdr:twoCellAnchor",
         bbox);
+  }
+
+  private static WorksheetParser.ParsedShapeAsset shapeWithSvg(final String anchor, final String svgFilename, final String svgPath) {
+    return new WorksheetParser.ParsedShapeAsset(
+        anchor,
+        Arrays.asList(new WorksheetParser.ParsedShapeRawEntry("kind", "rect")),
+        svgFilename,
+        svgPath,
+        "<svg/>".getBytes(java.nio.charset.StandardCharsets.UTF_8),
+        "Shape",
+        "Rectangle",
+        "",
+        null,
+        null,
+        "xdr:sp",
+        "xdr:twoCellAnchor",
+        new SheetAssets.BoundingBox(0, 0, 100, 20));
   }
 }
