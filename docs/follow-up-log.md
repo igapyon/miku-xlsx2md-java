@@ -99,7 +99,7 @@ diff summary:
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
   - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / merge pattern fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
@@ -134,6 +134,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after advanced sheet-markdown parity coverage subset expansion
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown hyperlink underline suppression coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown shape item spacing coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown table detection alias coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser richTextRuns / formula metadata coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser shared formula translation coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
@@ -144,7 +145,9 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula cross-sheet / shared fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula spill / chart mixed fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI table fixture alias coverage expansion
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin shape fixture coverage expansion
   - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
   - `mvn test` pass
   - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
@@ -164,6 +167,7 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - 次回の確認観点:
   - advanced `sheet-markdown` fixture parity coverage をさらに広げる
   - worksheet parser shared / cross-sheet formula fixture coverage を current focused regression からさらに広げる

@@ -240,6 +240,17 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void normalizesTableDetectionCompatibilityAliasInCoreConversion() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Alias", Collections.<WorksheetParser.ParsedCell>emptyList());
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, null, null, "border-priority"));
+
+    assertEquals("border", file.getSummary().getTableDetectionMode());
+  }
+
+  @Test
   void preservesPlainAndGithubLineBreakDifferences() {
     final WorksheetParser.ParsedSheet sheet = sheet("Lines", Arrays.asList(cell("A1", 1, 1, "Line1\nLine2")));
     final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);

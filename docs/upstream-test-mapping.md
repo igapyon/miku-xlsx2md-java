@@ -426,6 +426,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.reordersCalendarLikeSectionsWithSidebar`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.createsEmptyBodyFallbackSummary`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.normalizesTableDetectionCompatibilityAliasInCoreConversion`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesPlainAndGithubLineBreakDifferences`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsMarkdownMarkersLiteralInNarrativeOutput`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.rendersExternalAndWorkbookHyperlinksAsMarkdownLinks`
@@ -440,7 +441,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, and SVG-backed shape item spacing.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, and SVG-backed shape item spacing.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
@@ -453,9 +454,11 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsBorderPriorityAsCompatibilityAliasWhenUsingUpstreamTableFixture`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 
 focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
@@ -467,9 +470,11 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.writesMarkdownThroughCoreConversion`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamHyperlinkFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamShapeFixtureWhenAvailable`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
