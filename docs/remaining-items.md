@@ -44,6 +44,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, empty fallback, line breaks, literal escaping, and hyperlink output modes
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -54,7 +55,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - help text compatibility
   - focused regression command layout
 - 保留
-  - advanced `sheet-markdown` parity coverage
+  - advanced `sheet-markdown` parity coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage
   - Maven plugin smoke execution command
 
@@ -94,5 +95,5 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Expand advanced `sheet-markdown` parity coverage
+- Expand advanced `sheet-markdown` parity coverage beyond the current subset
 - Add broader CLI / Maven plugin fixture coverage

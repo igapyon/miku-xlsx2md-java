@@ -5,6 +5,7 @@
 package jp.igapyon.mikuxlsx2md.sheetmarkdown;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -113,6 +114,129 @@ class SheetMarkdownTest {
     assertTrue(file.getMarkdown().contains("- Shapes: Shape 001"));
     assertTrue(file.getMarkdown().contains("#### Shape: 001 (B3)"));
     assertTrue(file.getMarkdown().contains("#### Shape: 002 (E8)"));
+  }
+
+  @Test
+  void keepsNearbyCalendarRowsInOneNarrativeBlock() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Calendar", Arrays.asList(
+        cell("A1", 1, 1, "2021-01-03"),
+        cell("B1", 1, 2, "2021-01-04"),
+        cell("C1", 1, 3, "2021-01-05"),
+        cell("D1", 1, 4, "2021-01-06"),
+        cell("E1", 1, 5, "2021-01-07"),
+        cell("F1", 1, 6, "2021-01-08"),
+        cell("G1", 1, 7, "2021-01-09"),
+        cell("J2", 2, 10, "仕事"),
+        cell("K2", 2, 11, "私用")));
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final List<SheetMarkdown.NarrativeBlock> blocks = SheetMarkdown.extractNarrativeBlocks(
+        workbook,
+        sheet,
+        Collections.<SheetMarkdown.TableCandidate>emptyList(),
+        new MarkdownOptions());
+
+    assertEquals(1, blocks.size());
+    assertEquals(Arrays.asList(
+        "2021-01-03 2021-01-04 2021-01-05 2021-01-06 2021-01-07 2021-01-08 2021-01-09",
+        "仕事 私用"), blocks.get(0).getLines());
+  }
+
+  @Test
+  void createsEmptyBodyFallbackSummary() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Empty", Collections.<WorksheetParser.ParsedCell>emptyList());
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final SheetMarkdown.SheetRenderState state = SheetMarkdown.collectSheetRenderState(workbook, sheet, new MarkdownOptions());
+    final String markdown = SheetMarkdown.createSheetMarkdownText(workbook, sheet, state);
+    final MarkdownExport.MarkdownSummary summary = SheetMarkdown.createSheetSummary(sheet, state);
+
+    assertEquals("", state.getBody());
+    assertTrue(markdown.contains("_No extractable body content was found._"));
+    assertEquals(0, summary.getSections());
+    assertEquals(0, summary.getTables());
+    assertEquals(0, summary.getNarrativeBlocks());
+  }
+
+  @Test
+  void preservesPlainAndGithubLineBreakDifferences() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Lines", Arrays.asList(cell("A1", 1, 1, "Line1\nLine2")));
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile plain = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+    final MarkdownExport.MarkdownFile github = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+
+    assertTrue(plain.getMarkdown().contains("Line1 Line2"));
+    assertTrue(github.getMarkdown().contains("Line1<br>Line2"));
+  }
+
+  @Test
+  void keepsMarkdownMarkersLiteralInNarrativeOutput() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Literal", Arrays.asList(
+        cell("A1", 1, 1, "# heading"),
+        cell("A2", 2, 1, "- item"),
+        cell("A3", 3, 1, "1. item"),
+        cell("A4", 4, 1, "> quote"),
+        cell("A5", 5, 1, "![alt](img.png)"),
+        cell("A6", 6, 1, "`code`"),
+        cell("A7", 7, 1, "+ plus"),
+        cell("A8", 8, 1, "* star"),
+        cell("A9", 9, 1, "a & b")));
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertTrue(file.getMarkdown().contains("\\# heading"));
+    assertTrue(file.getMarkdown().contains("\\- item"));
+    assertTrue(file.getMarkdown().contains("1\\. item"));
+    assertTrue(file.getMarkdown().contains("&gt; quote"));
+    assertTrue(file.getMarkdown().contains("\\!\\[alt\\]\\(img.png\\)"));
+    assertTrue(file.getMarkdown().contains("\\`code\\`"));
+    assertTrue(file.getMarkdown().contains("\\+ plus"));
+    assertTrue(file.getMarkdown().contains("\\* star"));
+    assertTrue(file.getMarkdown().contains("a &amp; b"));
+  }
+
+  @Test
+  void rendersExternalAndWorkbookHyperlinksAsMarkdownLinks() {
+    final WorksheetParser.ParsedSheet source = sheet("Sheet1", Arrays.asList(
+        cell("A1", 1, 1, "Open", "Open", new WorksheetParser.Hyperlink("external", "https://example.com/", "", "", "")),
+        cell("A2", 2, 1, "Jump", "Jump", new WorksheetParser.Hyperlink("internal", "'Other Sheet'!C3", "'Other Sheet'!C3", "", ""))));
+    final WorksheetParser.ParsedSheet target = sheet("Other Sheet", Collections.<WorksheetParser.ParsedCell>emptyList());
+    final WorkbookLoader.ParsedWorkbook workbook = new WorkbookLoader.ParsedWorkbook(
+        "book.xlsx",
+        Arrays.asList(source, target),
+        Collections.<jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings.SharedStringEntry>emptyList(),
+        Collections.<WorkbookLoader.DefinedName>emptyList());
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, source,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+
+    assertTrue(file.getMarkdown().contains("[Open](https://example.com/)"));
+    assertTrue(file.getMarkdown().contains("[Jump](#other-sheet) (Other Sheet!C3)"));
+  }
+
+  @Test
+  void preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode() {
+    final WorksheetParser.ParsedSheet rawSheet = sheet("Raw", Arrays.asList(
+        cell("A1", 1, 1, "Displayed", "https://raw.example/",
+            new WorksheetParser.Hyperlink("external", "https://example.com/", "", "", ""))));
+    final WorkbookLoader.ParsedWorkbook rawWorkbook = workbook(rawSheet);
+    final MarkdownExport.MarkdownFile raw = SheetMarkdown.convertSheetToMarkdown(rawWorkbook, rawSheet,
+        new MarkdownOptions(null, null, null, null, null, "raw", null, null));
+
+    assertTrue(raw.getMarkdown().contains("[https://raw.example/](https://example.com/)"));
+
+    final WorksheetParser.ParsedSheet bothSheet = sheet("Both", Arrays.asList(
+        cell("A1", 1, 1, "Displayed", "RawValue", null),
+        cell("A2", 2, 1, "SameValue", "SameValue", null)));
+    final MarkdownExport.MarkdownFile both = SheetMarkdown.convertSheetToMarkdown(workbook(bothSheet), bothSheet,
+        new MarkdownOptions(null, null, null, null, null, "both", null, null));
+
+    assertTrue(both.getMarkdown().contains("Displayed [raw=RawValue]"));
+    assertTrue(both.getMarkdown().contains("SameValue"));
+    assertFalse(both.getMarkdown().contains("SameValue [raw=SameValue]"));
   }
 
   private static WorkbookLoader.ParsedWorkbook workbook(final WorksheetParser.ParsedSheet sheet) {

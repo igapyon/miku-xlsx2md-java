@@ -12,7 +12,7 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- advanced `sheet-markdown` parity coverage を広げる
+- advanced `sheet-markdown` parity coverage をさらに広げる
 - worksheet parser の coverage を広げる
 
 ## Next Queue
@@ -50,6 +50,7 @@ Document version: `2026-04-22`
 - `sheet-assets.ts` の rendering / shape block grouping 範囲を Java へ移植した
 - `SheetMarkdown` の asset section rendering を `SheetAssets` へ委譲した
 - `SheetMarkdown` の shape block rendering を `SheetAssets` の block helper へ接続した
+- advanced `sheet-markdown` parity coverage に calendar / empty fallback / line break / literal escaping / hyperlink output mode cases を追加した
 - `sheet-assets.ts` の `parseDrawingImages` / `parseDrawingCharts` / `parseDrawingShapes` を Java へ移植した
 - `WorksheetParser` の parsed sheet 生成を sheet assets parse helper へ接続した
 - `office-drawing.ts` の shape SVG rendering helper を Java へ移植した

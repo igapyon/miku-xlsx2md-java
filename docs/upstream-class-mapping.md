@@ -327,7 +327,7 @@ notes:
 - facade: static sheet / workbook markdown conversion helpers
 - helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering and shape block rendering are delegated to `SheetAssets`; hyperlink formatting remains inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
-- remaining parity gap: advanced fixture parity coverage is still pending
+- remaining parity gap: advanced fixture parity coverage beyond the current calendar / empty fallback / line break / literal escaping / hyperlink output mode subset is still pending
 
 ### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
@@ -354,4 +354,4 @@ notes:
 
 ## Next Candidates
 
-- advanced `sheet-markdown` parity coverage
+- advanced `sheet-markdown` parity coverage beyond the current subset
