@@ -196,6 +196,65 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void parsesUpstreamFormulaCrossSheetFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-crosssheet-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-crosssheet-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+    final WorksheetParser.ParsedSheet sheet1 = workbook.getSheets().get(0);
+    final WorksheetParser.ParsedSheet sheet2 = workbook.getSheets().get(1);
+    final WorksheetParser.ParsedSheet sheet3 = workbook.getSheets().get(2);
+
+    assertEquals(Arrays.asList("Sheet1", "Sheet2", "日本語シート"), Arrays.asList(sheet1.getName(), sheet2.getName(), sheet3.getName()));
+    assertEquals("複数シート参照サンプル", findCell(sheet1.getCells(), "A1").getOutputValue());
+    assertEquals("=Sheet2!B3", findCell(sheet1.getCells(), "B3").getFormulaText());
+    assertEquals("CrossValue", findCell(sheet1.getCells(), "B3").getOutputValue());
+    assertEquals("resolved", findCell(sheet1.getCells(), "B3").getResolutionStatus());
+    assertEquals("=日本語シート!C4", findCell(sheet1.getCells(), "B4").getFormulaText());
+    assertEquals("日本語参照値", findCell(sheet1.getCells(), "B4").getOutputValue());
+    assertEquals("resolved", findCell(sheet1.getCells(), "B4").getResolutionStatus());
+    assertEquals("=SUM(Sheet2!A1:B2)", findCell(sheet1.getCells(), "B5").getFormulaText());
+    assertEquals("10", findCell(sheet1.getCells(), "B5").getOutputValue());
+    assertEquals("CrossValue", findCell(sheet2.getCells(), "B3").getOutputValue());
+    assertEquals("日本語参照値", findCell(sheet3.getCells(), "C4").getOutputValue());
+    assertEquals(3, files.get(0).getSummary().getFormulaDiagnostics().size());
+    assertTrue(files.get(0).getSummary().getFormulaDiagnostics().stream().allMatch((diagnostic) -> "cached_value".equals(diagnostic.getSource())));
+    assertTrue(files.get(0).getMarkdown().contains("| sheet2\\_ref | CrossValue |"));
+    assertTrue(files.get(0).getMarkdown().contains("| jp\\_sheet\\_ref | 日本語参照値 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| sum\\_range | 10 |"));
+    assertTrue(files.get(1).getMarkdown().contains("|  | CrossValue |"));
+    assertTrue(files.get(2).getMarkdown().contains("日本語参照値"));
+  }
+
+  @Test
+  void parsesUpstreamFormulaSharedFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-shared-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-shared-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("formula", sheet.getName());
+    assertEquals("No", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals("連番", findCell(sheet.getCells(), "B1").getOutputValue());
+    assertEquals("shared formula サンプル", findCell(sheet.getCells(), "D1").getOutputValue());
+    assertEquals("=B2+1", findCell(sheet.getCells(), "B3").getFormulaText());
+    assertEquals("2", findCell(sheet.getCells(), "B3").getOutputValue());
+    assertEquals("=B3+1", findCell(sheet.getCells(), "B4").getFormulaText());
+    assertEquals("3", findCell(sheet.getCells(), "B4").getOutputValue());
+    assertEquals("=B10+1", findCell(sheet.getCells(), "B11").getFormulaText());
+    assertEquals("10", findCell(sheet.getCells(), "B11").getOutputValue());
+    assertEquals("resolved", findCell(sheet.getCells(), "B11").getResolutionStatus());
+    assertEquals(9, files.get(0).getSummary().getFormulaDiagnostics().size());
+    assertTrue(files.get(0).getMarkdown().contains("| No | 連番 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 1 | 1 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 5 | 5 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 10 | 10 |"));
+  }
+
+  @Test
   void parsesUpstreamFormulaSpillFixtureWorkbookWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("formula", "formula-spill-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
