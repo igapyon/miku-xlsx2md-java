@@ -24,7 +24,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `shared-strings`
   - `styles-parser`
   - worksheet parser minimum scope
-  - `WorksheetParser` richTextRuns / formula metadata coverage subset
+  - `WorksheetParser` richTextRuns / formula metadata / hyperlink range coverage subset
   - connected workbook parse facade
   - workbook parse fixture regression
   - `markdown-table-escape`
@@ -45,7 +45,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, empty fallback, line breaks, literal escaping, and hyperlink output modes
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, and shape details toggle
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -58,7 +58,8 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - help text compatibility
   - focused regression command layout
 - 保留
-  - advanced `sheet-markdown` parity coverage beyond the current subset
+  - advanced `sheet-markdown` fixture parity coverage beyond the current subset
+  - broader worksheet parser fixture coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 
@@ -99,6 +100,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Expand advanced `sheet-markdown` parity coverage beyond the current subset
-- Expand worksheet parser coverage beyond the current subset
+- Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
+- Expand worksheet parser fixture coverage beyond the current subset
 - Add broader CLI / Maven plugin fixture coverage beyond the current subset
