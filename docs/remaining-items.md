@@ -30,6 +30,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `markdown-export` helper layer
   - `cell-format`
   - `worksheet-tables`
+  - `narrative-structure`
   - `sheet-markdown` minimum conversion layer
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -40,6 +41,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` parity coverage
+  - `table-detector` / `rich-text-*` / `sheet-assets` split migration
   - broader CLI / Maven plugin fixture coverage
   - Maven plugin smoke execution command
 
@@ -63,6 +65,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 - `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
+- `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest test`
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
 - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
@@ -74,5 +77,5 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 ## Next Unit
 
 - Expand advanced `sheet-markdown` parity coverage
-- Port or split advanced table detector / narrative structure / rich text / sheet assets helpers as needed
+- Port or split advanced table detector / rich text / sheet assets helpers as needed
 - Add broader CLI / Maven plugin fixture coverage

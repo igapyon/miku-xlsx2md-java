@@ -20,6 +20,7 @@ import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
 import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownnormalize.MarkdownNormalize;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
+import jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructure;
 import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
 import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
@@ -234,41 +235,7 @@ public final class SheetMarkdown {
   }
 
   public static String renderNarrativeBlock(final NarrativeBlock block) {
-    if (block == null || block.getItems().isEmpty()) {
-      return block == null ? "" : joinLines(normalizeLines(block.getLines()));
-    }
-    if (isCalendarLikeNarrativeBlock(block)) {
-      final List<String> parts = new ArrayList<String>();
-      for (final NarrativeItem item : block.getItems()) {
-        parts.add(renderCalendarLikeItem(item));
-      }
-      return joinParagraphs(parts);
-    }
-    final List<String> parts = new ArrayList<String>();
-    int index = 0;
-    while (index < block.getItems().size()) {
-      final NarrativeItem current = block.getItems().get(index);
-      final NarrativeItem next = index + 1 < block.getItems().size() ? block.getItems().get(index + 1) : null;
-      if (isIndentedChildItem(current, next)) {
-        int childEnd = index + 1;
-        while (childEnd < block.getItems().size() && isIndentedChildItem(current, block.getItems().get(childEnd))) {
-          childEnd += 1;
-        }
-        final List<String> childLines = new ArrayList<String>();
-        for (int childIndex = index + 1; childIndex < childEnd; childIndex += 1) {
-          childLines.add(formatNarrativeBullet(block.getItems().get(childIndex).getText()));
-        }
-        parts.add(formatNarrativeHeading(current.getText()));
-        if (!childLines.isEmpty()) {
-          parts.add(joinLines(childLines));
-        }
-        index = childEnd;
-      } else {
-        parts.add(normalizeNarrativeText(current.getText()));
-        index += 1;
-      }
-    }
-    return joinParagraphs(parts);
+    return NarrativeStructure.renderNarrativeBlock(block);
   }
 
   public static MarkdownExport.MarkdownFile convertSheetToMarkdown(
@@ -635,57 +602,6 @@ public final class SheetMarkdown {
     return true;
   }
 
-  private static boolean isCalendarLikeNarrativeBlock(final NarrativeBlock block) {
-    if (block.getItems().size() < 2) {
-      return false;
-    }
-    int count = 0;
-    for (final NarrativeItem item : block.getItems()) {
-      if (isCalendarLikeItem(item)) {
-        count += 1;
-      }
-    }
-    return count >= 2;
-  }
-
-  private static boolean isCalendarLikeItem(final NarrativeItem item) {
-    final List<String> values = nonEmptyTrimmed(item.getCellValues());
-    if (values.size() < 5) {
-      return false;
-    }
-    int weekdayCount = 0;
-    int dateCount = 0;
-    for (final String value : values) {
-      if (isWeekdayToken(value)) {
-        weekdayCount += 1;
-      }
-      if (isIsoDateToken(value)) {
-        dateCount += 1;
-      }
-    }
-    return weekdayCount >= 5 || dateCount >= 5 || values.size() >= 7;
-  }
-
-  private static String renderCalendarLikeItem(final NarrativeItem item) {
-    final List<String> values = nonEmptyTrimmed(item.getCellValues());
-    if (values.isEmpty()) {
-      return normalizeNarrativeText(item.getText());
-    }
-    boolean allWeekdays = true;
-    boolean allDatesOrWeekdays = true;
-    for (final String value : values) {
-      allWeekdays = allWeekdays && isWeekdayToken(value);
-      allDatesOrWeekdays = allDatesOrWeekdays && (isIsoDateToken(value) || isWeekdayToken(value));
-    }
-    if (allWeekdays) {
-      return formatNarrativeHeading(joinWithSpace(values));
-    }
-    if (allDatesOrWeekdays) {
-      return join(values, " | ");
-    }
-    return join(values, " | ");
-  }
-
   private static boolean isCalendarHeaderSection(final ContentSection section) {
     if (!"narrative".equals(section.getKind()) || section.getNarrativeBlock() == null) {
       return false;
@@ -875,22 +791,6 @@ public final class SheetMarkdown {
     return result;
   }
 
-  private static String normalizeNarrativeText(final String text) {
-    return MarkdownNormalize.normalizeMarkdownText(text);
-  }
-
-  private static String formatNarrativeHeading(final String text) {
-    return "### " + MarkdownNormalize.normalizeMarkdownHeadingText(text);
-  }
-
-  private static String formatNarrativeBullet(final String text) {
-    return "- " + MarkdownNormalize.normalizeMarkdownListItemText(text);
-  }
-
-  private static boolean isIndentedChildItem(final NarrativeItem parent, final NarrativeItem child) {
-    return parent != null && child != null && child.getStartCol() > parent.getStartCol();
-  }
-
   private static boolean isIsoDateToken(final String value) {
     return ISO_DATE_PATTERN.matcher(stringValue(value).trim()).matches();
   }
@@ -943,14 +843,6 @@ public final class SheetMarkdown {
       }
     }
     return values;
-  }
-
-  private static List<String> normalizeLines(final List<String> lines) {
-    final List<String> result = new ArrayList<String>();
-    for (final String line : lines == null ? Collections.<String>emptyList() : lines) {
-      result.add(normalizeNarrativeText(line));
-    }
-    return result;
   }
 
   private static List<WorksheetParser.ParsedCell> safeCells(final WorksheetParser.ParsedSheet sheet) {
