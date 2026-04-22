@@ -7,13 +7,18 @@ package jp.igapyon.mikuxlsx2md.worksheetparser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -323,6 +328,80 @@ class WorksheetParserTest {
     assertNull(findCell(sheet, "A1").getRichTextRuns());
   }
 
+  @Test
+  void parsesUpstreamFormulaCrossSheetFixtureWithConcreteFollowerCoverageWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-crosssheet-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-crosssheet-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet1 = workbook.getSheets().get(0);
+    final WorksheetParser.ParsedSheet sheet2 = workbook.getSheets().get(1);
+    final WorksheetParser.ParsedSheet sheet3 = workbook.getSheets().get(2);
+
+    assertEquals(Arrays.asList("Sheet1", "Sheet2", "日本語シート"),
+        Arrays.asList(sheet1.getName(), sheet2.getName(), sheet3.getName()));
+    assertEquals("xl/worksheets/sheet1.xml", sheet1.getPath());
+    assertEquals("xl/worksheets/sheet2.xml", sheet2.getPath());
+    assertEquals("xl/worksheets/sheet3.xml", sheet3.getPath());
+    assertEquals(23, sheet1.getCells().size());
+    assertEquals(5, sheet2.getCells().size());
+    assertEquals(1, sheet3.getCells().size());
+    assertEquals("複数シート参照サンプル", findCell(sheet1, "A1").getOutputValue());
+    assertEquals("=Sheet2!B3", findCell(sheet1, "B3").getFormulaText());
+    assertEquals("CrossValue", findCell(sheet1, "B3").getOutputValue());
+    assertEquals("resolved", findCell(sheet1, "B3").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet1, "B3").getResolutionSource());
+    assertEquals("present_nonempty", findCell(sheet1, "B3").getCachedValueState());
+    assertEquals("=日本語シート!C4", findCell(sheet1, "B4").getFormulaText());
+    assertEquals("日本語参照値", findCell(sheet1, "B4").getOutputValue());
+    assertEquals("resolved", findCell(sheet1, "B4").getResolutionStatus());
+    assertEquals("=SUM(Sheet2!A1:B2)", findCell(sheet1, "B5").getFormulaText());
+    assertEquals("10", findCell(sheet1, "B5").getOutputValue());
+    assertEquals("CrossValue", findCell(sheet2, "B3").getOutputValue());
+    assertEquals("日本語参照値", findCell(sheet3, "C4").getOutputValue());
+  }
+
+  @Test
+  void parsesUpstreamFormulaSharedFixtureWithExtendedFollowerCoverageWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-shared-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-shared-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+
+    assertEquals("formula", sheet.getName());
+    assertEquals("xl/worksheets/sheet1.xml", sheet.getPath());
+    assertEquals(13, sheet.getMaxRow());
+    assertEquals(4, sheet.getMaxCol());
+    assertEquals(27, sheet.getCells().size());
+    assertEquals("No", findCell(sheet, "A1").getOutputValue());
+    assertEquals("連番", findCell(sheet, "B1").getOutputValue());
+    assertEquals("shared formula サンプル", findCell(sheet, "D1").getOutputValue());
+    assertEquals("=B2+1", findCell(sheet, "B3").getFormulaText());
+    assertEquals("2", findCell(sheet, "B3").getOutputValue());
+    assertEquals("resolved", findCell(sheet, "B3").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet, "B3").getResolutionSource());
+    assertEquals("present_nonempty", findCell(sheet, "B3").getCachedValueState());
+    assertEquals("=B3+1", findCell(sheet, "B4").getFormulaText());
+    assertEquals("3", findCell(sheet, "B4").getOutputValue());
+    assertEquals("=B4+1", findCell(sheet, "B5").getFormulaText());
+    assertEquals("4", findCell(sheet, "B5").getOutputValue());
+    assertEquals("=B5+1", findCell(sheet, "B6").getFormulaText());
+    assertEquals("5", findCell(sheet, "B6").getOutputValue());
+    assertEquals("=B6+1", findCell(sheet, "B7").getFormulaText());
+    assertEquals("6", findCell(sheet, "B7").getOutputValue());
+    assertEquals("=B7+1", findCell(sheet, "B8").getFormulaText());
+    assertEquals("7", findCell(sheet, "B8").getOutputValue());
+    assertEquals("=B8+1", findCell(sheet, "B9").getFormulaText());
+    assertEquals("8", findCell(sheet, "B9").getOutputValue());
+    assertEquals("=B9+1", findCell(sheet, "B10").getFormulaText());
+    assertEquals("9", findCell(sheet, "B10").getOutputValue());
+    assertEquals("=B10+1", findCell(sheet, "B11").getFormulaText());
+    assertEquals("10", findCell(sheet, "B11").getOutputValue());
+  }
+
   private static WorksheetParser.ParsedCell findCell(final WorksheetParser.ParsedSheet sheet, final String address) {
     for (final WorksheetParser.ParsedCell cell : sheet.getCells()) {
       if (address.equals(cell.getAddress())) {
@@ -397,5 +476,13 @@ class WorksheetParserTest {
     private static jp.igapyon.mikuxlsx2md.addressutils.AddressUtils.MergeRange mergeRange(final String ref) {
       return jp.igapyon.mikuxlsx2md.addressutils.AddressUtils.parseRangeRef(ref);
     }
+  }
+
+  private static Path resolveFixturePath(final String group, final String fileName) {
+    final Path local = Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    if (Files.isRegularFile(local)) {
+      return local;
+    }
+    return Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
   }
 }
