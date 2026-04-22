@@ -66,6 +66,56 @@ notes:
 - Java-side extension: Java runtime charset lookup for `shift_jis`
 
 ### upstream file:
+`src/ts/xml-utils.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils`
+
+notes:
+- facade: static DOM helper methods
+- helper split: secure parser setup kept inside same class
+- Java-side extension: JAXP-based DOM parsing with secure processing flags
+
+### upstream file:
+`src/ts/zip-io.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIo`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIo.ExportEntry`
+- `jp.igapyon.mikuxlsx2md.zipio.ZipIo.ZipEntryTimestamp`
+
+notes:
+- facade: static ZIP read/write helpers
+- helper split: little-endian readers and raw inflate kept inside same class
+- Java-side extension: Java `Inflater(true)` for deflate-raw support
+
+### upstream file:
+`src/ts/rels-parser.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParser`
+- `jp.igapyon.mikuxlsx2md.relsparser.RelsParser.RelationshipEntry`
+
+notes:
+- facade: static relationship parsing helpers
+- helper split: none
+- Java-side extension: XML utils are called directly instead of module-registry injection
+
+### upstream file:
+`src/ts/workbook-loader.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader`
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader.WorkbookLoaderDependencies`
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader.ParsedWorkbook`
+- `jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader.DefinedName`
+
+notes:
+- facade: static workbook loading helpers with dependency injection
+- helper split: nested contract/value types kept in the same class
+- Java-side extension: minimum workbook entrypoint currently uses simplified placeholder value objects
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -90,6 +140,6 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/xml-utils.ts`
-- `src/ts/zip-io.ts`
 - `src/ts/shared-strings.ts`
+- `src/ts/styles-parser.ts`
+- `src/ts/worksheet-parser.ts`

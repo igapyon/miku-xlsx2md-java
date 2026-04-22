@@ -10,6 +10,10 @@ upstream file:
 - `src/ts/markdown-escape.ts`
 - `src/ts/markdown-options.ts`
 - `src/ts/text-encoding.ts`
+- `src/ts/xml-utils.ts`
+- `src/ts/zip-io.ts`
+- `src/ts/rels-parser.ts`
+- `src/ts/workbook-loader.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -18,6 +22,10 @@ java classes:
 - `MarkdownEscape`
 - `MarkdownOptions`
 - `TextEncoding`
+- `XmlUtils`
+- `ZipIo`
+- `RelsParser`
+- `WorkbookLoader`
 - `CliOptions`
 - `MikuXlsx2mdCli`
 - `MikuXlsx2mdMojo`
@@ -28,6 +36,10 @@ tests:
 - `MarkdownEscapeTest`
 - `MarkdownOptionsTest`
 - `TextEncodingTest`
+- `XmlUtilsTest`
+- `ZipIoTest`
+- `RelsParserTest`
+- `WorkbookLoaderTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
 
@@ -38,7 +50,10 @@ diff summary:
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
-  - workbook parse
+  - workbook parse core integration
+  - worksheet parse
+  - shared strings parse
+  - styles parse
   - markdown export
   - zip export
   - summary output
@@ -56,6 +71,6 @@ follow-up:
 - fixture:
   - none
 - 次回の確認観点:
-  - `zip-io.ts` と `xml-utils.ts` を Java へ移す
-  - workbook parsing の最小入口を作る
+  - shared strings / styles / worksheet parser を Java へ移す
+  - workbook parsing の最小入口から実データ読込へ進める
   - Maven plugin を core API へ接続する
