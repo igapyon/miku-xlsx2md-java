@@ -1,0 +1,202 @@
+# Follow-up Log
+
+Document version: `2026-04-22`
+
+## 2026-04-22 Initial Straight Conversion Setup
+
+upstream file:
+- `src/ts/address-utils.ts`
+- `src/ts/markdown-normalize.ts`
+- `src/ts/markdown-escape.ts`
+- `src/ts/markdown-options.ts`
+- `src/ts/text-encoding.ts`
+- `src/ts/xml-utils.ts`
+- `src/ts/zip-io.ts`
+- `src/ts/rels-parser.ts`
+- `src/ts/workbook-loader.ts`
+- `src/ts/shared-strings.ts`
+- `src/ts/styles-parser.ts`
+- `src/ts/worksheet-parser.ts`
+- `src/ts/core.ts`
+- `src/ts/markdown-table-escape.ts`
+- `src/ts/markdown-export.ts`
+- `src/ts/cell-format.ts`
+- `src/ts/worksheet-tables.ts`
+- `src/ts/narrative-structure.ts`
+- `src/ts/border-grid.ts`
+- `src/ts/table-detector.ts`
+- `src/ts/sheet-assets.ts`
+- `src/ts/office-drawing.ts`
+- `src/ts/rich-text-parser.ts`
+- `src/ts/rich-text-plain-formatter.ts`
+- `src/ts/rich-text-github-formatter.ts`
+- `src/ts/rich-text-renderer.ts`
+- `src/ts/sheet-markdown.ts`
+- `scripts/miku-xlsx2md-cli.mjs`
+
+java classes:
+- `AddressUtils`
+- `MarkdownNormalize`
+- `MarkdownEscape`
+- `MarkdownOptions`
+- `TextEncoding`
+- `XmlUtils`
+- `ZipIo`
+- `RelsParser`
+- `WorkbookLoader`
+- `SharedStrings`
+- `StylesParser`
+- `WorksheetParser`
+- `Core`
+- `MarkdownTableEscape`
+- `MarkdownExport`
+- `CellFormat`
+- `WorksheetTables`
+- `NarrativeStructure`
+- `BorderGrid`
+- `TableDetector`
+- `SheetAssets`
+- `OfficeDrawing`
+- `RichTextRenderer`
+- `SheetMarkdown`
+- `CliOptions`
+- `MikuXlsx2mdCli`
+- `MikuXlsx2mdMojo`
+
+tests:
+- `AddressUtilsTest`
+- `MarkdownNormalizeTest`
+- `MarkdownEscapeTest`
+- `MarkdownOptionsTest`
+- `TextEncodingTest`
+- `XmlUtilsTest`
+- `ZipIoTest`
+- `RelsParserTest`
+- `WorkbookLoaderTest`
+- `SharedStringsTest`
+- `StylesParserTest`
+- `WorksheetParserTest`
+- `CoreTest`
+- `CoreFixtureRegressionTest`
+- `MarkdownExportTest`
+- `CellFormatTest`
+- `WorksheetTablesTest`
+- `NarrativeStructureTest`
+- `BorderGridTest`
+- `TableDetectorTest`
+- `SheetAssetsTest`
+- `OfficeDrawingTest`
+- `RichTextRendererTest`
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - CLI は option validation / help / initial workbook conversion を実装
+  - Maven plugin は runtime core conversion へ接続済み
+  - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
+  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済みで、`xlsx2md-basic` / `image-basic-sample02` / weird-sheetname まで横展開済み
+  - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline / narrative / edge-empty / edge-weird-sheetname / border-priority / table-basic / grid-layout / image-basic-sample02 fixture coverage subset を追加済み
+  - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname cases の subset を追加済み
+  - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
+  - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
+  - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
+  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location、sheet-qualified な shared formula translation、upstream formula-crosssheet / formula-shared fixture assertion expansionの coverage subset を追加済み
+  - `office-drawing` は Java では shape SVG rendering helper 範囲を移植済み
+  - `SheetAssets` は shape parsing 時に `OfficeDrawing` の SVG asset を接続済み
+  - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
+- 命名差分:
+  - module registry 方式を Java static facade へ読み替え
+- 未移植差分:
+  - worksheet parser shared / cross-sheet formula fixture coverage expansion beyond the current focused regression subset
+  - advanced `sheet-markdown` fixture parity coverage beyond the current subset
+  - broader CLI / Maven plugin fixture coverage beyond the current subset
+  - broader Maven plugin smoke coverage beyond the fixed minimum command
+- Java 側独自拡張:
+  - immutable value objects for equality-based tests
+
+follow-up:
+- 実施した確認:
+  - upstream source/test inventory
+  - sibling repo の multi-module / Maven plugin 構成
+  - `.mvn/jvm.config` による Maven 通信前提の固定
+  - Java 17 + Maven 3.9 on source/target 1.8
+  - `mvn -o test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest,SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=BorderGridTest,TableDetectorTest,SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,WorksheetParserTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=OfficeDrawingTest,SheetAssetsTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after image / shape fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,SheetMarkdownTest,CoreFixtureRegressionTest test` pass after shape block rendering connection
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after advanced sheet-markdown parity coverage subset expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown hyperlink underline suppression coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown shape item spacing coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after sheet-markdown table detection alias coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser richTextRuns / formula metadata coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser shared formula translation coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich usecase / merge pattern fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula basic / chart basic fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula cross-sheet / shared fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after formula spill / chart mixed fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after narrative / edge-empty / border-priority fixture parity coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after table-basic / grid-layout fixture parity coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after broader table-basic fixture parity coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI table fixture alias coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI shape details alias coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI display / named-range / narrative fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin shape fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin border-priority fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin display / named-range / narrative fixture coverage expansion
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
+  - `mvn test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after sheet-markdown / worksheet parser coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich-text / merge-multiline / weird-sheetname / image-basic-sample02 fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after xlsx2md-basic / shape-flowchart / shape-block-arrow / formula fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass after broader sheet-markdown / CLI fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage expansion
+- fixture:
+  - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-text-github-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
+- 次回の確認観点:
+  - advanced `sheet-markdown` fixture parity coverage をさらに広げる
+  - worksheet parser shared / cross-sheet formula fixture coverage を current focused regression からさらに広げる
+  - CLI / Maven plugin の fixture coverage をさらに広げる
