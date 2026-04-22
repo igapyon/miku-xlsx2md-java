@@ -491,6 +491,35 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void convertsUpstreamTableBasicSample03FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample03.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample03.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("table-basic", sheet.getName());
+    assertEquals(13, sheet.getMaxRow());
+    assertEquals(12, sheet.getMaxCol());
+    assertEquals("隣接するテーブルのテスト（縦横に密接）", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals("隣接するテーブルその3", findCell(sheet.getCells(), "B8").getOutputValue());
+    assertEquals("隣接するテーブルその4", findCell(sheet.getCells(), "H8").getOutputValue());
+    assertEquals("=H12+1", findCell(sheet.getCells(), "H13").getFormulaText());
+    assertEquals(1, files.size());
+    assertEquals(4, files.get(0).getSummary().getTables());
+    assertEquals(Arrays.asList("B3-F7", "H3-L7", "B9-F13", "H9-L13"),
+        Arrays.asList(
+            files.get(0).getSummary().getTableScores().get(0).getRange(),
+            files.get(0).getSummary().getTableScores().get(1).getRange(),
+            files.get(0).getSummary().getTableScores().get(2).getRange(),
+            files.get(0).getSummary().getTableScores().get(3).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("### Table: 004 (H9-L13)"));
+    assertTrue(!files.get(0).getMarkdown().contains("### Table: 005"));
+    assertTrue(files.get(0).getMarkdown().contains("| 2 | 別名 | altname | Sawada | 何かの別名 |"));
+  }
+
+  @Test
   void convertsUpstreamTableBasicSample11FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("table", "table-basic-sample11.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -513,6 +542,107 @@ class CoreFixtureRegressionTest {
     assertEquals("B3-T7", files.get(0).getSummary().getTableScores().get(0).getRange());
     assertTrue(files.get(0).getMarkdown().contains("### Table: 001 (B3-T7)"));
     assertTrue(files.get(0).getMarkdown().contains("| 4 | 更新日 | updatedate | 3月14日 | 何かの更新日 |"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicSample12FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample12.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample12.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("table-basic", sheet.getName());
+    assertEquals(14, sheet.getMaxRow());
+    assertEquals(20, sheet.getMaxCol());
+    assertEquals(40, sheet.getMerges().size());
+    assertEquals("方眼紙風のためにセル結合が多用されます", findCell(sheet.getCells(), "B8").getOutputValue());
+    assertEquals("テーブルその2", findCell(sheet.getCells(), "B9").getOutputValue());
+    assertEquals("=B13+1", findCell(sheet.getCells(), "B14").getFormulaText());
+    assertEquals(1, files.size());
+    assertEquals(2, files.get(0).getSummary().getTables());
+    assertEquals(Arrays.asList("B3-T7", "B10-T14"),
+        Arrays.asList(files.get(0).getSummary().getTableScores().get(0).getRange(),
+            files.get(0).getSummary().getTableScores().get(1).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("### Table: 002 (B10-T14)"));
+    assertTrue(files.get(0).getMarkdown().contains("方眼紙風のためにセル結合が多用されます"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicSample13FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample13.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample13.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("table-basic", sheet.getName());
+    assertEquals(14, sheet.getMaxRow());
+    assertEquals(40, sheet.getMaxCol());
+    assertEquals(80, sheet.getMerges().size());
+    assertEquals("テーブルその3", findCell(sheet.getCells(), "B9").getOutputValue());
+    assertEquals("テーブルその4", findCell(sheet.getCells(), "V9").getOutputValue());
+    assertEquals("=V13+1", findCell(sheet.getCells(), "V14").getFormulaText());
+    assertEquals(1, files.size());
+    assertEquals(4, files.get(0).getSummary().getTables());
+    assertEquals(Arrays.asList("B3-T7", "V3-AN7", "B10-T14", "V10-AN14"),
+        Arrays.asList(
+            files.get(0).getSummary().getTableScores().get(0).getRange(),
+            files.get(0).getSummary().getTableScores().get(1).getRange(),
+            files.get(0).getSummary().getTableScores().get(2).getRange(),
+            files.get(0).getSummary().getTableScores().get(3).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("### Table: 004 (V10-AN14)"));
+    assertTrue(files.get(0).getMarkdown().contains("| 2 | 名前 | name | Sabro | 何かの名前 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 2 | 名前 | name | Jiro | 何かの名前 |"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicSample14FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample14.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample14.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("table-basic", sheet.getName());
+    assertEquals(8, sheet.getMaxRow());
+    assertEquals(20, sheet.getMaxCol());
+    assertEquals(18, sheet.getMerges().size());
+    assertEquals("テーブルその1", findCell(sheet.getCells(), "B2").getOutputValue());
+    assertEquals("Taro", findCell(sheet.getCells(), "L5").getOutputValue());
+    assertEquals("3月13日", findCell(sheet.getCells(), "L6").getOutputValue());
+    assertEquals(1, files.size());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals("B3-T7", files.get(0).getSummary().getTableScores().get(0).getRange());
+    assertTrue(files.get(0).getMarkdown().contains("| 2 | 名前 | name | Taro | 何かの名前 |"));
+    assertTrue(files.get(0).getMarkdown().contains("たまに結合漏れのセルがある場合"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicSample15FixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-basic-sample15.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-basic-sample15.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("table-basic", sheet.getName());
+    assertEquals(8, sheet.getMaxRow());
+    assertEquals(20, sheet.getMaxCol());
+    assertEquals(19, sheet.getMerges().size());
+    assertEquals("※方眼紙＋結合＋さらに縦結合", findCell(sheet.getCells(), "B8").getOutputValue());
+    assertEquals("登録および更新日", findCell(sheet.getCells(), "P6").getOutputValue());
+    assertEquals("", findCell(sheet.getCells(), "P7").getOutputValue());
+    assertEquals(1, files.size());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals("B3-T7", files.get(0).getSummary().getTableScores().get(0).getRange());
+    assertTrue(files.get(0).getMarkdown().contains("| 3 | 登録日 | entrydate | 3月13日 | 登録および更新日 |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 4 | 更新日 | updatedate | 3月14日 | [↑M↑] |"));
+    assertTrue(files.get(0).getMarkdown().contains("※方眼紙＋結合＋さらに縦結合"));
   }
 
   @Test

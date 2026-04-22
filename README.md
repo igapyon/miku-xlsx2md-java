@@ -59,7 +59,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Focused workbook fixture regression includes upstream formula and chart fixtures, including cross-sheet, shared, spill, and mixed chart cases
 - Focused workbook fixture regression includes upstream rich text and merge fixtures
 - Focused workbook fixture regression includes upstream image and shape fixtures
-- Focused workbook fixture regression includes upstream narrative, edge-empty, table border-priority, table-basic, and grid-layout parity cases
+- Focused workbook fixture regression includes upstream narrative, edge-empty, table border-priority, full table-basic parity subset, and grid-layout parity cases
 - `WorksheetParserTest` includes shared formula translation coverage with sheet-qualified and absolute references
 - `SheetMarkdownTest` includes GitHub hyperlink rendering coverage that suppresses underline markup on linked cells
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered
@@ -67,7 +67,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion
-- CLI / Maven plugin fixture coverage includes upstream table alias, table/basic narrative/display/named-range fixtures, shape fixture, and compatibility alias cases
+- CLI / Maven plugin fixture coverage includes upstream table alias, narrative/display/named-range fixtures, shape fixture, and compatibility alias cases
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
 - Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending
 

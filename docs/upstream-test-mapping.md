@@ -229,7 +229,12 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamEdgeEmptyFixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample01FixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample02FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample03FixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample11FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample12FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample13FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample14FixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample15FixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamTableBasicSample16FixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamGridLayoutFixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamMergePatternFixtureWorkbookWhenAvailable`
@@ -252,7 +257,12 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
@@ -457,7 +467,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / table-basic / grid-layout parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout parity checks.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
@@ -470,10 +480,16 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamDisplayFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamNamedRangeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamNarrativeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsBorderPriorityAsCompatibilityAliasWhenUsingUpstreamTableFixture`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsIncludeShapeDetailsAsCompatibilityAliasWhenUsingUpstreamShapeFixture`
 
 fixtures:
+- `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 
