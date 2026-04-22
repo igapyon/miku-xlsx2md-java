@@ -52,12 +52,13 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - image / shape workbook parse fixture regression
   - CLI option vocabulary and initial conversion
   - Maven plugin initial conversion
+  - CLI / Maven plugin upstream fixture conversion coverage subset
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` parity coverage beyond the current subset
-  - broader CLI / Maven plugin fixture coverage
+  - broader CLI / Maven plugin fixture coverage beyond the current subset
   - Maven plugin smoke execution command
 
 ## Focused Regression
@@ -98,4 +99,4 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 - Expand advanced `sheet-markdown` parity coverage beyond the current subset
 - Expand worksheet parser coverage beyond the current subset
-- Add broader CLI / Maven plugin fixture coverage
+- Add broader CLI / Maven plugin fixture coverage beyond the current subset

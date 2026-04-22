@@ -17,7 +17,7 @@ Document version: `2026-04-22`
 
 ## Next Queue
 
-- CLI / Maven plugin の fixture coverage を広げる
+- CLI / Maven plugin の fixture coverage をさらに広げる
 - Maven plugin smoke 実行の確認方法を固定する
 
 ## Done In This Step
@@ -64,6 +64,7 @@ Document version: `2026-04-22`
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - CLI を runtime core conversion に接続した
 - Maven plugin を runtime core conversion に接続した
+- CLI / Maven plugin の upstream fixture conversion coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した

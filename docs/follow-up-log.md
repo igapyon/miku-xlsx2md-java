@@ -95,6 +95,7 @@ diff summary:
 - 挙動差分:
   - CLI は option validation / help / initial workbook conversion を実装
   - Maven plugin は runtime core conversion へ接続済み
+  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
   - advanced `sheet-markdown` parity coverage は calendar narrative / empty fallback / line break / literal escaping / hyperlink output mode cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
@@ -109,7 +110,7 @@ diff summary:
 - 未移植差分:
   - worksheet parse coverage expansion
   - advanced `sheet-markdown` parity coverage beyond the current subset
-  - broader CLI / Maven plugin fixture coverage
+  - broader CLI / Maven plugin fixture coverage beyond the current subset
   - Maven plugin smoke execution command
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
@@ -135,6 +136,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
   - `mvn test` pass
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
@@ -146,4 +148,4 @@ follow-up:
 - 次回の確認観点:
   - advanced `sheet-markdown` parity coverage をさらに広げる
   - worksheet parser coverage をさらに広げる
-  - CLI / Maven plugin の fixture coverage を広げる
+  - CLI / Maven plugin の fixture coverage をさらに広げる

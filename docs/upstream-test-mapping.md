@@ -430,9 +430,10 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
 
 fixtures:
-- none
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 
 focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
@@ -443,9 +444,10 @@ Maven plugin option mapping, skip behavior, and initial conversion I/O
 java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.writesMarkdownThroughCoreConversion`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamHyperlinkFixtureWhenAvailable`
 
 fixtures:
-- none
+- `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
