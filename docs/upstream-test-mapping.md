@@ -430,6 +430,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsMarkdownMarkersLiteralInNarrativeOutput`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.rendersExternalAndWorkbookHyperlinksAsMarkdownLinks`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.suppressesUnderlineMarkupForHyperlinkCellsInGithubMode`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsBlankLineBetweenShapeItemsWhenSvgOutputIsPresent`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode`
 
 fixtures:
@@ -439,7 +440,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, and GitHub hyperlink underline suppression.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, and SVG-backed shape item spacing.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
