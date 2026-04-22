@@ -42,6 +42,17 @@ notes:
 - Java-side extension: value object for literal parts
 
 ### upstream file:
+`src/ts/markdown-table-escape.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.markdowntableescape.MarkdownTableEscape`
+
+notes:
+- facade: static utility methods
+- helper split: delegates to `MarkdownNormalize`
+- Java-side extension: none
+
+### upstream file:
 `src/ts/markdown-options.ts`
 
 java classes:
@@ -169,6 +180,27 @@ notes:
 - Java-side extension: current scope exposes only the connected workbook parsing path
 
 ### upstream file:
+`src/ts/markdown-export.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.FormulaDiagnostic`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.TableScoreDetail`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.MarkdownSummary`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.MarkdownFile`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.ExportWorkbook`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.ExportSheet`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.ExportImage`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.ExportShape`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.CombinedMarkdownExportFile`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.CombinedMarkdownExportPayload`
+
+notes:
+- facade: static markdown export helper methods
+- helper split: archive entry creation is delegated to `ZipIo`, text encoding is delegated to `TextEncoding`
+- Java-side extension: export-side workbook and markdown summary shapes are expressed as immutable value objects
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -193,6 +225,6 @@ notes:
 
 ## Next Candidates
 
+- `src/ts/cell-format.ts`
 - `src/ts/worksheet-tables.ts`
 - `src/ts/sheet-markdown.ts`
-- `src/ts/markdown-export.ts`

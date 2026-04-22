@@ -49,6 +49,19 @@ focused regression:
 - `mvn -Dtest=MarkdownEscapeTest test`
 
 ### upstream test / intent:
+`src/ts/markdown-table-escape.ts` escaping behavior consumed from markdown export
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.escapesMarkdownCellsAndKeepsSpacingRules`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.rendersMarkdownTablesWithEscapedCellContent`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
+
+### upstream test / intent:
 `src/ts/markdown-options.ts` option normalization behavior
 
 java tests:
@@ -194,6 +207,41 @@ fixtures:
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=CoreTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-main.test.js` fixture-based workbook parsing expectations for named-range / hyperlink fixtures
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamNamedRangeFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamHyperlinkFixtureWorkbookWhenAvailable`
+
+fixtures:
+- `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-markdown-export.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.normalizesLineBreaksIntoSpaces`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.rendersMarkdownTablesWithEscapedCellContent`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.escapesMarkdownCellsAndKeepsSpacingRules`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsSanitizedOutputFileNamesWithoutModeSuffixes`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.summarizesFormulaDiagnosticsAndTableScores`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsExportEntriesAndZipArchivesIncludingMarkdownAndAssets`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsAssetEntriesWithoutMarkdownAndSkipsIncompleteShapeSvgAssets`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsEncodedPayloadBytesForUtf16BeWithBom`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.writesTheBookHeadingOnlyOnceInCombinedMarkdown`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsMarkdownExportEntryWhenMarkdownExists`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 
 ### upstream test / intent:
 Node CLI option compatibility and help text shape
