@@ -99,11 +99,11 @@ diff summary:
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
   - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline / narrative / edge-empty / edge-weird-sheetname / border-priority / table-basic / grid-layout / image-basic-sample02 fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
-  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location、sheet-qualified な shared formula translation の coverage subset を追加済み
+  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location、sheet-qualified な shared formula translation、upstream formula-crosssheet / formula-shared fixture assertion expansionの coverage subset を追加済み
   - `office-drawing` は Java では shape SVG rendering helper 範囲を移植済み
   - `SheetAssets` は shape parsing 時に `OfficeDrawing` の SVG asset を接続済み
   - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
@@ -160,6 +160,7 @@ follow-up:
   - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after sheet-markdown / worksheet parser coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich-text / merge-multiline / weird-sheetname / image-basic-sample02 fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after xlsx2md-basic / shape-flowchart / shape-block-arrow / formula fixture coverage expansion
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`

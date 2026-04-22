@@ -193,15 +193,18 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.expandsHyperlinkRangesAndHashTargetsAcrossCells`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.attachesCellTextStyleToSharedInlineBooleanAndFormattedValues`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.exposesFormulaCachedStateTypeAndSpillRef`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesUpstreamFormulaCrossSheetFixtureWithConcreteFollowerCoverageWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesUpstreamFormulaSharedFixtureWithExtendedFollowerCoverageWhenAvailable`
 
 fixtures:
-- none
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 
 notes:
-- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
+- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
 
 ### upstream test / intent:
 connected workbook parsing path through the Java core facade
@@ -469,15 +472,20 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.suppressesUnderlineMarkupForHyperlinkCellsInGithubMode`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsBlankLineBetweenShapeItemsWhenSvgOutputIsPresent`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFlowchartShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBlockArrowShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
 
 fixtures:
-- none
+- `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow parity checks.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:

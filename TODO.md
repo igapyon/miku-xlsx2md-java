@@ -15,7 +15,9 @@ Document version: `2026-04-22`
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
   - rich text / markdown escape fixture coverage は追加済み
   - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
+  - xlsx2md-basic / shape-flowchart / shape-block-arrow fixture coverage は追加済み
 - worksheet parser の shared / cross-sheet formula fixture coverage を upstream fixture focused regression からさらに広げる
+  - formula-crosssheet / formula-shared fixture assertion expansion は追加済み
 
 ## Next Queue
 
@@ -66,6 +68,8 @@ Document version: `2026-04-22`
 - `SheetMarkdownTest` に GitHub hyperlink rendering 時の underline suppression coverage を追加した
 - `SheetMarkdownTest` に consecutive SVG-backed shape items の spacing coverage を追加した
 - `SheetMarkdownTest` に table detection compatibility alias coverage を追加した
+- `SheetMarkdownTest` に upstream xlsx2md-basic / shape-flowchart / shape-block-arrow fixture coverage を追加した
+- `WorksheetParserTest` に upstream formula-crosssheet / formula-shared fixture coverage を追加した
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - formula basic / chart basic fixture を使う workbook-to-markdown focused regression を追加した

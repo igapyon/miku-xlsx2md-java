@@ -8,10 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
@@ -363,6 +368,94 @@ class SheetMarkdownTest {
     assertFalse(both.getMarkdown().contains("SameValue [raw=SameValue]"));
   }
 
+  @Test
+  void convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("", "xlsx2md-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "xlsx2md-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile plain = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+    final MarkdownExport.MarkdownFile raw = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, "raw", null, null));
+    final MarkdownExport.MarkdownFile both = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, "both", null, null));
+
+    assertEquals("xlsx2md-basic-sample01_001_xlsx2md-basic.md", plain.getFileName());
+    assertEquals(4, plain.getSummary().getTables());
+    assertEquals(2, plain.getSummary().getMerges());
+    assertEquals(27, plain.getSummary().getFormulaDiagnostics().size());
+    assertTrue(plain.getMarkdown().contains("## Sheet: xlsx2md-basic"));
+    assertTrue(plain.getMarkdown().contains("### Table: 003 (B26-F30)"));
+    assertTrue(plain.getMarkdown().contains("### Table: 004 (B33-F46)"));
+    assertTrue(plain.getMarkdown().contains("| 3 | 登録日 | entrydate | 3月13日 | 何かの登録日 |"));
+    assertTrue(plain.getMarkdown().contains("| 12 | その他 | value11 | 1 0 2 3 4 5 6 | その他 |"));
+    assertTrue(plain.getMarkdown().contains("[←M←]"));
+    assertTrue(plain.getMarkdown().contains("[↑M↑]"));
+
+    assertTrue(raw.getMarkdown().contains("1023456"));
+    assertTrue(raw.getMarkdown().contains("46094"));
+    assertTrue(raw.getMarkdown().contains("0.98699999999999999"));
+    assertTrue(both.getMarkdown().contains("1 0 2 3 4 5 6 [raw=1023456]"));
+    assertTrue(both.getMarkdown().contains("令和8年3月17日 [raw=46098]"));
+    assertTrue(both.getMarkdown().contains("3月13日 [raw=46094]"));
+  }
+
+  @Test
+  void convertsUpstreamFlowchartShapeFixtureIntoShapeBlockMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-flowchart-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "shape-flowchart-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("shape-flowchart-sample01_001_shape-flowchart.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(0, file.getSummary().getImages());
+    assertEquals(0, file.getSummary().getCharts());
+    assertTrue(file.getMarkdown().contains("## Sheet: shape-flowchart"));
+    assertTrue(file.getMarkdown().contains("### Shape Block: 001 (K3-AB7)"));
+    assertTrue(file.getMarkdown().contains("- Shapes: Shape 001, Shape 002, Shape 003, Shape 004, Shape 005, Shape 006, Shape 007"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 001 (H3)"));
+    assertTrue(file.getMarkdown().contains("- `a:prstGeom@prst`: `flowChartTerminator`"));
+    assertTrue(file.getMarkdown().contains("- `a:t#text`: `開始`"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 005 (I4)"));
+    assertTrue(file.getMarkdown().contains("- `a:endCxn@id`: `6`"));
+    assertTrue(file.getMarkdown().contains("![shape_005.svg](assets/shape-flowchart/shape_005.svg)"));
+    assertTrue(file.getMarkdown().contains("![shape_006.svg](assets/shape-flowchart/shape_006.svg)"));
+    assertTrue(file.getMarkdown().contains("![shape_007.svg](assets/shape-flowchart/shape_007.svg)"));
+    assertFalse(file.getMarkdown().contains("### Image:"));
+    assertFalse(file.getMarkdown().contains("### Chart:"));
+  }
+
+  @Test
+  void convertsUpstreamBlockArrowShapeFixtureIntoShapeBlockMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-block-arrow-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "shape-block-arrow-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("shape-block-arrow-sample01_001_shape-block-arrow.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertTrue(file.getMarkdown().contains("## Sheet: shape-block-arrow"));
+    assertTrue(file.getMarkdown().contains("### Shape Block: 001 (K3-AA14)"));
+    assertTrue(file.getMarkdown().contains("- Shapes: Shape 001, Shape 002, Shape 003, Shape 004, Shape 005"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 001 (H3)"));
+    assertTrue(file.getMarkdown().contains("- `a:prstGeom@prst`: `rightArrow`"));
+    assertTrue(file.getMarkdown().contains("- `a:t#text`: `右矢印`"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 005 (H8)"));
+    assertTrue(file.getMarkdown().contains("- `a:prstGeom@prst`: `quadArrow`"));
+    assertFalse(file.getMarkdown().contains("![shape_001.svg]"));
+    assertFalse(file.getMarkdown().contains("### Image:"));
+    assertFalse(file.getMarkdown().contains("### Chart:"));
+  }
+
   private static WorkbookLoader.ParsedWorkbook workbook(final WorksheetParser.ParsedSheet sheet) {
     return new WorkbookLoader.ParsedWorkbook(
         "book.xlsx",
@@ -447,5 +540,17 @@ class SheetMarkdownTest {
         "xdr:sp",
         "xdr:twoCellAnchor",
         new SheetAssets.BoundingBox(0, 0, 100, 20));
+  }
+
+  private static Path resolveFixturePath(final String group, final String fileName) {
+    final Path local = group.isEmpty()
+        ? Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", fileName)
+        : Paths.get("workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
+    if (Files.isRegularFile(local)) {
+      return local;
+    }
+    return group.isEmpty()
+        ? Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", fileName)
+        : Paths.get("..", "workplace", "miku-xlsx2md", "tests", "fixtures", group, fileName);
   }
 }

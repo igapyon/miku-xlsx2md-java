@@ -45,7 +45,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout cases
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -64,7 +64,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
-  - broader worksheet parser shared / cross-sheet formula fixture coverage beyond the current focused regression subset
+  - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions, but further expansion is still pending
   - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 
