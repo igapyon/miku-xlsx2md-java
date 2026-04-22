@@ -171,6 +171,57 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void parsesUpstreamFormulaBasicFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("formula", sheet.getName());
+    assertEquals("=B3", findCell(sheet.getCells(), "B5").getFormulaText());
+    assertEquals("10", findCell(sheet.getCells(), "B5").getOutputValue());
+    assertEquals("resolved", findCell(sheet.getCells(), "B5").getResolutionStatus());
+    assertEquals("=IF(B3>B4,\"OK\",\"NG\")", findCell(sheet.getCells(), "B7").getFormulaText());
+    assertEquals("OK", findCell(sheet.getCells(), "B7").getOutputValue());
+    assertEquals("=SUM(B3:B4)", findCell(sheet.getCells(), "B8").getFormulaText());
+    assertEquals("15", findCell(sheet.getCells(), "B8").getOutputValue());
+    assertEquals("=DATE(2024,3,17)", findCell(sheet.getCells(), "B11").getFormulaText());
+    assertEquals("2024/3/17", findCell(sheet.getCells(), "B11").getOutputValue());
+    assertEquals(9, files.get(0).getSummary().getFormulaDiagnostics().size());
+    assertTrue(files.get(0).getSummary().getFormulaDiagnostics().stream().allMatch((diagnostic) -> "cached_value".equals(diagnostic.getSource())));
+    assertTrue(files.get(0).getMarkdown().contains("| if | OK |"));
+    assertTrue(files.get(0).getMarkdown().contains("| date | 2024/3/17 |"));
+  }
+
+  @Test
+  void parsesUpstreamChartBasicFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("chart", "chart-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "chart-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+    final WorksheetParser.ParsedChartAsset chart = sheet.getCharts().get(0);
+
+    assertEquals("chart-basic", sheet.getName());
+    assertEquals(1, sheet.getCharts().size());
+    assertEquals("B10", chart.getAnchor());
+    assertEquals("棒グラフのグラフ", chart.getTitle());
+    assertEquals("Bar Chart", chart.getChartType());
+    assertEquals(2, chart.getSeries().size());
+    assertEquals("値A", chart.getSeries().get(0).getName());
+    assertEquals("'chart-basic'!$B$4:$B$7", chart.getSeries().get(0).getCategoriesRef());
+    assertEquals("'chart-basic'!$C$4:$C$7", chart.getSeries().get(0).getValuesRef());
+    assertEquals("primary", chart.getSeries().get(0).getAxis());
+    assertEquals(1, files.get(0).getSummary().getCharts());
+    assertTrue(files.get(0).getMarkdown().contains("### Chart: 001 (B10)"));
+    assertTrue(files.get(0).getMarkdown().contains("- Title: 棒グラフのグラフ"));
+    assertTrue(files.get(0).getMarkdown().contains("    - values: 'chart-basic'!$D$4:$D$7"));
+  }
+
+  @Test
   void parsesUpstreamImageFixtureWorkbookWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
