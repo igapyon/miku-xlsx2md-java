@@ -94,7 +94,8 @@ diff summary:
   - Maven plugin は runtime core conversion へ接続済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
-  - `sheet-assets` は Java では rendering / shape block grouping 範囲を先行移植し、drawing parse helper は未移植
+  - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
+  - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
   - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
@@ -103,6 +104,7 @@ diff summary:
   - advanced `sheet-markdown` parity coverage
   - broader CLI / Maven plugin fixture coverage
   - Maven plugin smoke execution command
+  - `office-drawing` / shape SVG rendering helper migration
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
 
@@ -116,6 +118,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest,SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=BorderGridTest,TableDetectorTest,SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,SheetMarkdownTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,WorksheetParserTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
@@ -128,5 +131,5 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - 次回の確認観点:
   - advanced `sheet-markdown` parity coverage を広げる
-  - sheet assets parse helper の移植範囲を広げる
+  - `office-drawing` / shape SVG rendering helper の移植範囲を確認する
   - CLI / Maven plugin の fixture coverage を広げる

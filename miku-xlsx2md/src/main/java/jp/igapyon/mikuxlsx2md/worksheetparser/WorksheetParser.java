@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
+import jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets;
 import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
 import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
 import jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils;
@@ -314,7 +315,10 @@ public final class WorksheetParser {
       }
     }
 
-    return new ParsedSheet(sheetName, sheetIndex, sheetPath, cells, merges, maxRow, maxCol);
+    final List<ParsedImageAsset> images = SheetAssets.parseDrawingImages(files, sheetName, sheetPath);
+    final List<ParsedChartAsset> charts = SheetAssets.parseDrawingCharts(files, sheetName, sheetPath);
+    final List<ParsedShapeAsset> shapes = SheetAssets.parseDrawingShapes(files, sheetName, sheetPath);
+    return new ParsedSheet(sheetName, sheetIndex, sheetPath, cells, merges, images, charts, shapes, maxRow, maxCol);
   }
 
   private static String collectInlineText(final Element cellElement, final WorksheetParserDependencies deps) {
@@ -713,12 +717,18 @@ public final class WorksheetParser {
     private final String filename;
     private final String path;
     private final byte[] data;
+    private final String mediaPath;
 
     public ParsedImageAsset(final String anchor, final String filename, final String path, final byte[] data) {
+      this(anchor, filename, path, data, "");
+    }
+
+    public ParsedImageAsset(final String anchor, final String filename, final String path, final byte[] data, final String mediaPath) {
       this.anchor = anchor;
       this.filename = filename;
       this.path = path;
       this.data = data;
+      this.mediaPath = mediaPath;
     }
 
     public String getAnchor() {
@@ -735,6 +745,10 @@ public final class WorksheetParser {
 
     public byte[] getData() {
       return data;
+    }
+
+    public String getMediaPath() {
+      return mediaPath;
     }
   }
 
@@ -773,12 +787,23 @@ public final class WorksheetParser {
     private final String title;
     private final String chartType;
     private final List<ParsedChartSeries> series;
+    private final String chartPath;
 
     public ParsedChartAsset(final String anchor, final String title, final String chartType, final List<ParsedChartSeries> series) {
+      this(anchor, title, chartType, series, "");
+    }
+
+    public ParsedChartAsset(
+        final String anchor,
+        final String title,
+        final String chartType,
+        final List<ParsedChartSeries> series,
+        final String chartPath) {
       this.anchor = anchor;
       this.title = title;
       this.chartType = chartType;
       this.series = series;
+      this.chartPath = chartPath;
     }
 
     public String getAnchor() {
@@ -795,6 +820,10 @@ public final class WorksheetParser {
 
     public List<ParsedChartSeries> getSeries() {
       return series;
+    }
+
+    public String getChartPath() {
+      return chartPath;
     }
   }
 
@@ -822,6 +851,14 @@ public final class WorksheetParser {
     private final String svgFilename;
     private final String svgPath;
     private final byte[] svgData;
+    private final String name;
+    private final String kind;
+    private final String text;
+    private final Long widthEmu;
+    private final Long heightEmu;
+    private final String elementName;
+    private final String anchorElementName;
+    private final SheetAssets.BoundingBox bbox;
 
     public ParsedShapeAsset(
         final String anchor,
@@ -829,11 +866,36 @@ public final class WorksheetParser {
         final String svgFilename,
         final String svgPath,
         final byte[] svgData) {
+      this(anchor, rawEntries, svgFilename, svgPath, svgData, "", "", "", null, null, "", "", null);
+    }
+
+    public ParsedShapeAsset(
+        final String anchor,
+        final List<ParsedShapeRawEntry> rawEntries,
+        final String svgFilename,
+        final String svgPath,
+        final byte[] svgData,
+        final String name,
+        final String kind,
+        final String text,
+        final Long widthEmu,
+        final Long heightEmu,
+        final String elementName,
+        final String anchorElementName,
+        final SheetAssets.BoundingBox bbox) {
       this.anchor = anchor;
       this.rawEntries = rawEntries;
       this.svgFilename = svgFilename;
       this.svgPath = svgPath;
       this.svgData = svgData;
+      this.name = name;
+      this.kind = kind;
+      this.text = text;
+      this.widthEmu = widthEmu;
+      this.heightEmu = heightEmu;
+      this.elementName = elementName;
+      this.anchorElementName = anchorElementName;
+      this.bbox = bbox;
     }
 
     public String getAnchor() {
@@ -854,6 +916,38 @@ public final class WorksheetParser {
 
     public byte[] getSvgData() {
       return svgData;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getKind() {
+      return kind;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public Long getWidthEmu() {
+      return widthEmu;
+    }
+
+    public Long getHeightEmu() {
+      return heightEmu;
+    }
+
+    public String getElementName() {
+      return elementName;
+    }
+
+    public String getAnchorElementName() {
+      return anchorElementName;
+    }
+
+    public SheetAssets.BoundingBox getBbox() {
+      return bbox;
     }
   }
 }
