@@ -17,7 +17,7 @@ Document version: `2026-04-22`
 
 ## Next Queue
 
-- table detector / sheet assets の分割移植を検討する
+- sheet assets の分割移植を検討する
 - CLI / Maven plugin の fixture coverage を広げる
 - Maven plugin smoke 実行の確認方法を固定する
 
@@ -45,6 +45,9 @@ Document version: `2026-04-22`
 - `sheet-markdown.ts` の最小範囲を Java へ移植した
 - `narrative-structure.ts` を Java へ移植した
 - `SheetMarkdown` の narrative rendering を `NarrativeStructure` へ委譲した
+- `border-grid.ts` を Java へ移植した
+- `table-detector.ts` を Java へ移植した
+- `SheetMarkdown` の table detection / table matrix rendering を `TableDetector` へ委譲した
 - `rich-text-*` helper 群を Java へ移植した
 - `SheetMarkdown` の cell display rendering を `RichTextRenderer` へ委譲した
 - table cell pipe escaping を rich-text renderer 経由でも二重エスケープしないよう調整した

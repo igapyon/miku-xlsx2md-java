@@ -4,16 +4,12 @@
  */
 package jp.igapyon.mikuxlsx2md.sheetmarkdown;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
@@ -21,6 +17,7 @@ import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructure;
 import jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer;
+import jp.igapyon.mikuxlsx2md.tabledetector.TableDetector;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 
@@ -32,11 +29,7 @@ public final class SheetMarkdown {
   }
 
   public static Map<String, WorksheetParser.ParsedCell> buildCellMap(final WorksheetParser.ParsedSheet sheet) {
-    final Map<String, WorksheetParser.ParsedCell> map = new LinkedHashMap<String, WorksheetParser.ParsedCell>();
-    for (final WorksheetParser.ParsedCell cell : safeCells(sheet)) {
-      map.put(cell.getRow() + ":" + cell.getCol(), cell);
-    }
-    return map;
+    return TableDetector.buildCellMap(sheet);
   }
 
   public static String formatCellForMarkdown(final WorksheetParser.ParsedCell cell, final MarkdownOptions options) {
@@ -178,33 +171,19 @@ public final class SheetMarkdown {
   public static List<TableCandidate> detectTableCandidates(
       final WorksheetParser.ParsedSheet sheet,
       final String tableDetectionMode) {
-    final List<WorksheetParser.ParsedCell> seedCells = new ArrayList<WorksheetParser.ParsedCell>();
-    final boolean borderMode = "border".equals(MarkdownOptions.normalizeTableDetectionMode(tableDetectionMode));
-    for (final WorksheetParser.ParsedCell cell : safeCells(sheet)) {
-      if (borderMode) {
-        if (hasBorder(cell)) {
-          seedCells.add(cell);
-        }
-      } else if (!stringValue(cell.getOutputValue()).trim().isEmpty() || hasBorder(cell)) {
-        seedCells.add(cell);
-      }
-    }
     final List<TableCandidate> candidates = new ArrayList<TableCandidate>();
-    for (final List<WorksheetParser.ParsedCell> component : collectConnectedComponents(seedCells, borderMode)) {
-      final TableCandidate candidate = createTableCandidate(component);
-      if (candidate != null) {
-        candidates.add(candidate);
-      }
+    for (final TableDetector.TableCandidate candidate : TableDetector.detectTableCandidates(
+        sheet,
+        TableDetector.DEFAULT_TABLE_SCORE_WEIGHTS,
+        tableDetectionMode)) {
+      candidates.add(new TableCandidate(
+          candidate.getStartRow(),
+          candidate.getStartCol(),
+          candidate.getEndRow(),
+          candidate.getEndCol(),
+          candidate.getScore(),
+          candidate.getReasonSummary()));
     }
-    Collections.sort(candidates, new Comparator<TableCandidate>() {
-      @Override
-      public int compare(final TableCandidate left, final TableCandidate right) {
-        if (left.getStartRow() != right.getStartRow()) {
-          return Integer.compare(left.getStartRow(), right.getStartRow());
-        }
-        return Integer.compare(left.getStartCol(), right.getStartCol());
-      }
-    });
     return candidates;
   }
 
@@ -213,23 +192,16 @@ public final class SheetMarkdown {
       final TableCandidate candidate,
       final MarkdownOptions options,
       final WorkbookLoader.ParsedWorkbook workbook) {
-    final Map<String, WorksheetParser.ParsedCell> cellMap = buildCellMap(sheet);
-    final List<List<String>> rows = new ArrayList<List<String>>();
-    for (int row = candidate.getStartRow(); row <= candidate.getEndRow(); row += 1) {
-      final List<String> values = new ArrayList<String>();
-      boolean hasValue = false;
-      for (int col = candidate.getStartCol(); col <= candidate.getEndCol(); col += 1) {
-        final String value = formatCellForMarkdown(cellMap.get(row + ":" + col), options, workbook, sheet);
-        values.add(value);
-        if (!value.trim().isEmpty()) {
-          hasValue = true;
-        }
-      }
-      if (hasValue || !MarkdownOptions.resolveMarkdownOptions(options).isRemoveEmptyRows()) {
-        rows.add(values);
-      }
-    }
-    return rows;
+    return TableDetector.matrixFromCandidate(
+        sheet,
+        new TableDetector.Bounds(candidate.getStartRow(), candidate.getStartCol(), candidate.getEndRow(), candidate.getEndCol()),
+        options,
+        new TableDetector.CellFormatter() {
+          @Override
+          public String formatCellForMarkdown(final WorksheetParser.ParsedCell cell, final MarkdownOptions cellOptions) {
+            return SheetMarkdown.formatCellForMarkdown(cell, cellOptions, workbook, sheet);
+          }
+        });
   }
 
   public static String renderNarrativeBlock(final NarrativeBlock block) {
@@ -425,114 +397,6 @@ public final class SheetMarkdown {
 
   private static String createHeadingFragment(final String text) {
     return stringValue(text).trim().toLowerCase().replaceAll("<[^>]+>", "").replaceAll("[^\\p{L}\\p{N}\\s_-]+", "").replaceAll("\\s+", "-");
-  }
-
-  private static List<List<WorksheetParser.ParsedCell>> collectConnectedComponents(
-      final List<WorksheetParser.ParsedCell> seedCells,
-      final boolean borderMode) {
-    final Map<String, WorksheetParser.ParsedCell> positionMap = new LinkedHashMap<String, WorksheetParser.ParsedCell>();
-    for (final WorksheetParser.ParsedCell cell : seedCells) {
-      positionMap.put(cell.getRow() + ":" + cell.getCol(), cell);
-    }
-    final Set<String> visited = new HashSet<String>();
-    final List<List<WorksheetParser.ParsedCell>> components = new ArrayList<List<WorksheetParser.ParsedCell>>();
-    for (final WorksheetParser.ParsedCell cell : seedCells) {
-      final String key = cell.getRow() + ":" + cell.getCol();
-      if (visited.contains(key)) {
-        continue;
-      }
-      final Queue<WorksheetParser.ParsedCell> queue = new ArrayDeque<WorksheetParser.ParsedCell>();
-      final List<WorksheetParser.ParsedCell> component = new ArrayList<WorksheetParser.ParsedCell>();
-      queue.add(cell);
-      visited.add(key);
-      while (!queue.isEmpty()) {
-        final WorksheetParser.ParsedCell current = queue.remove();
-        component.add(current);
-        final int[][] deltas = new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        for (final int[] delta : deltas) {
-          final String nextKey = (current.getRow() + delta[0]) + ":" + (current.getCol() + delta[1]);
-          final WorksheetParser.ParsedCell next = positionMap.get(nextKey);
-          if (next == null || visited.contains(nextKey)) {
-            continue;
-          }
-          if (borderMode && !areBorderAdjacent(current, next)) {
-            continue;
-          }
-          visited.add(nextKey);
-          queue.add(next);
-        }
-      }
-      components.add(component);
-    }
-    return components;
-  }
-
-  private static TableCandidate createTableCandidate(final List<WorksheetParser.ParsedCell> component) {
-    if (component == null || component.isEmpty()) {
-      return null;
-    }
-    int startRow = Integer.MAX_VALUE;
-    int startCol = Integer.MAX_VALUE;
-    int endRow = 0;
-    int endCol = 0;
-    int nonEmpty = 0;
-    int bordered = 0;
-    for (final WorksheetParser.ParsedCell cell : component) {
-      startRow = Math.min(startRow, cell.getRow());
-      startCol = Math.min(startCol, cell.getCol());
-      endRow = Math.max(endRow, cell.getRow());
-      endCol = Math.max(endCol, cell.getCol());
-      if (!stringValue(cell.getOutputValue()).trim().isEmpty()) {
-        nonEmpty += 1;
-      }
-      if (hasBorder(cell)) {
-        bordered += 1;
-      }
-    }
-    final int rows = endRow - startRow + 1;
-    final int cols = endCol - startCol + 1;
-    if (rows < 2 || cols < 2) {
-      return null;
-    }
-    final double density = nonEmpty / (double) (rows * cols);
-    int score = 2;
-    final List<String> reasons = new ArrayList<String>();
-    reasons.add("Minimum grid");
-    if (bordered > 0) {
-      score += 3;
-      reasons.add("Has borders");
-    }
-    if (density >= 0.6d) {
-      score += 2;
-      reasons.add("High density");
-    }
-    if (score < 4) {
-      return null;
-    }
-    return new TableCandidate(startRow, startCol, endRow, endCol, score, reasons);
-  }
-
-  private static boolean areBorderAdjacent(final WorksheetParser.ParsedCell current, final WorksheetParser.ParsedCell next) {
-    if (current.getRow() == next.getRow() && Math.abs(current.getCol() - next.getCol()) == 1) {
-      return (current.getBorders().isTop() && next.getBorders().isTop())
-          || (current.getBorders().isBottom() && next.getBorders().isBottom())
-          || (current.getCol() < next.getCol()
-              ? current.getBorders().isRight() && next.getBorders().isLeft()
-              : current.getBorders().isLeft() && next.getBorders().isRight());
-    }
-    if (current.getCol() == next.getCol() && Math.abs(current.getRow() - next.getRow()) == 1) {
-      return (current.getBorders().isLeft() && next.getBorders().isLeft())
-          || (current.getBorders().isRight() && next.getBorders().isRight())
-          || (current.getRow() < next.getRow()
-              ? current.getBorders().isBottom() && next.getBorders().isTop()
-              : current.getBorders().isTop() && next.getBorders().isBottom());
-    }
-    return false;
-  }
-
-  private static boolean hasBorder(final WorksheetParser.ParsedCell cell) {
-    return cell.getBorders() != null
-        && (cell.getBorders().isTop() || cell.getBorders().isBottom() || cell.getBorders().isLeft() || cell.getBorders().isRight());
   }
 
   private static boolean shouldStartNarrativeBlock(
