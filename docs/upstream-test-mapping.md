@@ -239,6 +239,21 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-worksheet-tables.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTablesTest.normalizesStructuredTableKeys`
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTablesTest.returnsNoTablesWhenNoTablePartsExist`
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTablesTest.resolvesWorksheetTablePartsThroughRelationships`
+- `jp.igapyon.mikuxlsx2md.worksheettables.WorksheetTablesTest.ignoresTableDefinitionsWithInvalidRanges`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
+
+### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
 
 java tests:

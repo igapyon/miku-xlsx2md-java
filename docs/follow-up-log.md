@@ -21,6 +21,7 @@ upstream file:
 - `src/ts/markdown-table-escape.ts`
 - `src/ts/markdown-export.ts`
 - `src/ts/cell-format.ts`
+- `src/ts/worksheet-tables.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -40,6 +41,7 @@ java classes:
 - `MarkdownTableEscape`
 - `MarkdownExport`
 - `CellFormat`
+- `WorksheetTables`
 - `CliOptions`
 - `MikuXlsx2mdCli`
 - `MikuXlsx2mdMojo`
@@ -61,6 +63,7 @@ tests:
 - `CoreFixtureRegressionTest`
 - `MarkdownExportTest`
 - `CellFormatTest`
+- `WorksheetTablesTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
 
@@ -91,6 +94,6 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - 次回の確認観点:
-  - `worksheet-tables`, `sheet-markdown` を追加する
+  - `sheet-markdown` を追加する
   - markdown export helper を core facade に接続する
   - Maven plugin を core API へ接続する
