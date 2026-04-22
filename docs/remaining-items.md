@@ -45,7 +45,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / table-basic / grid-layout cases
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression

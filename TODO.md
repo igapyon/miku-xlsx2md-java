@@ -77,6 +77,7 @@ Document version: `2026-04-22`
 - CLI / Maven plugin の upstream fixture conversion coverage を追加した
 - CLI に upstream table fixture を使う `border-priority` alias coverage を追加した
 - CLI に upstream shape fixture を使う `--include-shape-details` alias coverage を追加した
+- CLI に upstream display / named-range / narrative fixture conversion coverage を追加した
 - Maven plugin に upstream shape fixture conversion coverage を追加した
 - Maven plugin に upstream table fixture を使う `border-priority` coverage を追加した
 - Maven plugin に upstream display / named-range / narrative fixture conversion coverage を追加した
