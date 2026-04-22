@@ -14,6 +14,9 @@ upstream file:
 - `src/ts/zip-io.ts`
 - `src/ts/rels-parser.ts`
 - `src/ts/workbook-loader.ts`
+- `src/ts/shared-strings.ts`
+- `src/ts/styles-parser.ts`
+- `src/ts/worksheet-parser.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -26,6 +29,9 @@ java classes:
 - `ZipIo`
 - `RelsParser`
 - `WorkbookLoader`
+- `SharedStrings`
+- `StylesParser`
+- `WorksheetParser`
 - `CliOptions`
 - `MikuXlsx2mdCli`
 - `MikuXlsx2mdMojo`
@@ -40,6 +46,9 @@ tests:
 - `ZipIoTest`
 - `RelsParserTest`
 - `WorkbookLoaderTest`
+- `SharedStringsTest`
+- `StylesParserTest`
+- `WorksheetParserTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
 
@@ -51,9 +60,7 @@ diff summary:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
   - workbook parse core integration
-  - worksheet parse
-  - shared strings parse
-  - styles parse
+  - worksheet parse coverage expansion
   - markdown export
   - zip export
   - summary output
@@ -71,6 +78,6 @@ follow-up:
 - fixture:
   - none
 - 次回の確認観点:
-  - shared strings / styles / worksheet parser を Java へ移す
+  - workbook loader に shared strings / styles / worksheet parser を接続する
   - workbook parsing の最小入口から実データ読込へ進める
   - Maven plugin を core API へ接続する

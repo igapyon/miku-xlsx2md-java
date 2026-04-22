@@ -116,6 +116,48 @@ notes:
 - Java-side extension: minimum workbook entrypoint currently uses simplified placeholder value objects
 
 ### upstream file:
+`src/ts/shared-strings.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings`
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings.SharedStringEntry`
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings.RichTextRun`
+
+notes:
+- facade: static shared string parsing helpers
+- helper split: rich-text run extraction kept inside same class
+- Java-side extension: XML utils are called directly instead of runtime-env indirection
+
+### upstream file:
+`src/ts/styles-parser.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParser`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParser.BorderFlags`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParser.TextStyle`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParser.CellStyleInfo`
+
+notes:
+- facade: static style parsing helpers
+- helper split: builtin format code registry kept in same class
+- Java-side extension: XML utils are called directly instead of runtime-env indirection
+
+### upstream file:
+`src/ts/worksheet-parser.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ParsedSheet`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ParsedCell`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.Hyperlink`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ExtractedCellOutput`
+
+notes:
+- facade: static worksheet parsing helpers
+- helper split: hyperlink parsing and shared-formula translation kept in same class
+- Java-side extension: current scope is the minimum range covered by upstream unit tests
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -140,6 +182,6 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/shared-strings.ts`
-- `src/ts/styles-parser.ts`
-- `src/ts/worksheet-parser.ts`
+- `src/ts/worksheet-tables.ts`
+- `src/ts/sheet-markdown.ts`
+- `src/ts/markdown-export.ts`

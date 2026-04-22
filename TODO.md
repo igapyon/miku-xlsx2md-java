@@ -12,17 +12,16 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- shared strings / styles / worksheet parser を接続する
 - CLI と Maven plugin の接続先となる core API facade を整える
 - fixture を使う workbook parse 単位の focused regression を追加する
 - markdown export の最小 round-trip を作る
+- workbook loader に worksheet parser を実接続する
 
 ## Next Queue
 
-- worksheet parser の最小移植を進める
-- shared strings parser を移植する
-- styles parser を移植する
+- workbook loader に shared strings / styles / worksheet parser を組み込む
 - sheet / workbook artifact 組み立てを進める
+- worksheet parser の coverage を広げる
 - Maven plugin を runtime core に接続する
 
 ## Done In This Step
@@ -37,6 +36,9 @@ Document version: `2026-04-22`
 - `zip-io.ts` を Java へ移植した
 - `rels-parser.ts` を Java へ移植した
 - workbook loader の最小入口を追加した
+- `shared-strings.ts` を Java へ移植した
+- `styles-parser.ts` を Java へ移植した
+- `worksheet-parser.ts` の最小範囲を Java へ移植した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した
 - `mvn -o test` を通した

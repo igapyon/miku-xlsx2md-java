@@ -21,15 +21,16 @@ Java port scaffolding is ready as a Maven multi-module project, and the first lo
   - `zip-io`
   - `rels-parser`
   - workbook loader minimum entrypoint
+  - `shared-strings`
+  - `styles-parser`
+  - worksheet parser minimum scope
   - CLI option vocabulary skeleton
   - Maven plugin skeleton
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
-  - worksheet parser
-  - shared strings
-  - styles parser
+  - workbook loader core integration
   - markdown export
   - end-to-end CLI conversion
 
@@ -45,6 +46,9 @@ Java port scaffolding is ready as a Maven multi-module project, and the first lo
 - `mvn -pl miku-xlsx2md -Dtest=ZipIoTest test`
 - `mvn -pl miku-xlsx2md -Dtest=RelsParserTest test`
 - `mvn -pl miku-xlsx2md -Dtest=WorkbookLoaderTest test`
+- `mvn -pl miku-xlsx2md -Dtest=SharedStringsTest test`
+- `mvn -pl miku-xlsx2md -Dtest=StylesParserTest test`
+- `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
 - `mvn -pl miku-xlsx2md-maven-plugin -Dtest=MikuXlsx2mdMojoTest test`
 
@@ -54,5 +58,5 @@ Java port scaffolding is ready as a Maven multi-module project, and the first lo
 
 ## Next Unit
 
-- Connect shared strings / styles / worksheet parsing to the workbook loader
+- Connect workbook loader to the parsed shared strings, styles, and worksheet parser
 - Connect Maven plugin to runtime core API once workbook conversion becomes available
