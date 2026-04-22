@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jp.igapyon.mikuxlsx2md.relsparser.RelsParser;
+import jp.igapyon.mikuxlsx2md.cellformat.CellFormat;
 import jp.igapyon.mikuxlsx2md.sharedstrings.SharedStrings;
 import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
@@ -192,7 +193,7 @@ public final class WorkbookLoader {
 
       @Override
       public String formatCellDisplayValue(final String rawValue, final StylesParser.CellStyleInfo style) {
-        return null;
+        return CellFormat.formatCellDisplayValue(rawValue, style);
       }
     };
   }

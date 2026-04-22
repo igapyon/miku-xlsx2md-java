@@ -68,6 +68,30 @@ class CoreFixtureRegressionTest {
     assertEquals("Jump to Other", findCell(summary.getCells(), "B6").getHyperlink().getDisplay());
   }
 
+  @Test
+  void parsesUpstreamDisplayFormatFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("display", "display-format-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "display-format-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+
+    assertEquals("display-format", sheet.getName());
+    assertEquals(13, sheet.getMaxRow());
+    assertEquals(5, sheet.getMaxCol());
+    assertEquals("1,024,768", findCell(sheet.getCells(), "D3").getOutputValue());
+    assertEquals("¥1,024,768", findCell(sheet.getCells(), "D4").getOutputValue());
+    assertEquals("¥ 1,024,768", findCell(sheet.getCells(), "D5").getOutputValue());
+    assertEquals("1996/2/28", findCell(sheet.getCells(), "D6").getOutputValue());
+    assertEquals("12:34:56", findCell(sheet.getCells(), "D7").getOutputValue());
+    assertEquals("98.7%", findCell(sheet.getCells(), "D8").getOutputValue());
+    assertEquals("3/4", findCell(sheet.getCells(), "D9").getOutputValue());
+    assertEquals("1.023456E+06", findCell(sheet.getCells(), "D10").getOutputValue());
+    assertEquals("1023456", findCell(sheet.getCells(), "D11").getOutputValue());
+    assertEquals("1023456", findCell(sheet.getCells(), "D12").getOutputValue());
+    assertEquals("令和8年3月17日", findCell(sheet.getCells(), "D13").getOutputValue());
+  }
+
   private static WorksheetParser.ParsedCell findCell(final List<WorksheetParser.ParsedCell> cells, final String address) {
     for (final WorksheetParser.ParsedCell cell : cells) {
       if (address.equals(cell.getAddress())) {

@@ -201,6 +201,19 @@ notes:
 - Java-side extension: export-side workbook and markdown summary shapes are expressed as immutable value objects
 
 ### upstream file:
+`src/ts/cell-format.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormat`
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormat.DateParts`
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormat.ResolvedCellLike`
+
+notes:
+- facade: static cell display formatting and value parsing helpers
+- helper split: date parts and mutable resolved-cell contract are nested types in the same class
+- Java-side extension: display formatting is wired from `WorkbookLoader` into `WorksheetParser` through dependency injection
+
+### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -225,6 +238,5 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/cell-format.ts`
 - `src/ts/worksheet-tables.ts`
 - `src/ts/sheet-markdown.ts`
