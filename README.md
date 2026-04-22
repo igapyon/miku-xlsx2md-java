@@ -56,6 +56,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
+- Focused workbook fixture regression includes upstream formula and chart fixtures
 - Focused workbook fixture regression includes upstream rich text and merge fixtures
 - Focused workbook fixture regression includes upstream image and shape fixtures
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
