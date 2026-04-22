@@ -13,7 +13,7 @@ Document version: `2026-04-22`
 ## Current Queue
 
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
-- worksheet parser の shared / cross-sheet formula fixture coverage をさらに広げる
+- worksheet parser の shared / cross-sheet formula fixture coverage を upstream fixture focused regression からさらに広げる
 
 ## Next Queue
 
@@ -63,6 +63,7 @@ Document version: `2026-04-22`
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - formula basic / chart basic fixture を使う workbook-to-markdown focused regression を追加した
+- formula cross-sheet / shared fixture を使う workbook-to-markdown focused regression を追加した
 - formula spill / chart mixed fixture を使う workbook-to-markdown focused regression を追加した
 - rich usecase / merge pattern fixture を使う workbook-to-markdown focused regression を追加した
 - CLI を runtime core conversion に接続した
