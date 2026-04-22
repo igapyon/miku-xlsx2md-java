@@ -295,6 +295,29 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-rich-text-parser.test.js`
+`tests/xlsx2md-rich-text-plain-formatter.test.js`
+`tests/xlsx2md-rich-text-github-formatter.test.js`
+`tests/xlsx2md-rich-text-renderer.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.splitsRawTextIntoTextAndLineBreakTokens`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.tokenizesPlainModeIntoASingleEscapedTextToken`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.tokenizesGithubFallbackCellsIntoStyledTextAndLineBreakTokens`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.rendersTokenizedRichTextWithGithubFormatting`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.fallsBackToPlainTokensInPlainMode`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.rendersEscapedMarkdownLinkLikeTextSafelyInsideStyledRuns`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.rendersConsecutiveLineBreaksAcrossStyledRichRuns`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.showsPlainVsGithubDifferencesForTheSameRichTextInput`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRendererTest.suppressesUnderlineWhenRequestedForHyperlinkRendering`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest test`
+
+### upstream test / intent:
 `tests/xlsx2md-sheet-markdown.test.js`
 
 java tests:
@@ -311,7 +334,7 @@ focused regression:
 
 notes:
 - Current Java coverage is a minimum conversion regression for the new facade.
-- Upstream advanced table detection, rich text formatting, calendar grouping, and asset grouping cases remain follow-up coverage.
+- Upstream advanced table detection, calendar grouping, and asset grouping cases remain follow-up coverage.
 
 ### upstream test / intent:
 Node CLI option compatibility, help text shape, and initial conversion I/O

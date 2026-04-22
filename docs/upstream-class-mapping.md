@@ -237,6 +237,24 @@ notes:
 - Java-side extension: `SheetMarkdown.renderNarrativeBlock` delegates to this helper to preserve upstream responsibility boundaries
 
 ### upstream file:
+`src/ts/rich-text-parser.ts`
+`src/ts/rich-text-plain-formatter.ts`
+`src/ts/rich-text-github-formatter.ts`
+`src/ts/rich-text-renderer.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer.RichTextStyle`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer.StyledTextPart`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer.RichTextToken`
+- `jp.igapyon.mikuxlsx2md.richtextrenderer.RichTextRenderer.RawLineToken`
+
+notes:
+- facade: static rich text tokenization, plain rendering, GitHub rendering, and cell display rendering helpers
+- helper split: parser / plain formatter / GitHub formatter / renderer responsibilities are currently kept in one Java class while preserving method-level boundaries
+- Java-side extension: `SheetMarkdown.renderCellDisplayText` delegates to this helper, and table pipe escaping is idempotent for already escaped rich-text output
+
+### upstream file:
 `src/ts/sheet-markdown.ts`
 
 java classes:
@@ -250,9 +268,9 @@ java classes:
 
 notes:
 - facade: static sheet / workbook markdown conversion helpers
-- helper split: narrative rendering is delegated to `NarrativeStructure`; simple table candidate detection, hyperlink formatting, and asset section rendering remain inside the same class
+- helper split: narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; simple table candidate detection, hyperlink formatting, and asset section rendering remain inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
-- remaining parity gap: upstream advanced table detector / rich text module split / shape block grouping are not yet fully ported
+- remaining parity gap: upstream advanced table detector / sheet asset split / shape block grouping are not yet fully ported
 
 ### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
@@ -280,5 +298,4 @@ notes:
 ## Next Candidates
 
 - `src/ts/table-detector.ts`
-- `src/ts/rich-text-*`
 - `src/ts/sheet-assets.ts`

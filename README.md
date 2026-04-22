@@ -40,6 +40,11 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `worksheet-tables.ts`
 - Narrative structure helper is implemented:
   - `narrative-structure.ts`
+- Rich text rendering helper layer is implemented:
+  - `rich-text-parser.ts`
+  - `rich-text-plain-formatter.ts`
+  - `rich-text-github-formatter.ts`
+  - `rich-text-renderer.ts`
 - Initial sheet-to-markdown conversion layer is implemented:
   - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
