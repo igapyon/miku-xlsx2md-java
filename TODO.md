@@ -12,8 +12,8 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- advanced `sheet-markdown` parity coverage を fixture 側へ広げる
-- worksheet parser の fixture coverage をさらに広げる
+- advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
+- worksheet parser の formula / chart fixture coverage をさらに広げる
 
 ## Next Queue
 
@@ -62,6 +62,7 @@ Document version: `2026-04-22`
 - table cell pipe escaping を rich-text renderer 経由でも二重エスケープしないよう調整した
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
+- rich usecase / merge pattern fixture を使う workbook-to-markdown focused regression を追加した
 - CLI を runtime core conversion に接続した
 - Maven plugin を runtime core conversion に接続した
 - CLI / Maven plugin の upstream fixture conversion coverage を追加した
