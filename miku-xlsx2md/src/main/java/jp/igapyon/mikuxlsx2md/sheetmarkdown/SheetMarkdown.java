@@ -25,6 +25,10 @@ import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 public final class SheetMarkdown {
   private static final Pattern ISO_DATE_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
   private static final Pattern MONTH_TITLE_PATTERN = Pattern.compile("^\\d{4}年\\d{1,2}月$");
+  private static final long DEFAULT_CELL_WIDTH_EMU = 609600L;
+  private static final long DEFAULT_CELL_HEIGHT_EMU = 190500L;
+  private static final long SHAPE_BLOCK_GAP_X_EMU = DEFAULT_CELL_WIDTH_EMU * 4L;
+  private static final long SHAPE_BLOCK_GAP_Y_EMU = DEFAULT_CELL_HEIGHT_EMU * 6L;
 
   private SheetMarkdown() {
   }
@@ -242,6 +246,10 @@ public final class SheetMarkdown {
       final WorksheetParser.ParsedSheet sheet,
       final MarkdownOptions options) {
     final MarkdownOptions.ResolvedMarkdownOptions resolvedOptions = MarkdownOptions.resolveMarkdownOptions(options);
+    final List<WorksheetParser.ParsedShapeAsset> shapes = safeShapes(sheet);
+    final List<SheetAssets.ShapeBlock> shapeBlocks = SheetAssets.extractShapeBlocksFromAssets(
+        shapes,
+        new SheetAssets.ShapeBlockOptions(DEFAULT_CELL_WIDTH_EMU, DEFAULT_CELL_HEIGHT_EMU, SHAPE_BLOCK_GAP_X_EMU, SHAPE_BLOCK_GAP_Y_EMU));
     final List<TableCandidate> tables = detectTableCandidates(sheet, resolvedOptions.getTableDetectionMode());
     final List<NarrativeBlock> narrativeBlocks = extractNarrativeBlocks(workbook, sheet, tables, options);
     final List<MarkdownExport.FormulaDiagnostic> formulaDiagnostics = createFormulaDiagnostics(sheet);
@@ -272,7 +280,7 @@ public final class SheetMarkdown {
         body,
         SheetAssets.renderImageSection(sheet),
         SheetAssets.renderChartSection(safeCharts(sheet)),
-        SheetAssets.renderShapeSection(safeShapes(sheet), resolvedOptions.isIncludeShapeDetails()));
+        SheetAssets.renderShapeSection(shapes, shapeBlocks, resolvedOptions.isIncludeShapeDetails()));
   }
 
   public static String createSheetMarkdownText(

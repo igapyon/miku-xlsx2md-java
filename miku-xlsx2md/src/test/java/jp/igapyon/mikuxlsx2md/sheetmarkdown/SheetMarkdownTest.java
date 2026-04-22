@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
 import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
+import jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets;
 import jp.igapyon.mikuxlsx2md.stylesparser.StylesParser;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
@@ -88,6 +89,32 @@ class SheetMarkdownTest {
     assertTrue(files.get(0).getMarkdown().contains("Note"));
   }
 
+  @Test
+  void convertsSheetWithShapeBlocks() {
+    final List<WorksheetParser.ParsedShapeAsset> shapes = Arrays.asList(
+        shape("B3", new SheetAssets.BoundingBox(0, 0, 100, 20)),
+        shape("E8", new SheetAssets.BoundingBox(3000000, 1600000, 3100000, 1700000)));
+    final WorksheetParser.ParsedSheet sheet = new WorksheetParser.ParsedSheet(
+        "Shapes",
+        1,
+        "xl/worksheets/sheet1.xml",
+        Arrays.asList(cell("A1", 1, 1, "Note")),
+        Collections.<AddressUtils.MergeRange>emptyList(),
+        Collections.<WorksheetParser.ParsedImageAsset>emptyList(),
+        Collections.<WorksheetParser.ParsedChartAsset>emptyList(),
+        shapes,
+        10,
+        5);
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertTrue(file.getMarkdown().contains("### Shape Block: 001"));
+    assertTrue(file.getMarkdown().contains("- Shapes: Shape 001"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 001 (B3)"));
+    assertTrue(file.getMarkdown().contains("#### Shape: 002 (E8)"));
+  }
+
   private static WorkbookLoader.ParsedWorkbook workbook(final WorksheetParser.ParsedSheet sheet) {
     return new WorkbookLoader.ParsedWorkbook(
         "book.xlsx",
@@ -138,5 +165,22 @@ class SheetMarkdownTest {
         "",
         "",
         hyperlink);
+  }
+
+  private static WorksheetParser.ParsedShapeAsset shape(final String anchor, final SheetAssets.BoundingBox bbox) {
+    return new WorksheetParser.ParsedShapeAsset(
+        anchor,
+        Arrays.asList(new WorksheetParser.ParsedShapeRawEntry("kind", "rect")),
+        null,
+        null,
+        null,
+        "Shape",
+        "Rectangle",
+        "",
+        null,
+        null,
+        "xdr:sp",
+        "xdr:twoCellAnchor",
+        bbox);
   }
 }

@@ -49,6 +49,7 @@ Document version: `2026-04-22`
 - `SheetMarkdown` の table detection / table matrix rendering を `TableDetector` へ委譲した
 - `sheet-assets.ts` の rendering / shape block grouping 範囲を Java へ移植した
 - `SheetMarkdown` の asset section rendering を `SheetAssets` へ委譲した
+- `SheetMarkdown` の shape block rendering を `SheetAssets` の block helper へ接続した
 - `sheet-assets.ts` の `parseDrawingImages` / `parseDrawingCharts` / `parseDrawingShapes` を Java へ移植した
 - `WorksheetParser` の parsed sheet 生成を sheet assets parse helper へ接続した
 - `office-drawing.ts` の shape SVG rendering helper を Java へ移植した
