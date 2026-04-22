@@ -276,6 +276,38 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void suppressesUnderlineMarkupForHyperlinkCellsInGithubMode() {
+    final WorksheetParser.ParsedCell linkedCell = new WorksheetParser.ParsedCell(
+        "A1",
+        1,
+        1,
+        "s",
+        "Linked",
+        "Linked",
+        "",
+        null,
+        null,
+        "none",
+        0,
+        new StylesParser.BorderFlags(false, false, false, false),
+        0,
+        "General",
+        new StylesParser.TextStyle(false, false, false, true),
+        null,
+        "",
+        "",
+        new WorksheetParser.Hyperlink("external", "https://example.com/", "", "", ""));
+    final WorksheetParser.ParsedSheet sheet = sheet("Sheet1", Arrays.asList(linkedCell));
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+
+    assertTrue(file.getMarkdown().contains("[Linked](https://example.com/)"));
+    assertFalse(file.getMarkdown().contains("<ins>Linked</ins>"));
+  }
+
+  @Test
   void preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode() {
     final WorksheetParser.ParsedSheet rawSheet = sheet("Raw", Arrays.asList(
         cell("A1", 1, 1, "Displayed", "https://raw.example/",
