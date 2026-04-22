@@ -142,6 +142,45 @@ class WorksheetParserTest {
   }
 
   @Test
+  void expandsHyperlinkRangesAndHashTargetsAcrossCells() {
+    final WorksheetParser.WorksheetParserDependencies deps = createDeps();
+    final String worksheetXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" "
+        + "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">"
+        + "<sheetData>"
+        + "<row r=\"1\">"
+        + "<c r=\"A1\" t=\"inlineStr\"><is><t>A</t></is></c>"
+        + "<c r=\"B1\" t=\"inlineStr\"><is><t>B</t></is></c>"
+        + "</row>"
+        + "<row r=\"2\">"
+        + "<c r=\"A2\" t=\"inlineStr\"><is><t>C</t></is></c>"
+        + "<c r=\"B2\" t=\"inlineStr\"><is><t>D</t></is></c>"
+        + "</row>"
+        + "</sheetData>"
+        + "<hyperlinks><hyperlink ref=\"A1:B2\" location=\"#'Other Sheet'!D4\" display=\"Range\" tooltip=\"jump\"/></hyperlinks>"
+        + "</worksheet>";
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    files.put("xl/worksheets/sheet1.xml", worksheetXml.getBytes(StandardCharsets.UTF_8));
+
+    final WorksheetParser.ParsedSheet sheet = WorksheetParser.parseWorksheet(
+        files,
+        "Sheet1",
+        "xl/worksheets/sheet1.xml",
+        1,
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        Arrays.asList(new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", StylesParser.EMPTY_TEXT_STYLE)),
+        deps);
+
+    final WorksheetParser.Hyperlink expected =
+        new WorksheetParser.Hyperlink("internal", "'Other Sheet'!D4", "'Other Sheet'!D4", "jump", "Range");
+    assertEquals(expected, findCell(sheet, "A1").getHyperlink());
+    assertEquals(expected, findCell(sheet, "B1").getHyperlink());
+    assertEquals(expected, findCell(sheet, "A2").getHyperlink());
+    assertEquals(expected, findCell(sheet, "B2").getHyperlink());
+    assertEquals(Arrays.asList("B2", "C2", "B3", "C3"), WorksheetParser.expandRangeAddresses("B2:C3"));
+  }
+
+  @Test
   void attachesCellTextStyleToSharedInlineBooleanAndFormattedValues() {
     final WorksheetParser.WorksheetParserDependencies deps = createDeps();
     final StylesParser.CellStyleInfo boldStyle =

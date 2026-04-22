@@ -12,8 +12,8 @@ Document version: `2026-04-22`
 
 ## Current Queue
 
-- advanced `sheet-markdown` parity coverage をさらに広げる
-- worksheet parser の coverage をさらに広げる
+- advanced `sheet-markdown` parity coverage を fixture 側へ広げる
+- worksheet parser の fixture coverage をさらに広げる
 
 ## Next Queue
 
@@ -51,7 +51,7 @@ Document version: `2026-04-22`
 - `sheet-assets.ts` の rendering / shape block grouping 範囲を Java へ移植した
 - `SheetMarkdown` の asset section rendering を `SheetAssets` へ委譲した
 - `SheetMarkdown` の shape block rendering を `SheetAssets` の block helper へ接続した
-- advanced `sheet-markdown` parity coverage に calendar / empty fallback / line break / literal escaping / hyperlink output mode cases を追加した
+- advanced `sheet-markdown` parity coverage に calendar / empty fallback / line break / literal escaping / hyperlink output mode / shape details toggle cases を追加した
 - `sheet-assets.ts` の `parseDrawingImages` / `parseDrawingCharts` / `parseDrawingShapes` を Java へ移植した
 - `WorksheetParser` の parsed sheet 生成を sheet assets parse helper へ接続した
 - `office-drawing.ts` の shape SVG rendering helper を Java へ移植した
@@ -66,6 +66,7 @@ Document version: `2026-04-22`
 - Maven plugin を runtime core conversion に接続した
 - CLI / Maven plugin の upstream fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
+- `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
 - docs を module 構成へ更新した

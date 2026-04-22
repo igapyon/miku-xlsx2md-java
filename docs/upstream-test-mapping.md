@@ -189,6 +189,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.translatesSharedFormulasAcrossRelativeReferences`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetCellsMergesAndSharedFormulas`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetHyperlinksFromLocalRefsAndExternalRelationships`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.expandsHyperlinkRangesAndHashTargetsAcrossCells`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.attachesCellTextStyleToSharedInlineBooleanAndFormattedValues`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.exposesFormulaCachedStateTypeAndSpillRef`
 
@@ -199,7 +200,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 
 notes:
-- Current Java coverage includes shared formula translation with absolute / sheet-qualified references, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
+- Current Java coverage includes shared formula translation with absolute / sheet-qualified references, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
 
 ### upstream test / intent:
 connected workbook parsing path through the Java core facade
@@ -404,7 +405,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.formatsHyperlinksRawAndBothModes`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsWorkbookThroughCoreFacadeShape`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetWithShapeBlocks`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.reordersCalendarLikeSectionsWithSidebar`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.createsEmptyBodyFallbackSummary`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesPlainAndGithubLineBreakDifferences`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsMarkdownMarkersLiteralInNarrativeOutput`
@@ -418,7 +421,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, calendar narrative grouping, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, and hyperlink output modes.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, plain/GitHub line break behavior, Markdown literal escaping, and hyperlink output modes.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:

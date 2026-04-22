@@ -98,19 +98,19 @@ diff summary:
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / empty fallback / line break / literal escaping / hyperlink output mode cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / line break / literal escaping / hyperlink output mode / shape details toggle cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
-  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns と formula metadata の coverage subset を追加済み
+  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location の coverage subset を追加済み
   - `office-drawing` は Java では shape SVG rendering helper 範囲を移植済み
   - `SheetAssets` は shape parsing 時に `OfficeDrawing` の SVG asset を接続済み
   - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
-  - worksheet parse coverage expansion
-  - advanced `sheet-markdown` parity coverage beyond the current subset
+  - worksheet parser fixture coverage expansion
+  - advanced `sheet-markdown` fixture parity coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 - Java 側独自拡張:
@@ -140,6 +140,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
   - `mvn test` pass
   - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after sheet-markdown / worksheet parser coverage expansion
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
@@ -148,6 +149,6 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - 次回の確認観点:
-  - advanced `sheet-markdown` parity coverage をさらに広げる
-  - worksheet parser coverage をさらに広げる
+  - advanced `sheet-markdown` fixture parity coverage をさらに広げる
+  - worksheet parser fixture coverage をさらに広げる
   - CLI / Maven plugin の fixture coverage をさらに広げる

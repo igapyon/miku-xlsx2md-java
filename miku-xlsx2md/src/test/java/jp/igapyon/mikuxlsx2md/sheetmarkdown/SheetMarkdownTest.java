@@ -117,6 +117,33 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled() {
+    final List<WorksheetParser.ParsedShapeAsset> shapes = Arrays.asList(
+        shape("B3", new SheetAssets.BoundingBox(0, 0, 100, 20)));
+    final WorksheetParser.ParsedSheet sheet = new WorksheetParser.ParsedSheet(
+        "Shapes",
+        1,
+        "xl/worksheets/sheet1.xml",
+        Collections.<WorksheetParser.ParsedCell>emptyList(),
+        Collections.<AddressUtils.MergeRange>emptyList(),
+        Collections.<WorksheetParser.ParsedImageAsset>emptyList(),
+        Collections.<WorksheetParser.ParsedChartAsset>emptyList(),
+        shapes,
+        10,
+        5);
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile enabled = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+    final MarkdownExport.MarkdownFile disabled = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, Boolean.FALSE, null, null, null));
+
+    assertTrue(enabled.getMarkdown().contains("### Shape Block: 001"));
+    assertTrue(enabled.getMarkdown().contains("#### Shape: 001 (B3)"));
+    assertFalse(disabled.getMarkdown().contains("### Shape Block:"));
+    assertFalse(disabled.getMarkdown().contains("#### Shape:"));
+  }
+
+  @Test
   void keepsNearbyCalendarRowsInOneNarrativeBlock() {
     final WorksheetParser.ParsedSheet sheet = sheet("Calendar", Arrays.asList(
         cell("A1", 1, 1, "2021-01-03"),
@@ -140,6 +167,37 @@ class SheetMarkdownTest {
     assertEquals(Arrays.asList(
         "2021-01-03 2021-01-04 2021-01-05 2021-01-06 2021-01-07 2021-01-08 2021-01-09",
         "仕事 私用"), blocks.get(0).getLines());
+  }
+
+  @Test
+  void reordersCalendarLikeSectionsWithSidebar() {
+    final WorksheetParser.ParsedSheet sheet = sheet("Calendar", Arrays.asList(
+        cell("C2", 2, 3, "2021年1月"),
+        cell("C11", 11, 3, "2021-01-03"),
+        cell("D11", 11, 4, "2021-01-04"),
+        cell("E11", 11, 5, "2021-01-05"),
+        cell("F11", 11, 6, "2021-01-06"),
+        cell("G11", 11, 7, "2021-01-07"),
+        cell("H11", 11, 8, "2021-01-08"),
+        cell("I11", 11, 9, "2021-01-09"),
+        cell("Y24", 24, 25, "2020-12-01"),
+        cell("Z24", 24, 26, "2020-12-02"),
+        cell("AA24", 24, 27, "2020-12-03"),
+        cell("AB24", 24, 28, "2020-12-04"),
+        cell("AC24", 24, 29, "2020-12-05")));
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+    final String markdown = file.getMarkdown();
+
+    final int headerIndex = markdown.indexOf("2021年1月");
+    final int mainIndex = markdown.indexOf("2021-01-03");
+    final int sidebarHeadingIndex = markdown.indexOf("### Sidebar");
+    final int sidebarIndex = markdown.indexOf("2020-12-01");
+    assertTrue(headerIndex >= 0);
+    assertTrue(mainIndex > headerIndex);
+    assertTrue(sidebarHeadingIndex > mainIndex);
+    assertTrue(sidebarIndex > sidebarHeadingIndex);
   }
 
   @Test
