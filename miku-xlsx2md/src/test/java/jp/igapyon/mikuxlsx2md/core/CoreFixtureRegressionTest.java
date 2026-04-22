@@ -207,6 +207,58 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void convertsUpstreamRichTextGithubFixtureToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-text-github-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "rich-text-github-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> githubFiles = Core.convertWorkbookToMarkdownFiles(workbook,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+    final List<MarkdownExport.MarkdownFile> plainFiles = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals(1, githubFiles.size());
+    assertEquals(1, plainFiles.size());
+    assertEquals("github", githubFiles.get(0).getSummary().getFormattingMode());
+    assertEquals("plain", plainFiles.get(0).getSummary().getFormattingMode());
+    assertEquals(2, githubFiles.get(0).getSummary().getTables());
+    assertEquals(2, plainFiles.get(0).getSummary().getTables());
+    assertTrue(githubFiles.get(0).getMarkdown().contains("**bold whole cell**"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("<ins>underline whole cell</ins>"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("plain **bold** *italic* strike <ins>underline</ins>"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("改行入り文字列で<br>**一部だけ太**字"));
+    assertTrue(plainFiles.get(0).getMarkdown().contains("bold whole cell"));
+    assertTrue(plainFiles.get(0).getMarkdown().contains("改行入り文字列で 一部だけ太字"));
+    assertTrue(!plainFiles.get(0).getMarkdown().contains("<ins>underline whole cell</ins>"));
+    assertTrue(!plainFiles.get(0).getMarkdown().contains("<br>"));
+  }
+
+  @Test
+  void convertsUpstreamRichMarkdownEscapeFixtureToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-markdown-escape-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "rich-markdown-escape-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> githubFiles = Core.convertWorkbookToMarkdownFiles(workbook,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+    final List<MarkdownExport.MarkdownFile> plainFiles = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals(1, githubFiles.size());
+    assertEquals(1, plainFiles.size());
+    assertEquals(36, workbook.getSheets().get(0).getCells().size());
+    assertEquals(2, githubFiles.get(0).getSummary().getTables());
+    assertEquals(2, plainFiles.get(0).getSummary().getTables());
+    assertTrue(githubFiles.get(0).getMarkdown().contains("line1 \\* x<br>**line2 \\[y\\]\\(z\\)**"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("| Header \\| One | Header \\*Two\\* | Header \\[Three\\]\\(x\\) |"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("| \\# not **heading** | \\- not list | 1\\. ***not*** list |"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("| a \\| b | a \\| b |"));
+    assertTrue(githubFiles.get(0).getMarkdown().contains("| code \\`sample\\` | code \\`sample\\` |"));
+    assertTrue(plainFiles.get(0).getMarkdown().contains("line1 \\* x line2 \\[y\\]\\(z\\)"));
+    assertTrue(plainFiles.get(0).getMarkdown().contains("| a\\*b | a\\*b |"));
+    assertTrue(plainFiles.get(0).getMarkdown().contains("| \\# not heading | \\- not list | 1\\. not list |"));
+    assertTrue(!plainFiles.get(0).getMarkdown().contains("<br>"));
+  }
+
+  @Test
   void parsesUpstreamMergePatternFixtureWorkbookWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("merge", "merge-pattern-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -225,6 +277,33 @@ class CoreFixtureRegressionTest {
     assertEquals(12, files.get(0).getSummary().getMerges());
     assertTrue(files.get(0).getMarkdown().contains("横結合"));
     assertTrue(files.get(0).getMarkdown().contains("2x2結合"));
+  }
+
+  @Test
+  void parsesUpstreamMergeMultilineFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("merge", "merge-multiline-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "merge-multiline-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("merge-multiline", sheet.getName());
+    assertEquals(6, sheet.getMaxRow());
+    assertEquals(3, sheet.getMaxCol());
+    assertEquals(11, sheet.getCells().size());
+    assertEquals(Arrays.asList("B3:C4"), Arrays.asList(sheet.getMerges().get(0).getRef()));
+    assertEquals("1行目\n2行目", findCell(sheet.getCells(), "B3").getOutputValue());
+    assertEquals("", findCell(sheet.getCells(), "C3").getOutputValue());
+    assertEquals("", findCell(sheet.getCells(), "B4").getOutputValue());
+    assertEquals("※結合セル内の改行確認用", findCell(sheet.getCells(), "A6").getOutputValue());
+    assertEquals("merge-multiline-sample01_001_merge-multiline.md", files.get(0).getFileName());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals(1, files.get(0).getSummary().getMerges());
+    assertEquals(Arrays.asList("A1-C4"), Arrays.asList(files.get(0).getSummary().getTableScores().get(0).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("| 1 | 1行目 2行目 | [←M←] |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 2 | [↑M↑] | [↑M↑] |"));
+    assertTrue(files.get(0).getMarkdown().contains("※結合セル内の改行確認用"));
   }
 
   @Test
@@ -412,6 +491,41 @@ class CoreFixtureRegressionTest {
     assertEquals(2, files.get(0).getSummary().getImages());
     assertTrue(files.get(0).getMarkdown().contains("### Image: 001 (C8)"));
     assertTrue(files.get(0).getMarkdown().contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void parsesUpstreamImageFixtureSample02WorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample02.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "image-basic-sample02.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("image", sheet.getName());
+    assertEquals(6, sheet.getMaxRow());
+    assertEquals(4, sheet.getMaxCol());
+    assertEquals(13, sheet.getCells().size());
+    assertEquals(1, sheet.getImages().size());
+    assertEquals(1, sheet.getCharts().size());
+    assertEquals("image_001.png", sheet.getImages().get(0).getFilename());
+    assertEquals("assets/image/image_001.png", sheet.getImages().get(0).getPath());
+    assertEquals("H3", sheet.getImages().get(0).getAnchor());
+    assertEquals("xl/media/image1.png", sheet.getImages().get(0).getMediaPath());
+    assertEquals("B9", sheet.getCharts().get(0).getAnchor());
+    assertEquals("このグラフのタイトル", sheet.getCharts().get(0).getTitle());
+    assertEquals("Line Chart", sheet.getCharts().get(0).getChartType());
+    assertEquals("値B", sheet.getCharts().get(0).getSeries().get(1).getName());
+    assertEquals("image!$D$4:$D$6", sheet.getCharts().get(0).getSeries().get(1).getValuesRef());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals(1, files.get(0).getSummary().getImages());
+    assertEquals(1, files.get(0).getSummary().getCharts());
+    assertEquals(Arrays.asList("B3-D6"), Arrays.asList(files.get(0).getSummary().getTableScores().get(0).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("| 項目 | 値A | 値B |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 2024年 | 13,568 | 9,072 |"));
+    assertTrue(files.get(0).getMarkdown().contains("### Chart: 001 (B9)"));
+    assertTrue(files.get(0).getMarkdown().contains("- Type: Line Chart"));
+    assertTrue(files.get(0).getMarkdown().contains("### Image: 001 (H3)"));
   }
 
   @Test
@@ -693,6 +807,32 @@ class CoreFixtureRegressionTest {
     assertTrue(files.get(0).getMarkdown().contains("### Table: 001 (B2-U6)"));
     assertTrue(files.get(0).getMarkdown().contains("### Table: 002 (C8-V16)"));
     assertTrue(files.get(0).getMarkdown().contains("| 8 | 更新日 | updatedate |  | システムへの更新日 |"));
+  }
+
+  @Test
+  void parsesUpstreamEdgeWeirdSheetNameFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "edge-weird-sheetname-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("A B-東京&大阪.01", sheet.getName());
+    assertEquals(4, sheet.getMaxRow());
+    assertEquals(4, sheet.getMaxCol());
+    assertEquals(16, sheet.getCells().size());
+    assertEquals("項番", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals("名称", findCell(sheet.getCells(), "B1").getOutputValue());
+    assertEquals("3月13日", findCell(sheet.getCells(), "C4").getOutputValue());
+    assertEquals("何かの登録日", findCell(sheet.getCells(), "D4").getOutputValue());
+    assertEquals("edge-weird-sheetname-sample01_001_A_B-東京_大阪.01.md", files.get(0).getFileName());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals(Arrays.asList("A1-D4"), Arrays.asList(files.get(0).getSummary().getTableScores().get(0).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("## Sheet: A B-東京&大阪.01"));
+    assertTrue(files.get(0).getMarkdown().contains("### Table: 001 (A1-D4)"));
+    assertTrue(files.get(0).getMarkdown().contains("| 1 | コード | 101 | 何かのコード |"));
+    assertTrue(files.get(0).getMarkdown().contains("| 3 | 登録日 | 3月13日 | 何かの登録日 |"));
   }
 
   @Test

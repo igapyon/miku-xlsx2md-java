@@ -13,6 +13,8 @@ Document version: `2026-04-22`
 ## Current Queue
 
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
+  - rich text / markdown escape fixture coverage は追加済み
+  - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
 - worksheet parser の shared / cross-sheet formula fixture coverage を upstream fixture focused regression からさらに広げる
 
 ## Next Queue
@@ -70,8 +72,12 @@ Document version: `2026-04-22`
 - formula cross-sheet / shared fixture を使う workbook-to-markdown focused regression を追加した
 - formula spill / chart mixed fixture を使う workbook-to-markdown focused regression を追加した
 - rich usecase / merge pattern fixture を使う workbook-to-markdown focused regression を追加した
+- rich text github / markdown escape fixture を使う workbook-to-markdown focused regression を追加した
+- merge multiline fixture を使う workbook-to-markdown focused regression を追加した
 - narrative / edge-empty / table border-priority fixture を使う workbook-to-markdown focused regression を追加した
+- edge weird-sheetname fixture を使う workbook-to-markdown focused regression を追加した
 - table-basic / grid-layout fixture を使う workbook-to-markdown focused regression を追加した
+- image-basic-sample02 fixture を使う workbook parse / markdown focused regression を追加した
 - CLI を runtime core conversion に接続した
 - Maven plugin を runtime core conversion に接続した
 - CLI / Maven plugin の upstream fixture conversion coverage を追加した
