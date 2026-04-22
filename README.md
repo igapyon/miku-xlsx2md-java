@@ -45,6 +45,8 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `table-detector.ts`
 - Sheet asset parsing / rendering / grouping helper layer is partially implemented:
   - `sheet-assets.ts`
+- Office drawing shape SVG helper layer is implemented:
+  - `office-drawing.ts`
 - Rich text rendering helper layer is implemented:
   - `rich-text-parser.ts`
   - `rich-text-plain-formatter.ts`
@@ -54,6 +56,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
+- Focused workbook fixture regression includes upstream image and shape fixtures
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format` and `hyperlink` fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion

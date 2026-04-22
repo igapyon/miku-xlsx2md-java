@@ -217,11 +217,17 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamDisplayFormatFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamDisplayFormatFixtureWorkbookToMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamHyperlinkFixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamImageFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamShapeFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamCalloutShapeFixtureWithoutSvgAssetsWhenAvailable`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test`
@@ -306,8 +312,21 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest test`
 
 notes:
-- Current Java coverage ports asset drawing parsing, rendering, and shape block grouping intent.
-- Shape SVG rendering remains follow-up coverage with future `office-drawing` helper migration.
+- Current Java coverage ports asset drawing parsing, rendering, shape block grouping, and parsed shape SVG helper connection intent.
+
+### upstream test / intent:
+`tests/xlsx2md-office-drawing.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawingTest.rendersTextboxShapesAsSvgAssetsWithSanitizedSheetDirectories`
+- `jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawingTest.rendersConnectorShapesWithArrowMarkers`
+- `jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawingTest.returnsNullForUnsupportedShapeKinds`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=OfficeDrawingTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
@@ -387,7 +406,7 @@ focused regression:
 
 notes:
 - Current Java coverage is a minimum conversion regression for the new facade.
-- Upstream calendar grouping and shape SVG rendering cases remain follow-up coverage.
+- Upstream calendar grouping cases remain follow-up coverage.
 
 ### upstream test / intent:
 Node CLI option compatibility, help text shape, and initial conversion I/O

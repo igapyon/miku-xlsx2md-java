@@ -6,9 +6,11 @@ package jp.igapyon.mikuxlsx2md.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -127,6 +129,83 @@ class CoreFixtureRegressionTest {
     assertEquals("Other", files.get(1).getSheetName());
     assertTrue(files.get(0).getMarkdown().contains("[Open example](https://example.com/)"));
     assertTrue(files.get(0).getMarkdown().contains("[Jump to Other](#other)"));
+  }
+
+  @Test
+  void parsesUpstreamImageFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "image-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("image", sheet.getName());
+    assertEquals(13, sheet.getMaxRow());
+    assertEquals(6, sheet.getMaxCol());
+    assertEquals(2, sheet.getImages().size());
+    assertEquals("image_001.png", sheet.getImages().get(0).getFilename());
+    assertEquals("assets/image/image_001.png", sheet.getImages().get(0).getPath());
+    assertEquals("C8", sheet.getImages().get(0).getAnchor());
+    assertEquals("xl/media/image1.png", sheet.getImages().get(0).getMediaPath());
+    assertEquals("image_002.png", sheet.getImages().get(1).getFilename());
+    assertEquals("assets/image/image_002.png", sheet.getImages().get(1).getPath());
+    assertEquals("F8", sheet.getImages().get(1).getAnchor());
+    assertEquals("xl/media/image2.png", sheet.getImages().get(1).getMediaPath());
+    assertEquals("画像抽出サンプル", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals(2, files.get(0).getSummary().getImages());
+    assertTrue(files.get(0).getMarkdown().contains("### Image: 001 (C8)"));
+    assertTrue(files.get(0).getMarkdown().contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void parsesUpstreamShapeFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "shape-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("shape-basic", sheet.getName());
+    assertEquals(3, sheet.getShapes().size());
+    assertEquals("H3", sheet.getShapes().get(0).getAnchor());
+    assertEquals("テキスト ボックス 1", sheet.getShapes().get(0).getName());
+    assertEquals("Text Box", sheet.getShapes().get(0).getKind());
+    assertEquals("テキストボックスの例", sheet.getShapes().get(0).getText());
+    assertEquals(Long.valueOf(1980029L), sheet.getShapes().get(0).getWidthEmu());
+    assertEquals(Long.valueOf(392608L), sheet.getShapes().get(0).getHeightEmu());
+    assertEquals("shape_001.svg", sheet.getShapes().get(0).getSvgFilename());
+    assertEquals("assets/shape-basic/shape_001.svg", sheet.getShapes().get(0).getSvgPath());
+    assertTrue(new String(sheet.getShapes().get(0).getSvgData(), StandardCharsets.UTF_8).contains("テキストボックスの例"));
+    assertEquals("H8", sheet.getShapes().get(1).getAnchor());
+    assertEquals("Straight Arrow Connector", sheet.getShapes().get(1).getKind());
+    assertEquals("shape_002.svg", sheet.getShapes().get(1).getSvgFilename());
+    assertEquals("K3", sheet.getShapes().get(2).getAnchor());
+    assertEquals("Rectangle", sheet.getShapes().get(2).getKind());
+    assertEquals("shape_003.svg", sheet.getShapes().get(2).getSvgFilename());
+    assertEquals(0, files.get(0).getSummary().getImages());
+    assertEquals(0, files.get(0).getSummary().getCharts());
+    assertTrue(files.get(0).getMarkdown().contains("#### Shape: 001 (H3)"));
+    assertTrue(files.get(0).getMarkdown().contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
+  }
+
+  @Test
+  void parsesUpstreamCalloutShapeFixtureWithoutSvgAssetsWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-callout-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "shape-callout-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("shape-callout", sheet.getName());
+    assertEquals(4, sheet.getShapes().size());
+    assertEquals("Shape (wedgeRoundRectCallout)", sheet.getShapes().get(0).getKind());
+    assertEquals("角四角", sheet.getShapes().get(0).getText());
+    assertNull(sheet.getShapes().get(0).getSvgPath());
+    assertTrue(files.get(0).getMarkdown().contains("- `a:prstGeom@prst`: `wedgeRoundRectCallout`"));
+    assertTrue(files.get(0).getMarkdown().contains("- `a:t#text`: `角四角`"));
   }
 
   private static WorksheetParser.ParsedCell findCell(final List<WorksheetParser.ParsedCell> cells, final String address) {

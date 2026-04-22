@@ -267,8 +267,20 @@ java classes:
 
 notes:
 - facade: static sheet asset directory sanitizing, drawing image/chart/shape parsing, asset section rendering, hierarchical raw entry rendering, and shape block grouping helpers
-- helper split: image/chart/shape Markdown rendering is delegated from `SheetMarkdown`; parsed sheet asset collection is called from `WorksheetParser`
-- remaining parity gap: shape SVG rendering remains dependent on future `office-drawing` helper migration
+- helper split: image/chart/shape Markdown rendering is delegated from `SheetMarkdown`; parsed sheet asset collection is called from `WorksheetParser`; shape SVG rendering is delegated to `OfficeDrawing`
+- Java-side extension: parsed shape SVG assets are attached during `SheetAssets.parseDrawingShapes`
+
+### upstream file:
+`src/ts/office-drawing.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawing`
+- `jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawing.SvgRenderResult`
+
+notes:
+- facade: static shape SVG rendering helper
+- helper split: shape SVG rendering is called from `SheetAssets.parseDrawingShapes`
+- Java-side extension: browser `TextEncoder` output is represented as UTF-8 `byte[]`
 
 ### upstream file:
 `src/ts/narrative-structure.ts`
@@ -315,7 +327,7 @@ notes:
 - facade: static sheet / workbook markdown conversion helpers
 - helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering is delegated to `SheetAssets`; hyperlink formatting remains inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
-- remaining parity gap: upstream shape SVG helper is not yet ported
+- remaining parity gap: advanced fixture parity coverage is still pending
 
 ### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
@@ -342,4 +354,4 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/office-drawing.ts` shape SVG rendering helper
+- advanced `sheet-markdown` parity coverage
