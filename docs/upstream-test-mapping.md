@@ -139,6 +139,51 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorkbookLoaderTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-shared-strings.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStringsTest.returnsAnEmptyListWhenSharedStringsXmlIsMissing`
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStringsTest.collectsPlainAndRichTextRuns`
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStringsTest.skipsPhoneticTextNodesAndNormalizesCrLfToLf`
+- `jp.igapyon.mikuxlsx2md.sharedstrings.SharedStringsTest.preservesSupportedRichTextEmphasisFlags`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=SharedStringsTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-styles-parser.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParserTest.returnsAGeneralDefaultStyleWhenStylesXmlIsMissing`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParserTest.detectsBorderSidesFromStyleAttributesOrChildNodes`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParserTest.parsesBordersAndCustomNumberFormatsFromStylesXml`
+- `jp.igapyon.mikuxlsx2md.stylesparser.StylesParserTest.fallsBackToBuiltInFormatCodesWhenNoCustomNumFmtExists`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=StylesParserTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-worksheet-parser.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.extractsSharedStringAndBooleanCellValues`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.translatesSharedFormulasAcrossRelativeReferences`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetCellsMergesAndSharedFormulas`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetHyperlinksFromLocalRefsAndExternalRelationships`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
+
+### upstream test / intent:
 Node CLI option compatibility and help text shape
 
 java tests:
