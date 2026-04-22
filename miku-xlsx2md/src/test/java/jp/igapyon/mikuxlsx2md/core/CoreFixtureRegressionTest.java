@@ -186,6 +186,8 @@ class CoreFixtureRegressionTest {
     assertEquals("shape_003.svg", sheet.getShapes().get(2).getSvgFilename());
     assertEquals(0, files.get(0).getSummary().getImages());
     assertEquals(0, files.get(0).getSummary().getCharts());
+    assertTrue(files.get(0).getMarkdown().contains("### Shape Block: 001"));
+    assertTrue(files.get(0).getMarkdown().contains("- Shapes: Shape 001, Shape 002, Shape 003"));
     assertTrue(files.get(0).getMarkdown().contains("#### Shape: 001 (H3)"));
     assertTrue(files.get(0).getMarkdown().contains("![shape_003.svg](assets/shape-basic/shape_003.svg)"));
   }

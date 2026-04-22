@@ -303,6 +303,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.rendersHierarchicalRawEntries`
 - `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.groupsNearbyShapesIntoShapeBlocks`
 - `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.rendersImageChartAndShapeSections`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.rendersUngroupedShapesAfterGroupedShapeBlocks`
 - `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.parsesDrawingImagesChartsAndShapes`
 
 fixtures:
@@ -397,6 +398,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetToMarkdownWithDetectedTableAndSummary`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.formatsHyperlinksRawAndBothModes`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsWorkbookThroughCoreFacadeShape`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetWithShapeBlocks`
 
 fixtures:
 - none
@@ -405,7 +407,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage is a minimum conversion regression for the new facade.
+- Current Java coverage includes the core facade path and shape block rendering connection.
 - Upstream calendar grouping cases remain follow-up coverage.
 
 ### upstream test / intent:

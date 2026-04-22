@@ -34,6 +34,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `border-grid`
   - `table-detector`
   - `sheet-assets` rendering / shape block grouping subset
+  - `SheetMarkdown` shape block rendering connection
   - `sheet-assets` parseDrawingImages / parseDrawingCharts / parseDrawingShapes subset
   - `WorksheetParser` sheet assets parse helper connection
   - `office-drawing` shape SVG rendering helper

@@ -267,7 +267,7 @@ java classes:
 
 notes:
 - facade: static sheet asset directory sanitizing, drawing image/chart/shape parsing, asset section rendering, hierarchical raw entry rendering, and shape block grouping helpers
-- helper split: image/chart/shape Markdown rendering is delegated from `SheetMarkdown`; parsed sheet asset collection is called from `WorksheetParser`; shape SVG rendering is delegated to `OfficeDrawing`
+- helper split: image/chart/shape Markdown rendering and shape block section rendering are delegated from `SheetMarkdown`; parsed sheet asset collection is called from `WorksheetParser`; shape SVG rendering is delegated to `OfficeDrawing`
 - Java-side extension: parsed shape SVG assets are attached during `SheetAssets.parseDrawingShapes`
 
 ### upstream file:
@@ -325,7 +325,7 @@ java classes:
 
 notes:
 - facade: static sheet / workbook markdown conversion helpers
-- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering is delegated to `SheetAssets`; hyperlink formatting remains inside the same class
+- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering and shape block rendering are delegated to `SheetAssets`; hyperlink formatting remains inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
 - remaining parity gap: advanced fixture parity coverage is still pending
 

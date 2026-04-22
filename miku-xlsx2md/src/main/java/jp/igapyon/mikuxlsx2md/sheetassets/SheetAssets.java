@@ -226,22 +226,29 @@ public final class SheetAssets {
   public static String renderShapeSection(
       final List<WorksheetParser.ParsedShapeAsset> shapes,
       final boolean includeShapeDetails) {
+    return renderShapeSection(shapes, Collections.<ShapeBlock>emptyList(), includeShapeDetails);
+  }
+
+  public static String renderShapeSection(
+      final List<WorksheetParser.ParsedShapeAsset> shapes,
+      final List<ShapeBlock> shapeBlocks,
+      final boolean includeShapeDetails) {
     if (!includeShapeDetails || shapes == null || shapes.isEmpty()) {
       return "";
     }
     final List<String> entries = new ArrayList<String>();
-    int index = 0;
-    for (final WorksheetParser.ParsedShapeAsset shape : shapes) {
-      final List<String> lines = new ArrayList<String>();
-      lines.add("#### Shape: " + leftPad(index + 1, 3) + " (" + shape.getAnchor() + ")");
-      lines.addAll(renderHierarchicalRawEntries(shape.getRawEntries()));
-      if (shape.getSvgPath() != null) {
-        lines.add("- SVG: " + shape.getSvgPath());
-        lines.add("");
-        lines.add("![" + (shape.getSvgFilename() == null ? "shape_" + leftPad(index + 1, 3) + ".svg" : shape.getSvgFilename()) + "](" + shape.getSvgPath() + ")");
+    final List<ShapeBlock> safeShapeBlocks = shapeBlocks == null ? Collections.<ShapeBlock>emptyList() : shapeBlocks;
+    for (int blockIndex = 0; blockIndex < safeShapeBlocks.size(); blockIndex += 1) {
+      entries.add(createShapeBlockEntry(safeShapeBlocks.get(blockIndex), blockIndex, shapes));
+    }
+    final List<IndexedShape> ungrouped = collectUngroupedShapes(shapes, safeShapeBlocks);
+    if (!ungrouped.isEmpty()) {
+      if (!entries.isEmpty()) {
+        entries.add("### Ungrouped Shapes");
       }
-      entries.add(joinLines(lines));
-      index += 1;
+      for (final IndexedShape indexedShape : ungrouped) {
+        entries.add(renderShapeDetails(indexedShape.getShape(), indexedShape.getIndex()));
+      }
     }
     return "\n\n" + joinParagraphs(entries);
   }
@@ -318,6 +325,66 @@ public final class SheetAssets {
       }
     }
     return extractShapeBlocks(boxes, options);
+  }
+
+  private static String renderShapeDetails(final WorksheetParser.ParsedShapeAsset shape, final int shapeIndex) {
+    final List<String> lines = new ArrayList<String>();
+    lines.add("#### Shape: " + leftPad(shapeIndex + 1, 3) + " (" + shape.getAnchor() + ")");
+    lines.addAll(renderHierarchicalRawEntries(shape.getRawEntries()));
+    if (shape.getSvgPath() != null) {
+      lines.add("- SVG: " + shape.getSvgPath());
+      lines.add("");
+      lines.add("![" + (shape.getSvgFilename() == null ? "shape_" + leftPad(shapeIndex + 1, 3) + ".svg" : shape.getSvgFilename()) + "](" + shape.getSvgPath() + ")");
+    }
+    return joinLines(lines);
+  }
+
+  private static String createShapeBlockEntry(
+      final ShapeBlock block,
+      final int blockIndex,
+      final List<WorksheetParser.ParsedShapeAsset> shapes) {
+    final List<String> lines = new ArrayList<String>();
+    lines.add("### Shape Block: " + leftPad(blockIndex + 1, 3) + " ("
+        + AddressUtils.formatRange(block.getStartRow(), block.getStartCol(), block.getEndRow(), block.getEndCol()) + ")");
+    lines.add("- Shapes: " + createShapeBlockSummaryLine(block.getShapeIndexes()));
+    lines.add("- anchorRange: " + AddressUtils.colToLetters(block.getStartCol()) + block.getStartRow()
+        + "-" + AddressUtils.colToLetters(block.getEndCol()) + block.getEndRow());
+    final List<String> details = new ArrayList<String>();
+    for (final Integer shapeIndex : block.getShapeIndexes()) {
+      final int index = shapeIndex.intValue();
+      if (index >= 0 && index < shapes.size()) {
+        details.add(renderShapeDetails(shapes.get(index), index));
+      }
+    }
+    if (!details.isEmpty()) {
+      lines.add("");
+      lines.add(joinParagraphs(details));
+    }
+    return joinLines(lines);
+  }
+
+  private static String createShapeBlockSummaryLine(final List<Integer> shapeIndexes) {
+    final List<String> values = new ArrayList<String>();
+    for (final Integer shapeIndex : shapeIndexes == null ? Collections.<Integer>emptyList() : shapeIndexes) {
+      values.add("Shape " + leftPad(shapeIndex.intValue() + 1, 3));
+    }
+    return join(values, ", ");
+  }
+
+  private static List<IndexedShape> collectUngroupedShapes(
+      final List<WorksheetParser.ParsedShapeAsset> shapes,
+      final List<ShapeBlock> shapeBlocks) {
+    final java.util.Set<Integer> grouped = new java.util.LinkedHashSet<Integer>();
+    for (final ShapeBlock block : shapeBlocks == null ? Collections.<ShapeBlock>emptyList() : shapeBlocks) {
+      grouped.addAll(block.getShapeIndexes());
+    }
+    final List<IndexedShape> ungrouped = new ArrayList<IndexedShape>();
+    for (int index = 0; index < shapes.size(); index += 1) {
+      if (!grouped.contains(Integer.valueOf(index))) {
+        ungrouped.add(new IndexedShape(shapes.get(index), index));
+      }
+    }
+    return ungrouped;
   }
 
   private static String getImageExtension(final String mediaPath) {
@@ -719,6 +786,24 @@ public final class SheetAssets {
     private Gap(final long dx, final long dy) {
       this.dx = dx;
       this.dy = dy;
+    }
+  }
+
+  private static final class IndexedShape {
+    private final WorksheetParser.ParsedShapeAsset shape;
+    private final int index;
+
+    private IndexedShape(final WorksheetParser.ParsedShapeAsset shape, final int index) {
+      this.shape = shape;
+      this.index = index;
+    }
+
+    private WorksheetParser.ParsedShapeAsset getShape() {
+      return shape;
+    }
+
+    private int getIndex() {
+      return index;
     }
   }
 

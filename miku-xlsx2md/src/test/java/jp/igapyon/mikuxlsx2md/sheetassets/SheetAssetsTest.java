@@ -82,6 +82,34 @@ class SheetAssetsTest {
   }
 
   @Test
+  void rendersUngroupedShapesAfterGroupedShapeBlocks() {
+    final List<WorksheetParser.ParsedShapeAsset> shapes = Arrays.asList(
+        new WorksheetParser.ParsedShapeAsset(
+            "B3",
+            Arrays.asList(new WorksheetParser.ParsedShapeRawEntry("kind", "rect")),
+            null,
+            null,
+            null),
+        new WorksheetParser.ParsedShapeAsset(
+            "E8",
+            Arrays.asList(new WorksheetParser.ParsedShapeRawEntry("kind", "rect")),
+            "shape_002.svg",
+            "assets/Sheet1/shape_002.svg",
+            new byte[] {2}));
+    final List<SheetAssets.ShapeBlock> shapeBlocks = Arrays.asList(
+        new SheetAssets.ShapeBlock(3, 2, 3, 2, Arrays.asList(Integer.valueOf(0))));
+
+    final String section = SheetAssets.renderShapeSection(shapes, shapeBlocks, true);
+
+    assertTrue(section.contains("### Shape Block: 001 (B3-B3)"));
+    assertTrue(section.contains("- Shapes: Shape 001"));
+    assertTrue(section.contains("- anchorRange: B3-B3"));
+    assertTrue(section.contains("### Ungrouped Shapes"));
+    assertTrue(section.contains("#### Shape: 002 (E8)"));
+    assertTrue(section.contains("![shape_002.svg](assets/Sheet1/shape_002.svg)"));
+  }
+
+  @Test
   void parsesDrawingImagesChartsAndShapes() {
     final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
     files.put("xl/worksheets/_rels/sheet1.xml.rels", bytes(
