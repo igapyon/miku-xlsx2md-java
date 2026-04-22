@@ -4,7 +4,7 @@ Document version: `2026-04-22`
 
 ## Current Position
 
-Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, and initial end-to-end conversion is connected from both the CLI and Maven plugin.
+Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, and Maven plugin full-coordinate smoke execution is fixed as a script.
 
 ## Status
 
@@ -53,13 +53,14 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - CLI option vocabulary and initial conversion
   - Maven plugin initial conversion
   - CLI / Maven plugin upstream fixture conversion coverage subset
+  - Maven plugin full-coordinate smoke execution command
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` parity coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
-  - Maven plugin smoke execution command
+  - broader Maven plugin smoke coverage beyond the fixed minimum command
 
 ## Focused Regression
 
@@ -90,6 +91,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
 - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- `sh scripts/smoke-maven-plugin.sh`
 
 ## Last Known Result
 

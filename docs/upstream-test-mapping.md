@@ -451,3 +451,7 @@ fixtures:
 
 focused regression:
 - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- `sh scripts/smoke-maven-plugin.sh`
+
+notes:
+- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.

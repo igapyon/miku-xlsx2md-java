@@ -95,6 +95,7 @@ diff summary:
 - 挙動差分:
   - CLI は option validation / help / initial workbook conversion を実装
   - Maven plugin は runtime core conversion へ接続済み
+  - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
   - advanced `sheet-markdown` parity coverage は calendar narrative / empty fallback / line break / literal escaping / hyperlink output mode cases の subset を追加済み
@@ -111,7 +112,7 @@ diff summary:
   - worksheet parse coverage expansion
   - advanced `sheet-markdown` parity coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
-  - Maven plugin smoke execution command
+  - broader Maven plugin smoke coverage beyond the fixed minimum command
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
 
@@ -138,6 +139,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
   - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
   - `mvn test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass after Maven plugin full-coordinate smoke command fixation
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`

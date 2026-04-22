@@ -60,6 +60,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format` and `hyperlink` fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion
+- Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
 - Advanced sheet-markdown parity and broader fixture coverage are still pending
 
 ## Build
@@ -83,6 +84,20 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
+
+## Maven Plugin
+
+Full-coordinate smoke check:
+
+```bash
+sh scripts/smoke-maven-plugin.sh
+```
+
+The smoke script installs the local SNAPSHOT artifacts and invokes:
+
+```bash
+mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert
+```
 
 ## Documents
 
