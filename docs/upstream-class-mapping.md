@@ -226,6 +226,17 @@ notes:
 - Java-side extension: currently kept as an independent helper module and not yet connected into sheet-to-markdown conversion
 
 ### upstream file:
+`src/ts/narrative-structure.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructure`
+
+notes:
+- facade: static narrative block rendering and classification helpers
+- helper split: consumes `SheetMarkdown.NarrativeBlock` / `NarrativeItem` value types
+- Java-side extension: `SheetMarkdown.renderNarrativeBlock` delegates to this helper to preserve upstream responsibility boundaries
+
+### upstream file:
 `src/ts/sheet-markdown.ts`
 
 java classes:
@@ -239,7 +250,7 @@ java classes:
 
 notes:
 - facade: static sheet / workbook markdown conversion helpers
-- helper split: current Java minimum keeps narrative rendering, simple table candidate detection, hyperlink formatting, and asset section rendering inside the same class
+- helper split: narrative rendering is delegated to `NarrativeStructure`; simple table candidate detection, hyperlink formatting, and asset section rendering remain inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
 - remaining parity gap: upstream advanced table detector / rich text module split / shape block grouping are not yet fully ported
 
@@ -269,6 +280,5 @@ notes:
 ## Next Candidates
 
 - `src/ts/table-detector.ts`
-- `src/ts/narrative-structure.ts`
 - `src/ts/rich-text-*`
 - `src/ts/sheet-assets.ts`

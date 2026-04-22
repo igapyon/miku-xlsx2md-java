@@ -17,7 +17,7 @@ Document version: `2026-04-22`
 
 ## Next Queue
 
-- table detector / narrative structure / rich text / sheet assets の分割移植を検討する
+- table detector / rich text / sheet assets の分割移植を検討する
 - CLI / Maven plugin の fixture coverage を広げる
 - Maven plugin smoke 実行の確認方法を固定する
 
@@ -43,6 +43,8 @@ Document version: `2026-04-22`
 - `worksheet-tables.ts` を Java へ移植した
 - `WorksheetParser` の display value formatting を `CellFormat` へ委譲した
 - `sheet-markdown.ts` の最小範囲を Java へ移植した
+- `narrative-structure.ts` を Java へ移植した
+- `SheetMarkdown` の narrative rendering を `NarrativeStructure` へ委譲した
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - CLI を runtime core conversion に接続した

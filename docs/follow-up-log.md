@@ -22,6 +22,7 @@ upstream file:
 - `src/ts/markdown-export.ts`
 - `src/ts/cell-format.ts`
 - `src/ts/worksheet-tables.ts`
+- `src/ts/narrative-structure.ts`
 - `src/ts/sheet-markdown.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
@@ -43,6 +44,7 @@ java classes:
 - `MarkdownExport`
 - `CellFormat`
 - `WorksheetTables`
+- `NarrativeStructure`
 - `SheetMarkdown`
 - `CliOptions`
 - `MikuXlsx2mdCli`
@@ -66,6 +68,7 @@ tests:
 - `MarkdownExportTest`
 - `CellFormatTest`
 - `WorksheetTablesTest`
+- `NarrativeStructureTest`
 - `SheetMarkdownTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
@@ -92,6 +95,7 @@ follow-up:
   - `.mvn/jvm.config` による Maven 通信前提の固定
   - Java 17 + Maven 3.9 on source/target 1.8
   - `mvn -o test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest,SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
@@ -103,5 +107,5 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - 次回の確認観点:
   - advanced `sheet-markdown` parity coverage を広げる
-  - table detector / narrative structure / rich text / sheet assets helper の分割移植を検討する
+  - table detector / rich text / sheet assets helper の分割移植を検討する
   - CLI / Maven plugin の fixture coverage を広げる

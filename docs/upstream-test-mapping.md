@@ -278,6 +278,23 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-narrative-structure.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.rendersAnIndentedParentChildBlockAsHeadingPlusBullets`
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.rendersFlatNarrativeRowsAsPlainParagraphs`
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.normalizesHeadingAndListMarkersInsideHierarchicalNarrativeItems`
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.startsANewHeadingWhenIndentationReturnsToTheParentLevel`
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.detectsAHeadingBlockOnlyWhenTheSecondItemIsIndentedDeeper`
+- `jp.igapyon.mikuxlsx2md.narrativestructure.NarrativeStructureTest.rendersCalendarLikeNarrativeRowsWithCellBoundariesPreserved`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest test`
+
+### upstream test / intent:
 `tests/xlsx2md-sheet-markdown.test.js`
 
 java tests:
