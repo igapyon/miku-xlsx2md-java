@@ -188,6 +188,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.extractsSharedStringAndBooleanCellValues`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.translatesSharedFormulasAcrossRelativeReferences`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetCellsMergesAndSharedFormulas`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesSharedFormulasWithCrossSheetAndAbsoluteReferences`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesWorksheetHyperlinksFromLocalRefsAndExternalRelationships`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.expandsHyperlinkRangesAndHashTargetsAcrossCells`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.attachesCellTextStyleToSharedInlineBooleanAndFormattedValues`
@@ -200,7 +201,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 
 notes:
-- Current Java coverage includes shared formula translation with absolute / sheet-qualified references, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
+- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
 
 ### upstream test / intent:
 connected workbook parsing path through the Java core facade

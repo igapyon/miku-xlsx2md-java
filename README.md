@@ -59,6 +59,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Focused workbook fixture regression includes upstream formula and chart fixtures, including cross-sheet, shared, spill, and mixed chart cases
 - Focused workbook fixture regression includes upstream rich text and merge fixtures
 - Focused workbook fixture regression includes upstream image and shape fixtures
+- `WorksheetParserTest` includes shared formula translation coverage with sheet-qualified and absolute references
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion

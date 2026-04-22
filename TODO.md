@@ -36,6 +36,7 @@ Document version: `2026-04-22`
 - `styles-parser.ts` を Java へ移植した
 - `worksheet-parser.ts` の最小範囲を Java へ移植した
 - `WorksheetParser` の richTextRuns / formula metadata coverage を広げた
+- `WorksheetParserTest` に shared formula の sheet-qualified / absolute reference translation coverage を追加した
 - `core.ts` の最小 facade を Java へ追加した
 - `markdown-table-escape.ts` を Java へ移植した
 - `markdown-export.ts` を Java へ移植した

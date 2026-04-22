@@ -103,7 +103,7 @@ diff summary:
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
-  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location の coverage subset を追加済み
+  - `WorksheetParser` は cell style / inline rich text 由来の richTextRuns、formula metadata、hyperlink range / hash location、sheet-qualified な shared formula translation の coverage subset を追加済み
   - `office-drawing` は Java では shape SVG rendering helper 範囲を移植済み
   - `SheetAssets` は shape parsing 時に `OfficeDrawing` の SVG asset を接続済み
   - rich text rendering helper は Java では当面 1 class に集約し、parser / plain formatter / github formatter / renderer の責務を同一 class 内に保持
@@ -133,6 +133,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest,SheetMarkdownTest,CoreFixtureRegressionTest test` pass after shape block rendering connection
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after advanced sheet-markdown parity coverage subset expansion
   - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser richTextRuns / formula metadata coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test` pass after worksheet parser shared formula translation coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
