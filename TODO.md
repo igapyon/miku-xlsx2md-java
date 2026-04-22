@@ -17,7 +17,6 @@ Document version: `2026-04-22`
 
 ## Next Queue
 
-- office drawing / shape SVG helper の移植範囲を確認する
 - CLI / Maven plugin の fixture coverage を広げる
 - Maven plugin smoke 実行の確認方法を固定する
 
@@ -52,6 +51,9 @@ Document version: `2026-04-22`
 - `SheetMarkdown` の asset section rendering を `SheetAssets` へ委譲した
 - `sheet-assets.ts` の `parseDrawingImages` / `parseDrawingCharts` / `parseDrawingShapes` を Java へ移植した
 - `WorksheetParser` の parsed sheet 生成を sheet assets parse helper へ接続した
+- `office-drawing.ts` の shape SVG rendering helper を Java へ移植した
+- `SheetAssets` の shape parsing を office drawing SVG helper へ接続した
+- upstream image / shape fixture を使う workbook parse focused regression を追加した
 - `rich-text-*` helper 群を Java へ移植した
 - `SheetMarkdown` の cell display rendering を `RichTextRenderer` へ委譲した
 - table cell pipe escaping を rich-text renderer 経由でも二重エスケープしないよう調整した

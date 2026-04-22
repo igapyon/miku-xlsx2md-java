@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
+import jp.igapyon.mikuxlsx2md.officedrawing.OfficeDrawing;
 import jp.igapyon.mikuxlsx2md.relsparser.RelsParser;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
 import jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils;
@@ -130,6 +131,7 @@ public final class SheetAssets {
       final String sheetPath) {
     final Map<String, String> sheetRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(sheetPath), sheetPath);
     final List<WorksheetParser.ParsedShapeAsset> shapes = new ArrayList<WorksheetParser.ParsedShapeAsset>();
+    int shapeCounter = 1;
     for (final String drawingPath : sheetRels.values()) {
       if (!isDrawingXmlPath(drawingPath)) {
         continue;
@@ -157,12 +159,13 @@ public final class SheetAssets {
         final Element cNvPr = XmlUtils.getFirstChildByLocalName(nonVisual == null ? shapeNode : nonVisual, "cNvPr");
         final ShapeExtent extent = parseShapeExt(anchor, shapeNode);
         final BoundingBox bbox = parseShapeBoundingBox(anchor, shapeNode, extent);
+        final OfficeDrawing.SvgRenderResult svgAsset = OfficeDrawing.renderShapeSvg(shapeNode, anchor, sheetName, shapeCounter);
         shapes.add(new WorksheetParser.ParsedShapeAsset(
             point.toAddress(),
             parseShapeRawEntries(anchor),
-            null,
-            null,
-            null,
+            svgAsset == null ? null : svgAsset.getFilename(),
+            svgAsset == null ? null : svgAsset.getPath(),
+            svgAsset == null ? null : svgAsset.getData(),
             stringValue(attribute(cNvPr, "name")).trim().isEmpty() ? "Shape" : attribute(cNvPr, "name").trim(),
             parseShapeKind(shapeNode),
             parseShapeText(shapeNode),
@@ -171,6 +174,7 @@ public final class SheetAssets {
             "xdr:" + shapeNode.getLocalName(),
             firstNonEmpty(anchor.getTagName(), anchor.getNodeName(), anchor.getLocalName(), "anchor"),
             bbox));
+        shapeCounter += 1;
       }
     }
     return shapes;

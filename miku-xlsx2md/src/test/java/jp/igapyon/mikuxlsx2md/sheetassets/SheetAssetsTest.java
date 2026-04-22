@@ -134,6 +134,9 @@ class SheetAssetsTest {
     assertEquals("Box 1", shapes.get(0).getName());
     assertEquals("Text Box", shapes.get(0).getKind());
     assertEquals("Hello shape", shapes.get(0).getText());
+    assertEquals("shape_001.svg", shapes.get(0).getSvgFilename());
+    assertEquals("assets/Asset Sheet/shape_001.svg", shapes.get(0).getSvgPath());
+    assertTrue(new String(shapes.get(0).getSvgData(), StandardCharsets.UTF_8).contains("Hello shape"));
     assertEquals(new SheetAssets.BoundingBox(2743200L, 762000L, 3657600L, 952500L), shapes.get(0).getBbox());
   }
 
