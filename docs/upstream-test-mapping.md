@@ -184,6 +184,18 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 
 ### upstream test / intent:
+connected workbook parsing path through the Java core facade
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.core.CoreTest.parsesWorkbookThroughConnectedLoader`
+
+fixtures:
+- synthetic stored ZIP built in test
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=CoreTest test`
+
+### upstream test / intent:
 Node CLI option compatibility and help text shape
 
 java tests:

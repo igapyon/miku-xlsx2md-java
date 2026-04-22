@@ -17,6 +17,7 @@ upstream file:
 - `src/ts/shared-strings.ts`
 - `src/ts/styles-parser.ts`
 - `src/ts/worksheet-parser.ts`
+- `src/ts/core.ts`
 - `scripts/miku-xlsx2md-cli.mjs`
 
 java classes:
@@ -32,6 +33,7 @@ java classes:
 - `SharedStrings`
 - `StylesParser`
 - `WorksheetParser`
+- `Core`
 - `CliOptions`
 - `MikuXlsx2mdCli`
 - `MikuXlsx2mdMojo`
@@ -49,6 +51,7 @@ tests:
 - `SharedStringsTest`
 - `StylesParserTest`
 - `WorksheetParserTest`
+- `CoreTest`
 - `MikuXlsx2mdCliTest`
 - `MikuXlsx2mdMojoTest`
 
@@ -59,7 +62,7 @@ diff summary:
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
-  - workbook parse core integration
+  - workbook parse fixture coverage
   - worksheet parse coverage expansion
   - markdown export
   - zip export
@@ -78,6 +81,6 @@ follow-up:
 - fixture:
   - none
 - 次回の確認観点:
-  - workbook loader に shared strings / styles / worksheet parser を接続する
-  - workbook parsing の最小入口から実データ読込へ進める
+  - fixture を使う workbook parse regression を追加する
+  - markdown export の最小 round-trip へ進む
   - Maven plugin を core API へ接続する
