@@ -209,11 +209,14 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=CoreTest test`
 
 ### upstream test / intent:
-`tests/xlsx2md-main.test.js` fixture-based workbook parsing expectations for named-range / hyperlink fixtures
+`tests/xlsx2md-main.test.js` fixture-based workbook parsing and workbook-to-markdown expectations
 
 java tests:
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamNamedRangeFixtureWorkbookWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamHyperlinkFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.parsesUpstreamDisplayFormatFixtureWorkbookWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamDisplayFormatFixtureWorkbookToMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.core.CoreFixtureRegressionTest.convertsUpstreamHyperlinkFixtureWorkbookToMarkdownWhenAvailable`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
@@ -294,12 +297,13 @@ notes:
 - Upstream advanced table detection, rich text formatting, calendar grouping, and asset grouping cases remain follow-up coverage.
 
 ### upstream test / intent:
-Node CLI option compatibility and help text shape
+Node CLI option compatibility, help text shape, and initial conversion I/O
 
 java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.printsHelpAndExitsSuccessfully`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.failsForUnknownOption`
-- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsButReportsUnimplementedConversion`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 
 fixtures:
@@ -309,14 +313,14 @@ focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
 
 ### upstream test / intent:
-Maven plugin skeleton option mapping and skip behavior
+Maven plugin option mapping, skip behavior, and initial conversion I/O
 
 java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.failsFastUntilCoreConversionIsImplemented`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.writesMarkdownThroughCoreConversion`
 
 fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md-maven-plugin -Dtest=MikuXlsx2mdMojoTest test`
+- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
