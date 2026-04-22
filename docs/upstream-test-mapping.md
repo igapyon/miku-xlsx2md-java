@@ -218,9 +218,25 @@ java tests:
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test`
+
+### upstream test / intent:
+`tests/xlsx2md-cell-format.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormatTest.formatsDatePercentFractionAndCurrencyValues`
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormatTest.formatsSpecialTextAndScientificNotationPatterns`
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormatTest.parsesDateLikeTextIntoExcelSerialCompatibleNumbers`
+- `jp.igapyon.mikuxlsx2md.cellformat.CellFormatTest.appliesResolvedFormulaFormattingBackOntoACell`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
