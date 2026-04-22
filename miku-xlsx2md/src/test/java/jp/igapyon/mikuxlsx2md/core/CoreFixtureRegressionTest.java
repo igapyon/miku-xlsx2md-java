@@ -97,6 +97,63 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void convertsUpstreamNarrativeFixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("narrative", "narrative-vs-table-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "narrative-vs-table-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("narrative-vs-table", sheet.getName());
+    assertEquals(13, sheet.getMaxRow());
+    assertEquals(6, sheet.getMaxCol());
+    assertEquals("地の文と表の判定", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals("この設計書は受注入力画面を説明する。", findCell(sheet.getCells(), "A3").getOutputValue());
+    assertEquals("=B9+1", findCell(sheet.getCells(), "B10").getFormulaText());
+    assertEquals("2", findCell(sheet.getCells(), "B10").getOutputValue());
+    assertEquals("=B10+1", findCell(sheet.getCells(), "B11").getFormulaText());
+    assertEquals("3", findCell(sheet.getCells(), "B11").getOutputValue());
+    assertEquals("3月13日", findCell(sheet.getCells(), "E11").getOutputValue());
+    assertEquals(1, files.size());
+    assertEquals("narrative-vs-table-sample01_001_narrative-vs-table.md", files.get(0).getFileName());
+    assertEquals(1, files.get(0).getSummary().getTables());
+    assertEquals(2, files.get(0).getSummary().getFormulaDiagnostics().size());
+    assertEquals(Arrays.asList("B8-F11"),
+        Arrays.asList(files.get(0).getSummary().getTableScores().get(0).getRange()));
+    assertTrue(files.get(0).getMarkdown().contains("## Sheet: narrative-vs-table"));
+    assertTrue(files.get(0).getMarkdown().contains("地の文と表の判定"));
+    assertTrue(files.get(0).getMarkdown().contains("この設計書は受注入力画面を説明する。"));
+    assertTrue(files.get(0).getMarkdown().contains("### Table: 001 (B8-F11)"));
+    assertTrue(files.get(0).getMarkdown().contains("| 1 | コード | code | 101 | 何かのコード |"));
+    assertTrue(files.get(0).getMarkdown().contains("※注記: この表はサンプルです。"));
+  }
+
+  @Test
+  void convertsUpstreamEdgeEmptyFixtureWorkbookToMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-empty-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "edge-empty-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("edge-empty", sheet.getName());
+    assertEquals(7, sheet.getMaxRow());
+    assertEquals(3, sheet.getMaxCol());
+    assertEquals("空系境界サンプル", findCell(sheet.getCells(), "A1").getOutputValue());
+    assertEquals("only-value", findCell(sheet.getCells(), "C7").getOutputValue());
+    assertEquals(1, files.size());
+    assertEquals("edge-empty-sample01_001_edge-empty.md", files.get(0).getFileName());
+    assertEquals(0, files.get(0).getSummary().getTables());
+    assertEquals(0, files.get(0).getSummary().getTableScores().size());
+    assertTrue(files.get(0).getMarkdown().contains("## Sheet: edge-empty"));
+    assertTrue(files.get(0).getMarkdown().contains("空系境界サンプル"));
+    assertTrue(files.get(0).getMarkdown().contains("only-value"));
+    assertTrue(!files.get(0).getMarkdown().contains("### Table:"));
+  }
+
+  @Test
   void convertsUpstreamDisplayFormatFixtureWorkbookToMarkdownWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("display", "display-format-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -355,6 +412,29 @@ class CoreFixtureRegressionTest {
     assertEquals(2, files.get(0).getSummary().getImages());
     assertTrue(files.get(0).getMarkdown().contains("### Image: 001 (C8)"));
     assertTrue(files.get(0).getMarkdown().contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void convertsUpstreamBorderPriorityFixtureDifferentlyBetweenBalancedAndBorderModesWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-border-priority-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> balancedFiles = Core.convertWorkbookToMarkdownFiles(workbook,
+        new MarkdownOptions(null, null, null, null, null, null, null, "balanced"));
+    final List<MarkdownExport.MarkdownFile> borderFiles = Core.convertWorkbookToMarkdownFiles(workbook,
+        new MarkdownOptions(null, null, null, null, null, null, null, "border"));
+
+    assertEquals(1, balancedFiles.size());
+    assertEquals(1, borderFiles.size());
+    assertEquals(1, balancedFiles.get(0).getSummary().getTables());
+    assertEquals("balanced", balancedFiles.get(0).getSummary().getTableDetectionMode());
+    assertEquals(0, borderFiles.get(0).getSummary().getTables());
+    assertEquals("border", borderFiles.get(0).getSummary().getTableDetectionMode());
+    assertTrue(balancedFiles.get(0).getMarkdown().contains("### Table: 001 (A3-B4)"));
+    assertTrue(balancedFiles.get(0).getMarkdown().contains("| 項目 | 値 |"));
+    assertTrue(borderFiles.get(0).getMarkdown().contains("※罫線優先モード確認用"));
+    assertTrue(!borderFiles.get(0).getMarkdown().contains("### Table: 001"));
   }
 
   @Test
