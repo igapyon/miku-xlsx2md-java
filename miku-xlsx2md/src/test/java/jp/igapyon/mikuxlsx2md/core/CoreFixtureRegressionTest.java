@@ -132,6 +132,45 @@ class CoreFixtureRegressionTest {
   }
 
   @Test
+  void convertsUpstreamRichUsecaseFixtureToGithubMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-usecase-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "rich-usecase-sample01.xlsx");
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook,
+        new MarkdownOptions(null, null, null, null, null, null, "github", null));
+
+    assertEquals(1, files.size());
+    assertEquals("github", files.get(0).getSummary().getFormattingMode());
+    assertEquals("rich+usecase", files.get(0).getSheetName());
+    assertTrue(files.get(0).getMarkdown().contains("[Apple](https://www.apple.com/)"));
+    assertTrue(files.get(0).getMarkdown().contains("***Apple***"));
+    assertTrue(files.get(0).getMarkdown().contains("<ins>購入できます</ins>"));
+    assertTrue(files.get(0).getMarkdown().contains("実店舗とともに<br>**ネットショップ**でもお世話になっています。"));
+  }
+
+  @Test
+  void parsesUpstreamMergePatternFixtureWorkbookWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("merge", "merge-pattern-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook = Core.parseWorkbook(Files.readAllBytes(fixturePath), "merge-pattern-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final List<MarkdownExport.MarkdownFile> files = Core.convertWorkbookToMarkdownFiles(workbook, new MarkdownOptions());
+
+    assertEquals("merge", sheet.getName());
+    assertEquals(12, sheet.getMerges().size());
+    assertEquals("B15:C16", sheet.getMerges().get(0).getRef());
+    assertEquals("横結合", findCell(sheet.getCells(), "B2").getOutputValue());
+    assertEquals("", findCell(sheet.getCells(), "C2").getOutputValue());
+    assertEquals("2x2結合", findCell(sheet.getCells(), "B15").getOutputValue());
+    assertEquals("", findCell(sheet.getCells(), "C15").getOutputValue());
+    assertEquals(12, files.get(0).getSummary().getMerges());
+    assertTrue(files.get(0).getMarkdown().contains("横結合"));
+    assertTrue(files.get(0).getMarkdown().contains("2x2結合"));
+  }
+
+  @Test
   void parsesUpstreamImageFixtureWorkbookWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");

@@ -97,6 +97,7 @@ diff summary:
   - Maven plugin は runtime core conversion へ接続済み
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
   - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済み
+  - core fixture regression は rich usecase / merge pattern fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
   - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / line break / literal escaping / hyperlink output mode / shape details toggle cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
@@ -109,7 +110,7 @@ diff summary:
 - 命名差分:
   - module registry 方式を Java static facade へ読み替え
 - 未移植差分:
-  - worksheet parser fixture coverage expansion
+  - worksheet parser formula / chart fixture coverage expansion
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
   - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
@@ -135,6 +136,7 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest,SheetMarkdownTest,MarkdownNormalizeTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
   - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test` pass after rich usecase / merge pattern fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
   - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdCliTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after CLI / Maven plugin fixture coverage expansion
@@ -145,10 +147,12 @@ follow-up:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+  - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - 次回の確認観点:
   - advanced `sheet-markdown` fixture parity coverage をさらに広げる
-  - worksheet parser fixture coverage をさらに広げる
+  - worksheet parser formula / chart fixture coverage をさらに広げる
   - CLI / Maven plugin の fixture coverage をさらに広げる

@@ -56,12 +56,13 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
   - `sheet-markdown.ts`
 - Focused workbook fixture regression is in place for upstream `named-range` and `hyperlink` fixtures
 - Focused workbook fixture regression includes the upstream `display-format` fixture
+- Focused workbook fixture regression includes upstream rich text and merge fixtures
 - Focused workbook fixture regression includes upstream image and shape fixtures
-- Focused workbook-to-markdown fixture regression is in place for upstream `display-format` and `hyperlink` fixtures
+- Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
 - Maven plugin is connected to runtime core conversion
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
-- Advanced sheet-markdown parity and broader fixture coverage are still pending
+- Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending
 
 ## Build
 
