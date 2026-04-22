@@ -17,7 +17,7 @@ Document version: `2026-04-22`
 
 ## Next Queue
 
-- sheet assets parse helpers の移植範囲を広げる
+- office drawing / shape SVG helper の移植範囲を確認する
 - CLI / Maven plugin の fixture coverage を広げる
 - Maven plugin smoke 実行の確認方法を固定する
 
@@ -50,6 +50,8 @@ Document version: `2026-04-22`
 - `SheetMarkdown` の table detection / table matrix rendering を `TableDetector` へ委譲した
 - `sheet-assets.ts` の rendering / shape block grouping 範囲を Java へ移植した
 - `SheetMarkdown` の asset section rendering を `SheetAssets` へ委譲した
+- `sheet-assets.ts` の `parseDrawingImages` / `parseDrawingCharts` / `parseDrawingShapes` を Java へ移植した
+- `WorksheetParser` の parsed sheet 生成を sheet assets parse helper へ接続した
 - `rich-text-*` helper 群を Java へ移植した
 - `SheetMarkdown` の cell display rendering を `RichTextRenderer` へ委譲した
 - table cell pipe escaping を rich-text renderer 経由でも二重エスケープしないよう調整した

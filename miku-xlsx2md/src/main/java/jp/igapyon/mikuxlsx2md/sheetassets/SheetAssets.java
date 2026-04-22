@@ -5,13 +5,23 @@
 package jp.igapyon.mikuxlsx2md.sheetassets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import jp.igapyon.mikuxlsx2md.addressutils.AddressUtils;
+import jp.igapyon.mikuxlsx2md.relsparser.RelsParser;
 import jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser;
+import jp.igapyon.mikuxlsx2md.xmlutils.XmlUtils;
 
 public final class SheetAssets {
   private SheetAssets() {
@@ -20,6 +30,150 @@ public final class SheetAssets {
   public static String createSafeSheetAssetDir(final String sheetName) {
     final String safe = stringValue(sheetName).replaceAll("[\\\\/:*?\"<>|]+", "_").trim();
     return safe.isEmpty() ? "Sheet" : safe;
+  }
+
+  public static List<WorksheetParser.ParsedImageAsset> parseDrawingImages(
+      final Map<String, byte[]> files,
+      final String sheetName,
+      final String sheetPath) {
+    final Map<String, String> sheetRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(sheetPath), sheetPath);
+    final List<WorksheetParser.ParsedImageAsset> images = new ArrayList<WorksheetParser.ParsedImageAsset>();
+    int imageCounter = 1;
+    for (final String drawingPath : sheetRels.values()) {
+      if (!isDrawingXmlPath(drawingPath)) {
+        continue;
+      }
+      final byte[] drawingBytes = files.get(drawingPath);
+      if (drawingBytes == null) {
+        continue;
+      }
+      final Document drawingDoc = XmlUtils.xmlToDocument(XmlUtils.decodeXmlText(drawingBytes));
+      final Map<String, String> drawingRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(drawingPath), drawingPath);
+      for (final Element anchor : drawingAnchors(drawingDoc)) {
+        final AnchorPoint point = parseAnchorPoint(anchor);
+        if (point == null) {
+          continue;
+        }
+        final List<Element> blips = XmlUtils.getElementsByLocalName(anchor, "blip");
+        final Element blip = blips.isEmpty() ? null : blips.get(0);
+        final String embedId = firstNonEmpty(attribute(blip, "r:embed"), attribute(blip, "embed"));
+        final String mediaPath = stringValue(drawingRels.get(embedId));
+        if (mediaPath.isEmpty()) {
+          continue;
+        }
+        final byte[] mediaBytes = files.get(mediaPath);
+        if (mediaBytes == null) {
+          continue;
+        }
+        final String extension = getImageExtension(mediaPath);
+        final String filename = "image_" + leftPad(imageCounter, 3) + "." + extension;
+        images.add(new WorksheetParser.ParsedImageAsset(
+            point.toAddress(),
+            filename,
+            "assets/" + createSafeSheetAssetDir(sheetName) + "/" + filename,
+            Arrays.copyOf(mediaBytes, mediaBytes.length),
+            mediaPath));
+        imageCounter += 1;
+      }
+    }
+    return images;
+  }
+
+  public static List<WorksheetParser.ParsedChartAsset> parseDrawingCharts(
+      final Map<String, byte[]> files,
+      final String sheetName,
+      final String sheetPath) {
+    final Map<String, String> sheetRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(sheetPath), sheetPath);
+    final List<WorksheetParser.ParsedChartAsset> charts = new ArrayList<WorksheetParser.ParsedChartAsset>();
+    for (final String drawingPath : sheetRels.values()) {
+      if (!isDrawingXmlPath(drawingPath)) {
+        continue;
+      }
+      final byte[] drawingBytes = files.get(drawingPath);
+      if (drawingBytes == null) {
+        continue;
+      }
+      final Document drawingDoc = XmlUtils.xmlToDocument(XmlUtils.decodeXmlText(drawingBytes));
+      final Map<String, String> drawingRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(drawingPath), drawingPath);
+      for (final Element anchor : drawingAnchors(drawingDoc)) {
+        final AnchorPoint point = parseAnchorPoint(anchor);
+        if (point == null) {
+          continue;
+        }
+        final Element graphicFrame = XmlUtils.getFirstChildByLocalName(anchor, "graphicFrame");
+        final List<Element> chartRefs = XmlUtils.getElementsByLocalName(graphicFrame == null ? anchor : graphicFrame, "chart");
+        final Element chartRef = chartRefs.isEmpty() ? null : chartRefs.get(0);
+        final String relId = firstNonEmpty(attribute(chartRef, "r:id"), attribute(chartRef, "id"));
+        final String chartPath = stringValue(drawingRels.get(relId));
+        if (chartPath.isEmpty()) {
+          continue;
+        }
+        final byte[] chartBytes = files.get(chartPath);
+        if (chartBytes == null) {
+          continue;
+        }
+        final Document chartDoc = XmlUtils.xmlToDocument(XmlUtils.decodeXmlText(chartBytes));
+        charts.add(new WorksheetParser.ParsedChartAsset(
+            point.toAddress(),
+            parseChartTitle(chartDoc),
+            parseChartType(chartDoc),
+            parseChartSeries(chartDoc),
+            chartPath));
+      }
+    }
+    return charts;
+  }
+
+  public static List<WorksheetParser.ParsedShapeAsset> parseDrawingShapes(
+      final Map<String, byte[]> files,
+      final String sheetName,
+      final String sheetPath) {
+    final Map<String, String> sheetRels = RelsParser.parseRelationships(files, RelsParser.buildRelsPath(sheetPath), sheetPath);
+    final List<WorksheetParser.ParsedShapeAsset> shapes = new ArrayList<WorksheetParser.ParsedShapeAsset>();
+    for (final String drawingPath : sheetRels.values()) {
+      if (!isDrawingXmlPath(drawingPath)) {
+        continue;
+      }
+      final byte[] drawingBytes = files.get(drawingPath);
+      if (drawingBytes == null) {
+        continue;
+      }
+      final Document drawingDoc = XmlUtils.xmlToDocument(XmlUtils.decodeXmlText(drawingBytes));
+      for (final Element anchor : drawingAnchors(drawingDoc)) {
+        final AnchorPoint point = parseAnchorPoint(anchor);
+        if (point == null) {
+          continue;
+        }
+        if (!XmlUtils.getElementsByLocalName(anchor, "blip").isEmpty() || !XmlUtils.getElementsByLocalName(anchor, "chart").isEmpty()) {
+          continue;
+        }
+        final Element shapeNode = firstElement(
+            XmlUtils.getFirstChildByLocalName(anchor, "sp"),
+            XmlUtils.getFirstChildByLocalName(anchor, "cxnSp"));
+        if (shapeNode == null) {
+          continue;
+        }
+        final Element nonVisual = XmlUtils.getFirstChildByLocalName(shapeNode, "sp".equals(shapeNode.getLocalName()) ? "nvSpPr" : "nvCxnSpPr");
+        final Element cNvPr = XmlUtils.getFirstChildByLocalName(nonVisual == null ? shapeNode : nonVisual, "cNvPr");
+        final ShapeExtent extent = parseShapeExt(anchor, shapeNode);
+        final BoundingBox bbox = parseShapeBoundingBox(anchor, shapeNode, extent);
+        shapes.add(new WorksheetParser.ParsedShapeAsset(
+            point.toAddress(),
+            parseShapeRawEntries(anchor),
+            null,
+            null,
+            null,
+            stringValue(attribute(cNvPr, "name")).trim().isEmpty() ? "Shape" : attribute(cNvPr, "name").trim(),
+            parseShapeKind(shapeNode),
+            parseShapeText(shapeNode),
+            extent.getWidthEmu(),
+            extent.getHeightEmu(),
+            "xdr:" + shapeNode.getLocalName(),
+            firstNonEmpty(anchor.getTagName(), anchor.getNodeName(), anchor.getLocalName(), "anchor"),
+            bbox));
+      }
+    }
+    return shapes;
   }
 
   public static String renderImageSection(final WorksheetParser.ParsedSheet sheet) {
@@ -150,6 +304,307 @@ public final class SheetAssets {
     return blocks;
   }
 
+  public static List<ShapeBlock> extractShapeBlocksFromAssets(
+      final List<WorksheetParser.ParsedShapeAsset> shapes,
+      final ShapeBlockOptions options) {
+    final List<ShapeBox> boxes = new ArrayList<ShapeBox>();
+    for (final WorksheetParser.ParsedShapeAsset shape : shapes == null ? Collections.<WorksheetParser.ParsedShapeAsset>emptyList() : shapes) {
+      if (shape != null && shape.getBbox() != null) {
+        boxes.add(new ShapeBox(shape.getBbox()));
+      }
+    }
+    return extractShapeBlocks(boxes, options);
+  }
+
+  private static String getImageExtension(final String mediaPath) {
+    final java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\.([a-z0-9]+)$", java.util.regex.Pattern.CASE_INSENSITIVE)
+        .matcher(stringValue(mediaPath));
+    return matcher.find() ? matcher.group(1).toLowerCase(java.util.Locale.ROOT) : "bin";
+  }
+
+  private static boolean isDrawingXmlPath(final String path) {
+    return java.util.regex.Pattern.compile("/drawings/.+\\.xml$", java.util.regex.Pattern.CASE_INSENSITIVE).matcher(stringValue(path)).find();
+  }
+
+  private static List<Element> drawingAnchors(final Document drawingDoc) {
+    final List<Element> anchors = new ArrayList<Element>();
+    anchors.addAll(XmlUtils.getElementsByLocalName(drawingDoc, "oneCellAnchor"));
+    anchors.addAll(XmlUtils.getElementsByLocalName(drawingDoc, "twoCellAnchor"));
+    return anchors;
+  }
+
+  private static AnchorPoint parseAnchorPoint(final Element anchor) {
+    final Element from = XmlUtils.getFirstChildByLocalName(anchor, "from");
+    final Long col = parseLongText(XmlUtils.getFirstChildByLocalName(from == null ? anchor : from, "col"));
+    final Long row = parseLongText(XmlUtils.getFirstChildByLocalName(from == null ? anchor : from, "row"));
+    if (col == null || row == null || col.longValue() < 0L || row.longValue() < 0L) {
+      return null;
+    }
+    return new AnchorPoint(row.intValue() + 1, col.intValue() + 1);
+  }
+
+  private static String parseChartTitle(final Document chartDoc) {
+    final StringBuilder builder = new StringBuilder();
+    for (final Element node : XmlUtils.getElementsByLocalName(chartDoc, "t")) {
+      final String text = XmlUtils.getTextContent(node);
+      if (!text.isEmpty()) {
+        builder.append(text);
+      }
+    }
+    return builder.toString().trim();
+  }
+
+  private static String parseChartType(final Document chartDoc) {
+    final List<String> matched = new ArrayList<String>();
+    final String[][] typeMap = {
+        {"barChart", "Bar Chart"},
+        {"lineChart", "Line Chart"},
+        {"pieChart", "Pie Chart"},
+        {"doughnutChart", "Doughnut Chart"},
+        {"areaChart", "Area Chart"},
+        {"scatterChart", "Scatter Chart"},
+        {"radarChart", "Radar Chart"},
+        {"bubbleChart", "Bubble Chart"}
+    };
+    for (final String[] entry : typeMap) {
+      if (!XmlUtils.getElementsByLocalName(chartDoc, entry[0]).isEmpty()) {
+        matched.add(entry[1]);
+      }
+    }
+    if (matched.isEmpty()) {
+      return "Chart";
+    }
+    return matched.size() == 1 ? matched.get(0) : join(matched, " + ") + " (Combined)";
+  }
+
+  private static List<WorksheetParser.ParsedChartSeries> parseChartSeries(final Document chartDoc) {
+    final Element plotArea = firstElement(XmlUtils.getFirstChildByLocalName(chartDoc, "plotArea"), chartDoc.getDocumentElement());
+    final Map<String, String> axisPositionById = new LinkedHashMap<String, String>();
+    for (final Element axisNode : XmlUtils.getElementsByLocalName(plotArea, "valAx")) {
+      final Element axisIdNode = XmlUtils.getFirstChildByLocalName(axisNode, "axId");
+      final Element axisPosNode = XmlUtils.getFirstChildByLocalName(axisNode, "axPos");
+      final String axisId = firstNonEmpty(attribute(axisIdNode, "val"), XmlUtils.getTextContent(axisIdNode));
+      final String axisPos = firstNonEmpty(attribute(axisPosNode, "val"), XmlUtils.getTextContent(axisPosNode));
+      if (!axisId.isEmpty()) {
+        axisPositionById.put(axisId, axisPos);
+      }
+    }
+    final List<WorksheetParser.ParsedChartSeries> series = new ArrayList<WorksheetParser.ParsedChartSeries>();
+    for (final String localName : asList("barChart", "lineChart", "pieChart", "doughnutChart", "areaChart", "scatterChart", "radarChart", "bubbleChart")) {
+      for (final Element chartNode : XmlUtils.getElementsByLocalName(plotArea, localName)) {
+        boolean secondary = false;
+        for (final Element axisIdNode : XmlUtils.getElementsByLocalName(chartNode, "axId")) {
+          final String axisId = firstNonEmpty(attribute(axisIdNode, "val"), XmlUtils.getTextContent(axisIdNode));
+          secondary = secondary || "r".equals(axisPositionById.get(axisId));
+        }
+        for (final Element seriesNode : XmlUtils.getElementsByLocalName(chartNode, "ser")) {
+          final Element txNode = firstElement(XmlUtils.getFirstChildByLocalName(seriesNode, "tx"), seriesNode);
+          final Element nameRef = XmlUtils.getFirstChildByLocalName(txNode, "f");
+          final Element nameValue = XmlUtils.getFirstChildByLocalName(txNode, "v");
+          final String nameText = collectTextNodes(txNode).trim();
+          final Element catNode = firstElement(XmlUtils.getFirstChildByLocalName(seriesNode, "cat"), seriesNode);
+          final Element valNode = firstElement(XmlUtils.getFirstChildByLocalName(seriesNode, "val"), seriesNode);
+          final Element catRef = firstElement(
+              XmlUtils.getFirstChildByLocalName(firstElement(XmlUtils.getFirstChildByLocalName(catNode, "strRef"), catNode), "f"),
+              XmlUtils.getFirstChildByLocalName(firstElement(XmlUtils.getFirstChildByLocalName(catNode, "numRef"), catNode), "f"));
+          final Element valRef = firstElement(
+              XmlUtils.getFirstChildByLocalName(valNode, "f"),
+              XmlUtils.getFirstChildByLocalName(firstElement(XmlUtils.getFirstChildByLocalName(valNode, "numRef"), valNode), "f"));
+          series.add(new WorksheetParser.ParsedChartSeries(
+              firstNonEmpty(nameText, XmlUtils.getTextContent(nameValue), XmlUtils.getTextContent(nameRef), "Series"),
+              XmlUtils.getTextContent(catRef),
+              XmlUtils.getTextContent(valRef),
+              secondary ? "secondary" : "primary"));
+        }
+      }
+    }
+    return series;
+  }
+
+  private static String parseShapeKind(final Element shapeNode) {
+    if (shapeNode == null) {
+      return "Shape";
+    }
+    if ("cxnSp".equals(shapeNode.getLocalName())) {
+      final Element geomNode = XmlUtils.getFirstChildByLocalName(firstElement(XmlUtils.getFirstChildByLocalName(shapeNode, "spPr"), shapeNode), "prstGeom");
+      final String prst = stringValue(attribute(geomNode, "prst")).trim();
+      return "straightConnector1".equals(prst) ? "Straight Arrow Connector" : (prst.isEmpty() ? "Connector" : "Connector (" + prst + ")");
+    }
+    if (!"sp".equals(shapeNode.getLocalName())) {
+      return "Shape";
+    }
+    final Element nvSpPr = XmlUtils.getFirstChildByLocalName(shapeNode, "nvSpPr");
+    final Element cNvSpPr = XmlUtils.getFirstChildByLocalName(nvSpPr == null ? shapeNode : nvSpPr, "cNvSpPr");
+    if ("1".equals(attribute(cNvSpPr, "txBox"))) {
+      return "Text Box";
+    }
+    final Element geomNode = XmlUtils.getFirstChildByLocalName(firstElement(XmlUtils.getFirstChildByLocalName(shapeNode, "spPr"), shapeNode), "prstGeom");
+    final String prst = stringValue(attribute(geomNode, "prst")).trim();
+    return "rect".equals(prst) ? "Rectangle" : (prst.isEmpty() ? "Shape" : "Shape (" + prst + ")");
+  }
+
+  private static String parseShapeText(final Element shapeNode) {
+    return collectTextNodes(shapeNode).trim();
+  }
+
+  private static ShapeExtent parseShapeExt(final Element anchor, final Element shapeNode) {
+    final Element shapeTransform = XmlUtils.getDirectChildByLocalName(
+        firstElement(XmlUtils.getDirectChildByLocalName(shapeNode == null ? anchor : shapeNode, "spPr"), shapeNode, anchor),
+        "xfrm");
+    final Element extNode = firstElement(
+        XmlUtils.getDirectChildByLocalName(anchor, "ext"),
+        XmlUtils.getDirectChildByLocalName(shapeTransform, "ext"));
+    return new ShapeExtent(parseLongAttribute(extNode, "cx"), parseLongAttribute(extNode, "cy"));
+  }
+
+  private static List<WorksheetParser.ParsedShapeRawEntry> parseShapeRawEntries(final Element anchor) {
+    final List<WorksheetParser.ParsedShapeRawEntry> entries = new ArrayList<WorksheetParser.ParsedShapeRawEntry>();
+    flattenXmlNodeEntries(anchor, "", entries);
+    return entries;
+  }
+
+  private static void flattenXmlNodeEntries(
+      final Element node,
+      final String path,
+      final List<WorksheetParser.ParsedShapeRawEntry> entries) {
+    if (node == null) {
+      return;
+    }
+    final String nodeName = firstNonEmpty(node.getTagName(), node.getNodeName(), node.getLocalName(), "node");
+    final String currentPath = path.isEmpty() ? nodeName : path + "/" + nodeName;
+    final NamedNodeMap attributes = node.getAttributes();
+    for (int index = 0; index < attributes.getLength(); index += 1) {
+      final Node attribute = attributes.item(index);
+      entries.add(new WorksheetParser.ParsedShapeRawEntry(currentPath + "@" + attribute.getNodeName(), attribute.getNodeValue()));
+    }
+    final String directText = collectDirectText(node);
+    if (!directText.isEmpty()) {
+      entries.add(new WorksheetParser.ParsedShapeRawEntry(currentPath + "#text", directText));
+    }
+    final NodeList childNodes = node.getChildNodes();
+    for (int index = 0; index < childNodes.getLength(); index += 1) {
+      final Node child = childNodes.item(index);
+      if (child != null && child.getNodeType() == Node.ELEMENT_NODE) {
+        flattenXmlNodeEntries((Element) child, currentPath, entries);
+      }
+    }
+  }
+
+  private static BoundingBox parseShapeBoundingBox(
+      final Element anchor,
+      final Element shapeNode,
+      final ShapeExtent extent) {
+    final long defaultCellWidthEmu = 914400L;
+    final long defaultCellHeightEmu = 190500L;
+    final long fromCol = valueOrZero(parseAnchorLong(anchor, "from", "col"));
+    final long fromRow = valueOrZero(parseAnchorLong(anchor, "from", "row"));
+    final long fromColOff = valueOrZero(parseAnchorLong(anchor, "from", "colOff"));
+    final long fromRowOff = valueOrZero(parseAnchorLong(anchor, "from", "rowOff"));
+    final Long toCol = parseAnchorLong(anchor, "to", "col");
+    final Long toRow = parseAnchorLong(anchor, "to", "row");
+    final long toColOff = valueOrZero(parseAnchorLong(anchor, "to", "colOff"));
+    final long toRowOff = valueOrZero(parseAnchorLong(anchor, "to", "rowOff"));
+    final long left = fromCol * defaultCellWidthEmu + fromColOff;
+    final long top = fromRow * defaultCellHeightEmu + fromRowOff;
+    if (toCol != null && toRow != null) {
+      return new BoundingBox(left, top, toCol.longValue() * defaultCellWidthEmu + toColOff, toRow.longValue() * defaultCellHeightEmu + toRowOff);
+    }
+    final ShapeExtent parsedExtent = parseShapeExt(anchor, shapeNode);
+    final long width = Math.max(1L, firstPositive(parsedExtent.getWidthEmu(), extent.getWidthEmu(), Long.valueOf(defaultCellWidthEmu)));
+    final long height = Math.max(1L, firstPositive(parsedExtent.getHeightEmu(), extent.getHeightEmu(), Long.valueOf(defaultCellHeightEmu)));
+    return new BoundingBox(left, top, left + width, top + height);
+  }
+
+  private static Long parseAnchorLong(final Element anchor, final String parentName, final String childName) {
+    final Element parent = XmlUtils.getFirstChildByLocalName(anchor, parentName);
+    return parseLongText(XmlUtils.getFirstChildByLocalName(parent == null ? anchor : parent, childName));
+  }
+
+  private static String collectTextNodes(final Element root) {
+    final StringBuilder builder = new StringBuilder();
+    for (final Element node : XmlUtils.getElementsByLocalName(root, "t")) {
+      builder.append(XmlUtils.getTextContent(node));
+    }
+    return builder.toString();
+  }
+
+  private static String collectDirectText(final Element node) {
+    final List<String> values = new ArrayList<String>();
+    final NodeList childNodes = node.getChildNodes();
+    for (int index = 0; index < childNodes.getLength(); index += 1) {
+      final Node child = childNodes.item(index);
+      if (child != null && child.getNodeType() == Node.TEXT_NODE) {
+        final String value = stringValue(child.getTextContent()).trim();
+        if (!value.isEmpty()) {
+          values.add(value);
+        }
+      }
+    }
+    return join(values, " ");
+  }
+
+  private static Element firstElement(final Element... values) {
+    if (values == null) {
+      return null;
+    }
+    for (final Element value : values) {
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  private static String firstNonEmpty(final String... values) {
+    if (values == null) {
+      return "";
+    }
+    for (final String value : values) {
+      final String normalized = stringValue(value);
+      if (!normalized.isEmpty()) {
+        return normalized;
+      }
+    }
+    return "";
+  }
+
+  private static String attribute(final Element element, final String name) {
+    return element == null ? "" : stringValue(element.getAttribute(name));
+  }
+
+  private static Long parseLongText(final Element element) {
+    return parseLong(XmlUtils.getTextContent(element));
+  }
+
+  private static Long parseLongAttribute(final Element element, final String name) {
+    return parseLong(attribute(element, name));
+  }
+
+  private static Long parseLong(final String value) {
+    final String normalized = stringValue(value).trim();
+    if (normalized.isEmpty()) {
+      return null;
+    }
+    try {
+      return Long.valueOf((long) Double.parseDouble(normalized));
+    } catch (final NumberFormatException ex) {
+      return null;
+    }
+  }
+
+  private static long valueOrZero(final Long value) {
+    return value == null ? 0L : value.longValue();
+  }
+
+  private static long firstPositive(final Long... values) {
+    for (final Long value : values) {
+      if (value != null && value.longValue() > 0L) {
+        return value.longValue();
+      }
+    }
+    return 0L;
+  }
+
   private static ShapeBlock createShapeBlock(
       final List<ShapeBox> shapes,
       final List<Integer> shapeIndexes,
@@ -260,6 +715,38 @@ public final class SheetAssets {
     private Gap(final long dx, final long dy) {
       this.dx = dx;
       this.dy = dy;
+    }
+  }
+
+  private static final class AnchorPoint {
+    private final int row;
+    private final int col;
+
+    private AnchorPoint(final int row, final int col) {
+      this.row = row;
+      this.col = col;
+    }
+
+    private String toAddress() {
+      return AddressUtils.colToLetters(col) + row;
+    }
+  }
+
+  private static final class ShapeExtent {
+    private final Long widthEmu;
+    private final Long heightEmu;
+
+    private ShapeExtent(final Long widthEmu, final Long heightEmu) {
+      this.widthEmu = widthEmu;
+      this.heightEmu = heightEmu;
+    }
+
+    private Long getWidthEmu() {
+      return widthEmu;
+    }
+
+    private Long getHeightEmu() {
+      return heightEmu;
     }
   }
 

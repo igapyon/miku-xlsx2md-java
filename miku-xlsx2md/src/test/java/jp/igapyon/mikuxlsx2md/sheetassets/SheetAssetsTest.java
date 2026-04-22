@@ -7,9 +7,12 @@ package jp.igapyon.mikuxlsx2md.sheetassets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,6 +81,62 @@ class SheetAssetsTest {
     assertEquals("", SheetAssets.renderShapeSection(sheet.getShapes(), false));
   }
 
+  @Test
+  void parsesDrawingImagesChartsAndShapes() {
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    files.put("xl/worksheets/_rels/sheet1.xml.rels", bytes(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+            + "<Relationship Id=\"rIdDrawing\" Target=\"../drawings/drawing1.xml\"/>"
+            + "</Relationships>"));
+    files.put("xl/drawings/_rels/drawing1.xml.rels", bytes(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+            + "<Relationship Id=\"rIdImage\" Target=\"../media/image1.png\"/>"
+            + "<Relationship Id=\"rIdChart\" Target=\"../charts/chart1.xml\"/>"
+            + "</Relationships>"));
+    files.put("xl/media/image1.png", new byte[] {9, 8, 7});
+    files.put("xl/charts/chart1.xml", bytes(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<c:chartSpace xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">"
+            + "<c:chart><c:title><c:tx><c:rich><a:p xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"><a:r><a:t>Quarterly</a:t></a:r></a:p></c:rich></c:tx></c:title>"
+            + "<c:plotArea><c:barChart><c:axId val=\"10\"/><c:ser>"
+            + "<c:tx><c:v>Sales</c:v></c:tx>"
+            + "<c:cat><c:strRef><c:f>Sheet1!$A$1:$A$2</c:f></c:strRef></c:cat>"
+            + "<c:val><c:numRef><c:f>Sheet1!$B$1:$B$2</c:f></c:numRef></c:val>"
+            + "</c:ser></c:barChart><c:valAx><c:axId val=\"10\"/><c:axPos val=\"l\"/></c:valAx></c:plotArea></c:chart></c:chartSpace>"));
+    files.put("xl/drawings/drawing1.xml", bytes(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<xdr:wsDr xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" "
+            + "xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" "
+            + "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" "
+            + "xmlns:c=\"http://schemas.openxmlformats.org/drawingml/2006/chart\">"
+            + "<xdr:oneCellAnchor><xdr:from><xdr:col>1</xdr:col><xdr:row>2</xdr:row></xdr:from><xdr:pic><xdr:blipFill><a:blip r:embed=\"rIdImage\"/></xdr:blipFill></xdr:pic></xdr:oneCellAnchor>"
+            + "<xdr:oneCellAnchor><xdr:from><xdr:col>2</xdr:col><xdr:row>3</xdr:row></xdr:from><xdr:graphicFrame><a:graphic><a:graphicData><c:chart r:id=\"rIdChart\"/></a:graphicData></a:graphic></xdr:graphicFrame></xdr:oneCellAnchor>"
+            + "<xdr:twoCellAnchor><xdr:from><xdr:col>3</xdr:col><xdr:row>4</xdr:row></xdr:from><xdr:to><xdr:col>4</xdr:col><xdr:row>5</xdr:row></xdr:to>"
+            + "<xdr:sp><xdr:nvSpPr><xdr:cNvPr name=\"Box 1\"/><xdr:cNvSpPr txBox=\"1\"/></xdr:nvSpPr><xdr:spPr><a:prstGeom prst=\"rect\"/></xdr:spPr><xdr:txBody><a:p><a:r><a:t>Hello shape</a:t></a:r></a:p></xdr:txBody></xdr:sp></xdr:twoCellAnchor>"
+            + "</xdr:wsDr>"));
+
+    final List<WorksheetParser.ParsedImageAsset> images = SheetAssets.parseDrawingImages(files, "Asset Sheet", "xl/worksheets/sheet1.xml");
+    final List<WorksheetParser.ParsedChartAsset> charts = SheetAssets.parseDrawingCharts(files, "Asset Sheet", "xl/worksheets/sheet1.xml");
+    final List<WorksheetParser.ParsedShapeAsset> shapes = SheetAssets.parseDrawingShapes(files, "Asset Sheet", "xl/worksheets/sheet1.xml");
+
+    assertEquals(1, images.size());
+    assertEquals("B3", images.get(0).getAnchor());
+    assertEquals("image_001.png", images.get(0).getFilename());
+    assertEquals("xl/media/image1.png", images.get(0).getMediaPath());
+    assertEquals(1, charts.size());
+    assertEquals("C4", charts.get(0).getAnchor());
+    assertEquals("Bar Chart", charts.get(0).getChartType());
+    assertEquals("Sheet1!$B$1:$B$2", charts.get(0).getSeries().get(0).getValuesRef());
+    assertEquals(1, shapes.size());
+    assertEquals("D5", shapes.get(0).getAnchor());
+    assertEquals("Box 1", shapes.get(0).getName());
+    assertEquals("Text Box", shapes.get(0).getKind());
+    assertEquals("Hello shape", shapes.get(0).getText());
+    assertEquals(new SheetAssets.BoundingBox(2743200L, 762000L, 3657600L, 952500L), shapes.get(0).getBbox());
+  }
+
   private static String join(final List<String> values, final String delimiter) {
     final StringBuilder builder = new StringBuilder();
     for (int index = 0; index < values.size(); index += 1) {
@@ -87,5 +146,9 @@ class SheetAssetsTest {
       builder.append(values.get(index));
     }
     return builder.toString();
+  }
+
+  private static byte[] bytes(final String text) {
+    return text.getBytes(StandardCharsets.UTF_8);
   }
 }
