@@ -290,6 +290,25 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=TableDetectorTest test`
 
 ### upstream test / intent:
+`tests/xlsx2md-sheet-assets.test.js`
+
+java tests:
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.sanitizesSheetAssetDirectories`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.rendersHierarchicalRawEntries`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.groupsNearbyShapesIntoShapeBlocks`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssetsTest.rendersImageChartAndShapeSections`
+
+fixtures:
+- none
+
+focused regression:
+- `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest test`
+
+notes:
+- Current Java coverage ports asset rendering and shape block grouping intent.
+- `parseDrawingImages`, `parseDrawingCharts`, and `parseDrawingShapes` remain follow-up coverage.
+
+### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
 
 java tests:
@@ -367,7 +386,7 @@ focused regression:
 
 notes:
 - Current Java coverage is a minimum conversion regression for the new facade.
-- Upstream calendar grouping and asset grouping cases remain follow-up coverage.
+- Upstream calendar grouping and sheet asset drawing parse cases remain follow-up coverage.
 
 ### upstream test / intent:
 Node CLI option compatibility, help text shape, and initial conversion I/O

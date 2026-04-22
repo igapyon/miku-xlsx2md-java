@@ -253,6 +253,21 @@ notes:
 - Java-side extension: `SheetMarkdown.detectTableCandidates` and `SheetMarkdown.matrixFromCandidate` delegate to this helper while preserving the existing `SheetMarkdown.TableCandidate` public shape
 
 ### upstream file:
+`src/ts/sheet-assets.ts`
+
+java classes:
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets.BoundingBox`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets.ShapeBox`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets.ShapeBlockOptions`
+- `jp.igapyon.mikuxlsx2md.sheetassets.SheetAssets.ShapeBlock`
+
+notes:
+- facade: static sheet asset directory sanitizing, asset section rendering, hierarchical raw entry rendering, and shape block grouping helpers
+- helper split: image/chart/shape Markdown rendering is delegated from `SheetMarkdown`
+- remaining parity gap: `parseDrawingImages`, `parseDrawingCharts`, and `parseDrawingShapes` are not yet ported
+
+### upstream file:
 `src/ts/narrative-structure.ts`
 
 java classes:
@@ -295,9 +310,9 @@ java classes:
 
 notes:
 - facade: static sheet / workbook markdown conversion helpers
-- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; hyperlink formatting and asset section rendering remain inside the same class
+- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering is delegated to `SheetAssets`; hyperlink formatting remains inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
-- remaining parity gap: upstream sheet asset split / shape block grouping are not yet fully ported
+- remaining parity gap: upstream sheet asset drawing parse helpers are not yet fully ported
 
 ### upstream file:
 `scripts/miku-xlsx2md-cli.mjs`
@@ -324,4 +339,4 @@ notes:
 
 ## Next Candidates
 
-- `src/ts/sheet-assets.ts`
+- `src/ts/sheet-assets.ts` drawing parse helpers
