@@ -30,6 +30,7 @@ Document version: `2026-04-23`
 ## Next Queue
 
 - CLI / Maven plugin の fixture coverage をさらに広げる
+  - local upstream fixture inventory を再棚卸しし、CLI 側に残っていた hyperlink fixture coverage を追加済み
   - xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
   - shape-flowchart / shape-block-arrow fixture coverage は追加済み
   - shape-callout fixture coverage は追加済み
@@ -37,10 +38,11 @@ Document version: `2026-04-23`
   - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
   - rich-text-github / merge-pattern fixture coverage は追加済み
   - table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture coverage は追加済み
+  - この時点の local upstream fixture inventory では CLI / Maven plugin の未横展開 fixture 候補は未確認
 - Maven plugin smoke coverage を必要に応じて広げる
   - full-coordinate `convert-directory` smoke coverage は追加済み
 - Release Page の添付 asset 改善
-  - GitHub Actions で runtime jar を Release asset に添付する workflow は追加済み
+  - GitHub Actions で `mvn -B package` により runtime jar を生成し、Release asset に添付する workflow は追加済み
 
 ## Restart Memo
 
@@ -56,7 +58,8 @@ Document version: `2026-04-23`
 - CLI / Maven plugin 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
 - CLI / Maven plugin 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
 - CLI / Maven plugin 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
-- Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により runtime jar を GitHub Release asset へ添付する
+- CLI 側の `hyperlink-basic-sample01` は追加済み。Maven plugin 側は追加済みであることを再確認済み
+- Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により `mvn -B package` を実行し、runtime jar を GitHub Release asset へ添付する
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
 - 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` と `mvn package` と `sh scripts/smoke-maven-plugin.sh`
