@@ -64,15 +64,15 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring backed by shared runtime helper
   - Maven plugin `miku-xlsx2md.verbose` processing diagnostics
   - release version updated to `0.9.0`
-  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / merge / formula / chart / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
+  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / merge / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset, especially remaining formula/cross-sheet and image/edge fixture assertions
-  - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions, but further expansion is still pending
-  - broader CLI / Maven plugin fixture coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
+  - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions plus value type / raw value / formula type / cached value metadata assertions
+  - broader CLI / Maven plugin fixture coverage beyond the current subset
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 
 ## Focused Regression
@@ -112,6 +112,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
-- Expand worksheet parser shared / cross-sheet formula fixture coverage beyond the current focused regression subset
-- Add broader CLI / Maven plugin fixture coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
+- Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
+- Expand worksheet parser shared / cross-sheet formula fixture coverage further if upstream adds new cases
+- Add broader CLI / Maven plugin fixture coverage beyond the current subset

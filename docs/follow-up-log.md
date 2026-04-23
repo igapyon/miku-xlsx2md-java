@@ -67,11 +67,43 @@ diff summary:
 - 命名差分:
   - `rich-markdown-escape-sample01.xlsx` の sheet name `rich_escape` に合わせ、Java 側 sanitized markdown filename は `rich-markdown-escape-sample01_001_rich_escape.md`
 - 未移植差分:
-  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty の CLI / Maven plugin 横展開は follow-up
+  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty の CLI / Maven plugin 横展開は後続の `Formula and Edge Fixture Follow-up` で対応済み
 
 follow-up:
 - 実施した確認:
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
+
+## 2026-04-23 Formula and Edge Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `tests/fixtures/image/image-basic-sample01.xlsx`
+- `tests/fixtures/edge/edge-empty-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `WorksheetParserTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `WorksheetParserTest` の upstream formula fixture coverage に value type / raw value / formula type / cached value metadata assertions を追加
+  - CLI / Maven plugin fixture conversion coverage を formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty へ拡張
+- 命名差分:
+  - なし
+- 未移植差分:
+  - 追加の CLI / Maven plugin fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest,MikuXlsx2mdCliTest test` pass
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
   - `mvn test` pass
 
