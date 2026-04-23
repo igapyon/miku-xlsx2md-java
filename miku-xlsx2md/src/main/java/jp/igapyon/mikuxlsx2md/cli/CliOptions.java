@@ -15,8 +15,11 @@ final class CliOptions {
   private static final String[] SHAPE_DETAILS_MODES = {"include", "exclude"};
 
   private String inputPath;
+  private String inputDirectory;
   private String outPath;
+  private String outputDirectory;
   private String zipPath;
+  private boolean recursive;
   private boolean treatFirstRowAsHeader = true;
   private boolean trimText = true;
   private boolean removeEmptyRows = true;
@@ -75,8 +78,20 @@ final class CliOptions {
         options.summary = true;
         continue;
       }
+      if ("--recursive".equals(arg)) {
+        options.recursive = true;
+        continue;
+      }
 
-      if ("--out".equals(arg)) {
+      if ("--input-directory".equals(arg)) {
+        final String value = nextValue(args, arg, index);
+        index += 1;
+        options.inputDirectory = value;
+      } else if ("--output-directory".equals(arg)) {
+        final String value = nextValue(args, arg, index);
+        index += 1;
+        options.outputDirectory = value;
+      } else if ("--out".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
         options.outPath = value;
@@ -117,6 +132,21 @@ final class CliOptions {
     if ("shift_jis".equals(options.encoding) && "on".equals(options.bom)) {
       throw new IllegalArgumentException("BOM cannot be enabled for shift_jis.");
     }
+    if (options.inputPath != null && options.inputDirectory != null) {
+      throw new IllegalArgumentException("Specify either input workbook or --input-directory, not both.");
+    }
+    if (options.inputDirectory != null && options.outPath != null) {
+      throw new IllegalArgumentException("--out cannot be used with --input-directory.");
+    }
+    if (options.inputDirectory != null && options.zipPath != null) {
+      throw new IllegalArgumentException("--zip cannot be used with --input-directory.");
+    }
+    if (options.inputPath != null && options.outputDirectory != null) {
+      throw new IllegalArgumentException("--output-directory can only be used with --input-directory.");
+    }
+    if (options.inputPath != null && options.recursive) {
+      throw new IllegalArgumentException("--recursive can only be used with --input-directory.");
+    }
 
     return options;
   }
@@ -144,6 +174,10 @@ final class CliOptions {
     return inputPath;
   }
 
+  String getInputDirectory() {
+    return inputDirectory;
+  }
+
   boolean isHelp() {
     return help;
   }
@@ -156,8 +190,16 @@ final class CliOptions {
     return outPath;
   }
 
+  String getOutputDirectory() {
+    return outputDirectory;
+  }
+
   String getZipPath() {
     return zipPath;
+  }
+
+  boolean isRecursive() {
+    return recursive;
   }
 
   boolean isTreatFirstRowAsHeader() {

@@ -519,6 +519,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.failsForUnknownOption`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsZipWhenConvertingDirectoryInputs`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamDisplayFixtureWhenAvailable`
@@ -551,6 +553,7 @@ focused regression:
 
 notes:
 - CLI help now reflects upstream GUI-aligned defaults, including `formatting-mode=github` and the additional `planner-aware` table detection mode.
+- Java CLI also includes a Java-side directory batch conversion extension backed by the shared runtime directory converter.
 
 ### upstream test / intent:
 Maven plugin option mapping, skip behavior, and initial conversion I/O
@@ -574,6 +577,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
@@ -590,9 +596,9 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest,ConvertDirectoryMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
 - `sh scripts/smoke-maven-plugin.sh`
 
 notes:
 - Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
-- The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, and it scans `.xlsx` files only.
+- The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.

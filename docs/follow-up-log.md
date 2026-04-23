@@ -2,6 +2,39 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Shared Directory Batch Conversion
+
+upstream file:
+- none
+
+java classes:
+- `DirectoryConverter`
+- `CliOptions`
+- `MikuXlsx2mdCli`
+- `ConvertDirectoryMojo`
+
+tests:
+- `DirectoryConverterTest`
+- `MikuXlsx2mdCliTest`
+- `ConvertDirectoryMojoTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - directory batch conversion を runtime helper `DirectoryConverter` へ共通化
+  - Java CLI に `--input-directory`, `--output-directory`, `--recursive` を追加
+  - CLI directory mode は `--out` / `--zip` 併用を禁止
+  - Maven plugin `convert-directory` goal は `DirectoryConverter` へ委譲
+  - `.xlsx` のみを探索し、`outputDirectory` 省略時は入力ディレクトリへ `.md` を出力
+- 命名差分:
+  - CLI は upstream Node 版にない Java-side extension として directory mode を追加
+- 未移植差分:
+  - upstream に対応する CLI directory batch option は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+
 ## 2026-04-23 Maven Plugin Directory Goal
 
 upstream file:
