@@ -65,13 +65,13 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered
 - `SheetMarkdownTest` includes table detection compatibility alias coverage for `border-priority`
 - `SheetMarkdownTest` includes planner-aware calendar layout suppression coverage so repeated narrow calendar columns stay narrative instead of becoming small tables
-- `SheetMarkdownTest` includes upstream `xlsx2md-basic`, `shape-basic`, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, `table-basic-sample01`, `table-basic-sample02`, `table-basic-sample03`, `table-basic-sample11`, `table-basic-sample12`, `table-basic-sample13`, `table-basic-sample14`, `table-basic-sample15`, `table-basic-sample16`, `grid-layout`, `image-basic-sample02`, and weird-sheetname fixture parity coverage
+- `SheetMarkdownTest` includes upstream `xlsx2md-basic`, display, hyperlink, rich text / markdown escape, merge, formula, chart, shape, table, grid, image, and weird-sheetname fixture parity coverage
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
 - Maven plugin is connected to runtime core conversion, including a directory batch conversion goal with optional recursive scan shared with the CLI runtime helper
-- CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample02`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table alias, narrative/display/named-range fixtures, shape fixture, and compatibility alias cases
+- CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample02`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table alias, narrative/display/named-range/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
-- Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending, but the current subset now covers additional table/grid/image edge cases
+- Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending, but the current subset now covers additional rich/merge/formula/chart/table/grid/image edge cases
 
 ## Build
 
