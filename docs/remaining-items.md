@@ -4,7 +4,7 @@ Document version: `2026-04-23`
 
 ## Current Position
 
-Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, Maven plugin full-coordinate smoke execution is fixed as a script, and upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side.
+Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, Maven plugin full-coordinate smoke execution is fixed as a script, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, and the Maven plugin now has a directory batch conversion goal.
 
 ## Status
 
@@ -59,6 +59,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - CLI option vocabulary and initial conversion
   - CLI GUI-aligned default formatting mode `github` and help text sync
   - Maven plugin initial conversion
+  - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring
   - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command
 - 保守確認
