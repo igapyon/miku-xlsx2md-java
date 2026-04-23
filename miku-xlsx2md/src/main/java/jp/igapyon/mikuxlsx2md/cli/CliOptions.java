@@ -25,7 +25,7 @@ final class CliOptions {
   private boolean summary;
   private boolean help;
   private String outputMode = "display";
-  private String formattingMode = "plain";
+  private String formattingMode = "github";
   private String tableDetectionMode = "balanced";
   private String encoding = "utf-8";
   private String bom = "off";

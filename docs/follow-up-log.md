@@ -2,6 +2,52 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Upstream Sync (`e67f2bc`)
+
+upstream file:
+- `src/ts/markdown-options.ts`
+- `src/ts/table-detector.ts`
+- `src/ts/sheet-markdown.ts`
+- `src/ts/core.ts`
+- `src/ts/markdown-export.ts`
+- `src/ts/main.ts`
+- `src/ts/module-registry-access.ts`
+- `scripts/miku-xlsx2md-cli.mjs`
+- `tests/xlsx2md-table-detector.test.js`
+- `tests/xlsx2md-main.test.js`
+- `tests/xlsx2md-cli.test.js`
+- `tests/xlsx2md-node-runtime.test.js`
+
+java classes:
+- `MarkdownOptions`
+- `TableDetector`
+- `SheetMarkdown`
+- `CliOptions`
+- `MikuXlsx2mdCli`
+
+tests:
+- `MarkdownOptionsTest`
+- `TableDetectorTest`
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+
+diff summary:
+- 挙動差分:
+  - upstream `planner-aware` table detection mode を Java 側 `MarkdownOptions` / `TableDetector` / `SheetMarkdown` へ反映
+  - planner/calendar 向け抑制 heuristics は `planner-aware` 選択時だけ適用し、`balanced` / `border` 既存挙動は維持
+  - CLI help は upstream と同様に `planner-aware` を表示し、GUI-aligned defaults 表記を追加
+  - Java CLI 既定の `formattingMode` を `github` へ同期
+- 命名差分:
+  - `border-priority` compatibility alias は引き続き Java 側で `border` へ正規化
+- 未移植差分:
+  - upstream GUI HTML / browser runtime 表示変更は Java CLI / runtime の対象外
+
+follow-up:
+- 実施した確認:
+  - `workplace/miku-xlsx2md` を `origin/devel` `e67f2bc` へ fast-forward
+  - `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest,TableDetectorTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest,TableDetectorTest,SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
+
 ## 2026-04-22 Initial Straight Conversion Setup
 
 upstream file:

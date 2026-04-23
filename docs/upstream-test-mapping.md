@@ -1,6 +1,6 @@
 # Upstream Test Mapping
 
-Document version: `2026-04-22`
+Document version: `2026-04-23`
 
 ## Current Coverage
 
@@ -67,6 +67,7 @@ focused regression:
 java tests:
 - `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.normalizesModesAndBooleanDefaults`
 - `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.keepsCompatibilityAliasForBorderPriority`
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.acceptsPlannerAwareTableDetectionMode`
 
 fixtures:
 - none
@@ -350,6 +351,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.prunesRedundantAndCalendarLikeCandidates`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.borderModeExcludesDenseBorderlessBlocksButKeepsBorderedTables`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.doesNotTreatMergeHeavyFormBlocksAsTables`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDropsCalendarLikeColumnCandidatesWhileBorderKeepsThem`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDoesNotKeepHugeFallbackCandidateForMergeHeavyMixedLayoutSheet`
 
 fixtures:
 - none
@@ -464,6 +467,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.reordersCalendarLikeSectionsWithSidebar`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.plannerAwareDoesNotTurnRepeatedNarrowCalendarColumnsIntoTables`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.createsEmptyBodyFallbackSummary`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.normalizesTableDetectionCompatibilityAliasInCoreConversion`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesPlainAndGithubLineBreakDifferences`
@@ -504,6 +508,7 @@ focused regression:
 
 notes:
 - Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname parity checks.
+- Current Java coverage also includes planner-aware suppression for repeated narrow calendar layouts so those bands remain narrative instead of becoming small tables.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
@@ -543,6 +548,9 @@ fixtures:
 
 focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
+
+notes:
+- CLI help now reflects upstream GUI-aligned defaults, including `formatting-mode=github` and the additional `planner-aware` table detection mode.
 
 ### upstream test / intent:
 Maven plugin option mapping, skip behavior, and initial conversion I/O

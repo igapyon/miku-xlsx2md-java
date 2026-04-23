@@ -144,8 +144,8 @@ public final class MikuXlsx2mdCli {
     out.println("  --encoding <value>            utf-8 | shift_jis | utf-16le | utf-16be | utf-32le | utf-32be (default: utf-8)");
     out.println("  --bom <value>                 off | on (default: off; shift_jis does not allow on)");
     out.println("  --output-mode <mode>          display | raw | both (default: display)");
-    out.println("  --formatting-mode <mode>      plain | github (default: plain)");
-    out.println("  --table-detection-mode <mode> balanced | border (default: balanced)");
+    out.println("  --formatting-mode <mode>      plain | github (default: github)");
+    out.println("  --table-detection-mode <mode> balanced | border | planner-aware (default: balanced)");
     out.println("  --shape-details <mode>        include | exclude (default: exclude)");
     out.println("  --include-shape-details       Alias for --shape-details include");
     out.println("  --no-header-row               Do not treat the first row as a table header");
@@ -154,6 +154,9 @@ public final class MikuXlsx2mdCli {
     out.println("  --keep-empty-columns          Keep empty columns");
     out.println("  --summary                     Print per-sheet summary to stdout");
     out.println("  --help                        Show help and exit");
+    out.println();
+    out.println("GUI-aligned defaults:");
+    out.println("  output-mode=display, formatting-mode=github, table-detection-mode=balanced, shape-details=exclude");
     out.println();
     out.println("Exit codes:");
     out.println("  0                             Success");

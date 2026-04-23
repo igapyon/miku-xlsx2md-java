@@ -39,6 +39,9 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--bom"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
+    assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
+    assertTrue(asString(stdout).contains("formatting-mode=github"));
+    assertTrue(asString(stdout).contains("shape-details=exclude"));
     assertTrue(asString(stdout).contains("Exit codes:"));
     assertEquals("", asString(stderr));
   }
