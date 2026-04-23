@@ -36,6 +36,7 @@ Document version: `2026-04-23`
   - rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture coverage は追加済み
   - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
   - rich-text-github / merge-pattern fixture coverage は追加済み
+  - table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture coverage は追加済み
 - Maven plugin smoke coverage を必要に応じて広げる
   - full-coordinate `convert-directory` smoke coverage は追加済み
 - Release Page の添付 asset 改善
@@ -54,6 +55,7 @@ Document version: `2026-04-23`
 - CLI / Maven plugin 側の `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-basic-sample01` / `chart-mixed-sample01` は追加済み
 - CLI / Maven plugin 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
 - CLI / Maven plugin 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
+- CLI / Maven plugin 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
 - Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により runtime jar を GitHub Release asset へ添付する
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
@@ -137,6 +139,7 @@ Document version: `2026-04-23`
 - CLI に upstream rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture conversion coverage を追加した
 - CLI に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture conversion coverage を追加した
 - CLI に upstream rich-text-github / merge-pattern fixture conversion coverage を追加した
+- CLI に upstream table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture conversion coverage を追加した
 - Maven plugin に upstream shape fixture conversion coverage を追加した
 - Maven plugin に upstream table fixture を使う `border-priority` coverage を追加した
 - Maven plugin に upstream display / named-range / narrative fixture conversion coverage を追加した
@@ -146,6 +149,7 @@ Document version: `2026-04-23`
 - Maven plugin に upstream rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture conversion coverage を追加した
 - Maven plugin に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture conversion coverage を追加した
 - Maven plugin に upstream rich-text-github / merge-pattern fixture conversion coverage を追加した
+- Maven plugin に upstream table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
 - Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
 - GitHub Actions release workflow で runtime jar を Release Page の添付 asset に追加するようにした
