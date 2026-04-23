@@ -2,6 +2,38 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Node Java Markdown Byte Parity Script
+
+upstream file:
+- `tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- none
+
+scripts:
+- `scripts/compare-node-java-markdown.sh`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - Node CLI と Java CLI の Markdown 出力を fixture ごとに生成し、byte-level で比較する手動スクリプトを追加
+  - 初期比較対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`
+- 命名差分:
+  - 比較結果は `target/node-java-markdown-compare/` へ出力
+- 未移植差分:
+  - ZIP / assets の byte-level parity は未着手
+  - broader fixture comparison は未着手
+
+follow-up:
+- 実施した確認:
+  - `bash -n scripts/compare-node-java-markdown.sh` pass
+  - `sh scripts/compare-node-java-markdown.sh` pass
+  - `scripts/compare-node-java-markdown.sh` pass
+
 ## 2026-04-23 CLI Hyperlink Fixture Inventory Follow-up
 
 upstream file:

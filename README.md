@@ -96,6 +96,14 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar --help
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
 
+Node / Java Markdown byte-level comparison can be run after `mvn package` and upstream `npm install`:
+
+```bash
+scripts/compare-node-java-markdown.sh
+```
+
+By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/hyperlink-basic-sample01.xlsx`. Additional fixture paths can be passed relative to upstream `tests/fixtures/`.
+
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
