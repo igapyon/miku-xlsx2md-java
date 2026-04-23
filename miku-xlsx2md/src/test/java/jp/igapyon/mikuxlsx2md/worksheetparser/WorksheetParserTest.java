@@ -350,14 +350,31 @@ class WorksheetParserTest {
     assertEquals("複数シート参照サンプル", findCell(sheet1, "A1").getOutputValue());
     assertEquals("=Sheet2!B3", findCell(sheet1, "B3").getFormulaText());
     assertEquals("CrossValue", findCell(sheet1, "B3").getOutputValue());
+    assertEquals("CrossValue", findCell(sheet1, "B3").getRawValue());
+    assertEquals("str", findCell(sheet1, "B3").getValueType());
     assertEquals("resolved", findCell(sheet1, "B3").getResolutionStatus());
     assertEquals("cached_value", findCell(sheet1, "B3").getResolutionSource());
     assertEquals("present_nonempty", findCell(sheet1, "B3").getCachedValueState());
+    assertEquals("", findCell(sheet1, "B3").getFormulaType());
+    assertEquals("", findCell(sheet1, "B3").getSpillRef());
     assertEquals("=日本語シート!C4", findCell(sheet1, "B4").getFormulaText());
     assertEquals("日本語参照値", findCell(sheet1, "B4").getOutputValue());
+    assertEquals("日本語参照値", findCell(sheet1, "B4").getRawValue());
+    assertEquals("str", findCell(sheet1, "B4").getValueType());
     assertEquals("resolved", findCell(sheet1, "B4").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet1, "B4").getResolutionSource());
+    assertEquals("present_nonempty", findCell(sheet1, "B4").getCachedValueState());
     assertEquals("=SUM(Sheet2!A1:B2)", findCell(sheet1, "B5").getFormulaText());
     assertEquals("10", findCell(sheet1, "B5").getOutputValue());
+    assertEquals("10", findCell(sheet1, "B5").getRawValue());
+    assertEquals("formula", findCell(sheet1, "B5").getValueType());
+    assertEquals("resolved", findCell(sheet1, "B5").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet1, "B5").getResolutionSource());
+    assertEquals("present_nonempty", findCell(sheet1, "B5").getCachedValueState());
+    assertEquals("1", findCell(sheet2, "A1").getOutputValue());
+    assertEquals("2", findCell(sheet2, "B1").getOutputValue());
+    assertEquals("3", findCell(sheet2, "A2").getOutputValue());
+    assertEquals("4", findCell(sheet2, "B2").getOutputValue());
     assertEquals("CrossValue", findCell(sheet2, "B3").getOutputValue());
     assertEquals("日本語参照値", findCell(sheet3, "C4").getOutputValue());
   }
@@ -384,10 +401,18 @@ class WorksheetParserTest {
     assertEquals("resolved", findCell(sheet, "B3").getResolutionStatus());
     assertEquals("cached_value", findCell(sheet, "B3").getResolutionSource());
     assertEquals("present_nonempty", findCell(sheet, "B3").getCachedValueState());
+    assertEquals("", findCell(sheet, "B3").getFormulaType());
+    assertEquals("", findCell(sheet, "B3").getSpillRef());
     assertEquals("=B3+1", findCell(sheet, "B4").getFormulaText());
     assertEquals("3", findCell(sheet, "B4").getOutputValue());
+    assertEquals("shared", findCell(sheet, "B4").getFormulaType());
+    assertEquals("B4:B11", findCell(sheet, "B4").getSpillRef());
+    assertEquals("resolved", findCell(sheet, "B4").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet, "B4").getResolutionSource());
     assertEquals("=B4+1", findCell(sheet, "B5").getFormulaText());
     assertEquals("4", findCell(sheet, "B5").getOutputValue());
+    assertEquals("shared", findCell(sheet, "B5").getFormulaType());
+    assertEquals("", findCell(sheet, "B5").getSpillRef());
     assertEquals("=B5+1", findCell(sheet, "B6").getFormulaText());
     assertEquals("5", findCell(sheet, "B6").getOutputValue());
     assertEquals("=B6+1", findCell(sheet, "B7").getFormulaText());
@@ -400,6 +425,10 @@ class WorksheetParserTest {
     assertEquals("9", findCell(sheet, "B10").getOutputValue());
     assertEquals("=B10+1", findCell(sheet, "B11").getFormulaText());
     assertEquals("10", findCell(sheet, "B11").getOutputValue());
+    assertEquals("shared", findCell(sheet, "B11").getFormulaType());
+    assertEquals("resolved", findCell(sheet, "B11").getResolutionStatus());
+    assertEquals("cached_value", findCell(sheet, "B11").getResolutionSource());
+    assertEquals("present_nonempty", findCell(sheet, "B11").getCachedValueState());
   }
 
   private static WorksheetParser.ParsedCell findCell(final WorksheetParser.ParsedSheet sheet, final String address) {

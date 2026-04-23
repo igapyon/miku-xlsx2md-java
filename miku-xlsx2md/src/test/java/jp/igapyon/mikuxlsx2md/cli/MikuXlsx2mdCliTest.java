@@ -40,6 +40,7 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--input-directory"));
     assertTrue(asString(stdout).contains("--output-directory"));
     assertTrue(asString(stdout).contains("--recursive"));
+    assertTrue(asString(stdout).contains("--verbose"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
     assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
@@ -119,6 +120,30 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void printsProcessingFileToStderrWhenVerbose() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputPath = tempDir.resolve("sample.xlsx");
+    final Path outputPath = tempDir.resolve("out").resolve("sample.md");
+    Files.write(inputPath, createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            inputPath.toString(),
+            "--out", outputPath.toString(),
+            "--verbose"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertEquals("", asString(stdout));
+    assertTrue(asString(stderr).contains("[processing]"));
+    assertTrue(asString(stderr).contains("sample.xlsx"));
+    assertTrue(Files.isRegularFile(outputPath));
+  }
+
+  @Test
   void convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive() throws java.io.IOException {
     final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
@@ -145,6 +170,31 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("[workbook] root.xlsx"));
     assertTrue(asString(stdout).contains("[workbook] child.xlsx"));
     assertEquals("", asString(stderr));
+  }
+
+  @Test
+  void printsDirectoryProcessingFilesToStderrWhenVerbose() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    final Path outputDirectory = tempDir.resolve("out");
+    Files.createDirectories(inputDirectory);
+    Files.write(inputDirectory.resolve("root.xlsx"), createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--output-directory", outputDirectory.toString(),
+            "--verbose"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertEquals("", asString(stdout));
+    assertTrue(asString(stderr).contains("[processing]"));
+    assertTrue(asString(stderr).contains("root.xlsx"));
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("root.md")));
   }
 
   @Test
@@ -335,6 +385,385 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void convertsUpstreamHyperlinkFixtureInGithubModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("link", "hyperlink-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("hyperlink.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--formatting-mode", "github",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] hyperlink-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: hyperlink-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("[Open example](https://example.com/)"));
+    assertTrue(markdown.contains("[Jump to Other](#other)"));
+  }
+
+  @Test
+  void convertsUpstreamRichUsecaseFixtureInGithubModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-usecase-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("rich-usecase.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--formatting-mode", "github",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] rich-usecase-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: rich-usecase-sample01.xlsx"));
+    assertTrue(markdown.contains("[Apple](https://www.apple.com/)"));
+    assertTrue(markdown.contains("***Apple***"));
+    assertTrue(markdown.contains("実店舗とともに<br>**ネットショップ**でもお世話になっています。"));
+  }
+
+  @Test
+  void convertsUpstreamRichTextGithubFixtureInGithubModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-text-github-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("rich-text-github.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--formatting-mode", "github",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] rich-text-github-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: rich-text-github-sample01.xlsx"));
+    assertTrue(markdown.contains("**bold whole cell**"));
+    assertTrue(markdown.contains("<ins>underline whole cell</ins>"));
+    assertTrue(markdown.contains("plain **bold** *italic* strike <ins>underline</ins>"));
+  }
+
+  @Test
+  void convertsUpstreamMergeMultilineFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("merge", "merge-multiline-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("merge-multiline.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] merge-multiline-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: merge-multiline-sample01.xlsx"));
+    assertTrue(markdown.contains("### Table: 001 (A1-C4)"));
+    assertTrue(markdown.contains("| 1 | 1行目<br>2行目 | [←M←] |"));
+    assertTrue(markdown.contains("※結合セル内の改行確認用"));
+  }
+
+  @Test
+  void convertsUpstreamMergePatternFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("merge", "merge-pattern-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("merge-pattern.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] merge-pattern-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: merge-pattern-sample01.xlsx"));
+    assertTrue(markdown.contains("横結合"));
+    assertTrue(markdown.contains("2x2結合"));
+    assertTrue(markdown.contains("[←M←]"));
+    assertTrue(markdown.contains("[↑M↑]"));
+  }
+
+  @Test
+  void convertsUpstreamChartBasicFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("chart", "chart-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("chart-basic.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] chart-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: chart-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("### Chart: 001 (B10)"));
+    assertTrue(markdown.contains("- Title: 棒グラフのグラフ"));
+    assertTrue(markdown.contains("    - values: 'chart-basic'!$D$4:$D$7"));
+  }
+
+  @Test
+  void convertsUpstreamRichMarkdownEscapeFixtureInGithubModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-markdown-escape-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("rich-markdown-escape.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--formatting-mode", "github",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] rich-markdown-escape-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: rich-markdown-escape-sample01.xlsx"));
+    assertTrue(markdown.contains("line1 \\* x<br>**line2 \\[y\\]\\(z\\)**"));
+    assertTrue(markdown.contains("| Header \\| One | Header \\*Two\\* | Header \\[Three\\]\\(x\\) |"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaBasicFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("formula-basic.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] formula-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: formula-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("| if | OK |"));
+    assertTrue(markdown.contains("| date | 2024/3/17 |"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaSpillFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-spill-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("formula-spill.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] formula-spill-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: formula-spill-sample01.xlsx"));
+    assertTrue(markdown.contains("spill サンプル"));
+    assertTrue(markdown.contains("1 1 6"));
+  }
+
+  @Test
+  void convertsUpstreamChartMixedFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("chart", "chart-mixed-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("chart-mixed.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] chart-mixed-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: chart-mixed-sample01.xlsx"));
+    assertTrue(markdown.contains("- Type: Bar Chart + Line Chart (Combined)"));
+    assertTrue(markdown.contains("  - 利益率"));
+    assertTrue(markdown.contains("    - Axis: secondary"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaCrossSheetFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-crosssheet-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("formula-crosssheet.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] formula-crosssheet-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: formula-crosssheet-sample01.xlsx"));
+    assertTrue(markdown.contains("| sheet2\\_ref | CrossValue |"));
+    assertTrue(markdown.contains("| jp\\_sheet\\_ref | 日本語参照値 |"));
+    assertTrue(markdown.contains("| sum\\_range | 10 |"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaSharedFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-shared-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("formula-shared.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] formula-shared-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: formula-shared-sample01.xlsx"));
+    assertTrue(markdown.contains("| No | 連番 |"));
+    assertTrue(markdown.contains("| 1 | 1 |"));
+    assertTrue(markdown.contains("| 10 | 10 |"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample01WhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("image-basic-sample01.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] image-basic-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: image-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("画像抽出サンプル"));
+    assertTrue(markdown.contains("### Image: 001 (C8)"));
+    assertTrue(markdown.contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void convertsUpstreamEdgeEmptyFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-empty-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("edge-empty.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] edge-empty-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: edge-empty-sample01.xlsx"));
+    assertTrue(markdown.contains("空系境界サンプル"));
+    assertTrue(markdown.contains("only-value"));
+    assertTrue(!markdown.contains("### Table:"));
+  }
+
+  @Test
   void convertsUpstreamBasicFixtureInBothModeWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("", "xlsx2md-basic-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -471,6 +900,58 @@ class MikuXlsx2mdCliTest {
     assertTrue(markdown.contains("## Sheet: shape-callout"));
     assertTrue(markdown.contains("- `a:prstGeom@prst`: `wedgeRoundRectCallout`"));
     assertTrue(markdown.contains("- `a:t#text`: `角四角`"));
+  }
+
+  @Test
+  void convertsUpstreamTableBasicAndGridFixturesWhenAvailable() throws java.io.IOException {
+    final String[][] fixtureCases = new String[][] {
+        {"table-basic-sample01.xlsx", "table-basic-sample01.md", "### Table: 001 (B3-F7)", "### Table: 002 (B9-F13)",
+            "| 3 | 登録日 | createdAt | 3月15日 | 登録した日 |"},
+        {"table-basic-sample02.xlsx", "table-basic-sample02.md", "### Table: 001 (B3-F7)", "### Table: 002 (H3-L7)",
+            "| 2 | 別名 | altname | Hanako | 何かの別名 |"},
+        {"table-basic-sample03.xlsx", "table-basic-sample03.md", "### Table: 001 (B3-F7)", "### Table: 004 (H9-L13)",
+            "| 2 | 別名 | altname | Sawada | 何かの別名 |"},
+        {"table-basic-sample11.xlsx", "table-basic-sample11.md", "### Table: 001 (B3-T7)",
+            "| 4 | 更新日 | updatedate | 3月14日 | 何かの更新日 |"},
+        {"table-basic-sample12.xlsx", "table-basic-sample12.md", "### Table: 001 (B3-T7)", "### Table: 002 (B10-T14)",
+            "方眼紙風のためにセル結合が多用されます"},
+        {"table-basic-sample13.xlsx", "table-basic-sample13.md", "### Table: 001 (B3-T7)", "### Table: 004 (V10-AN14)",
+            "| 2 | 名前 | name | Sabro | 何かの名前 |"},
+        {"table-basic-sample14.xlsx", "table-basic-sample14.md", "### Table: 001 (B3-T7)",
+            "たまに結合漏れのセルがある場合"},
+        {"table-basic-sample15.xlsx", "table-basic-sample15.md", "### Table: 001 (B3-T7)",
+            "※方眼紙＋結合＋さらに縦結合"},
+        {"table-basic-sample16.xlsx", "table-basic-sample16.md", "### Table: 001 (B3-T7)",
+            "たまに結合漏れのセルがあって、さらに複数文字が登場"},
+        {"grid-layout-sample-01.xlsx", "grid-layout-sample-01.md", "### Table: 001 (B2-U6)", "### Table: 002 (C8-V16)",
+            "| 8 | 更新日 | updatedate |  | システムへの更新日 |"}
+    };
+
+    for (final String[] fixtureCase : fixtureCases) {
+      final Path fixturePath = resolveFixturePath("table", fixtureCase[0]);
+      Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+      final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+      final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+      final Path outputPath = tempDir.resolve(fixtureCase[1]);
+
+      final int exitCode = MikuXlsx2mdCli.run(
+          new String[] {
+              fixturePath.toString(),
+              "--out", outputPath.toString(),
+              "--summary"
+          },
+          asPrintStream(stdout),
+          asPrintStream(stderr));
+
+      final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+      assertEquals(0, exitCode);
+      assertTrue(asString(stdout).contains("[workbook] " + fixtureCase[0]));
+      assertEquals("", asString(stderr));
+      assertTrue(markdown.contains("# Book: " + fixtureCase[0]));
+      for (int index = 2; index < fixtureCase.length; index++) {
+        assertTrue(markdown.contains(fixtureCase[index]));
+      }
+    }
   }
 
   @Test

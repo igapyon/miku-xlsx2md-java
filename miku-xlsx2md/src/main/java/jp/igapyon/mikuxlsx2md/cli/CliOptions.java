@@ -26,6 +26,7 @@ final class CliOptions {
   private boolean removeEmptyColumns = true;
   private boolean includeShapeDetails;
   private boolean summary;
+  private boolean verbose;
   private boolean help;
   private String outputMode = "display";
   private String formattingMode = "github";
@@ -76,6 +77,10 @@ final class CliOptions {
       }
       if ("--summary".equals(arg)) {
         options.summary = true;
+        continue;
+      }
+      if ("--verbose".equals(arg)) {
+        options.verbose = true;
         continue;
       }
       if ("--recursive".equals(arg)) {
@@ -184,6 +189,10 @@ final class CliOptions {
 
   boolean isSummary() {
     return summary;
+  }
+
+  boolean isVerbose() {
+    return verbose;
   }
 
   String getOutPath() {

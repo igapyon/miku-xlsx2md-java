@@ -36,9 +36,9 @@ public final class MikuXlsx2mdCli {
       }
 
       if (options.getInputDirectory() != null) {
-        convertDirectory(options, out);
+        convertDirectory(options, out, err);
       } else {
-        convertWorkbook(options, out);
+        convertWorkbook(options, out, err);
       }
       return 0;
     } catch (final IllegalArgumentException ex) {
@@ -50,9 +50,12 @@ public final class MikuXlsx2mdCli {
     }
   }
 
-  private static void convertWorkbook(final CliOptions options, final PrintStream out) throws IOException {
+  private static void convertWorkbook(final CliOptions options, final PrintStream out, final PrintStream err) throws IOException {
     final Path inputPath = Paths.get(options.getInputPath()).toAbsolutePath();
     final String workbookName = inputPath.getFileName() == null ? "workbook.xlsx" : inputPath.getFileName().toString();
+    if (options.isVerbose()) {
+      err.println("[processing] " + inputPath.toString());
+    }
     final byte[] workbookBytes;
     try {
       workbookBytes = Files.readAllBytes(inputPath);
@@ -103,7 +106,7 @@ public final class MikuXlsx2mdCli {
     }
   }
 
-  private static void convertDirectory(final CliOptions options, final PrintStream out) throws IOException {
+  private static void convertDirectory(final CliOptions options, final PrintStream out, final PrintStream err) throws IOException {
     final List<DirectoryConverter.DirectoryConversionResult> results;
     try {
       results = DirectoryConverter.convertDirectory(new DirectoryConverter.DirectoryConversionOptions(
@@ -111,7 +114,13 @@ public final class MikuXlsx2mdCli {
           options.getOutputDirectory() == null ? null : Paths.get(options.getOutputDirectory()),
           options.isRecursive(),
           createMarkdownOptions(options),
-          new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom())));
+          new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom()),
+          options.isVerbose() ? new DirectoryConverter.ProgressListener() {
+            @Override
+            public void processing(final Path workbookPath) {
+              err.println("[processing] " + workbookPath.toString());
+            }
+          } : null));
     } catch (final IllegalArgumentException ex) {
       throw ex;
     }
@@ -181,6 +190,7 @@ public final class MikuXlsx2mdCli {
     out.println("  --keep-empty-rows             Keep empty rows");
     out.println("  --keep-empty-columns          Keep empty columns");
     out.println("  --summary                     Print per-sheet summary to stdout");
+    out.println("  --verbose                     Print processing file paths to stderr");
     out.println("  --help                        Show help and exit");
     out.println();
     out.println("GUI-aligned defaults:");

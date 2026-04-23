@@ -2,6 +2,277 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Node Java Markdown Byte Parity Script
+
+upstream file:
+- `tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- none
+
+scripts:
+- `scripts/compare-node-java-markdown.sh`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - Node CLI と Java CLI の Markdown 出力を fixture ごとに生成し、byte-level で比較する手動スクリプトを追加
+  - 初期比較対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`
+- 命名差分:
+  - 比較結果は `target/node-java-markdown-compare/` へ出力
+- 未移植差分:
+  - ZIP / assets の byte-level parity は未着手
+  - broader fixture comparison は未着手
+
+follow-up:
+- 実施した確認:
+  - `bash -n scripts/compare-node-java-markdown.sh` pass
+  - `sh scripts/compare-node-java-markdown.sh` pass
+  - `scripts/compare-node-java-markdown.sh` pass
+
+## 2026-04-23 CLI Hyperlink Fixture Inventory Follow-up
+
+upstream file:
+- `tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `MikuXlsx2mdCliTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - CLI fixture conversion coverage を hyperlink fixture へ拡張
+  - local upstream fixture inventory を再棚卸しし、この時点の CLI / Maven plugin 未横展開 fixture 候補は未確認
+- 命名差分:
+  - なし
+- 未移植差分:
+  - actual GitHub tag 上での release workflow 実行は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn test` pass
+
+## 2026-04-23 CLI and Maven Table Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/table/table-basic-sample01.xlsx`
+- `tests/fixtures/table/table-basic-sample02.xlsx`
+- `tests/fixtures/table/table-basic-sample03.xlsx`
+- `tests/fixtures/table/table-basic-sample11.xlsx`
+- `tests/fixtures/table/table-basic-sample12.xlsx`
+- `tests/fixtures/table/table-basic-sample13.xlsx`
+- `tests/fixtures/table/table-basic-sample14.xlsx`
+- `tests/fixtures/table/table-basic-sample15.xlsx`
+- `tests/fixtures/table/table-basic-sample16.xlsx`
+- `tests/fixtures/table/grid-layout-sample-01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - CLI fixture conversion coverage を table-basic-sample01-03 / table-basic-sample11-16 / grid-layout へ拡張
+  - Maven plugin fixture conversion coverage を table-basic-sample01-03 / table-basic-sample11-16 / grid-layout へ拡張
+- 命名差分:
+  - なし
+- 未移植差分:
+  - CLI / Maven plugin の追加 fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
+
+## 2026-04-23 Release Asset Workflow and Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/named-range/named-range-sample01.xlsx`
+- `tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+- `tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `tests/fixtures/table/table-border-priority-sample01.xlsx`
+- `tests/fixtures/rich/rich-text-github-sample01.xlsx`
+- `tests/fixtures/merge/merge-pattern-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+release workflow:
+- `.github/workflows/release.yml`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `SheetMarkdownTest` の upstream fixture parity coverage を named-range / narrative / chart-basic / table-border-priority へ拡張
+  - CLI / Maven plugin fixture conversion coverage を rich-text-github / merge-pattern へ拡張
+  - GitHub Actions release workflow を追加し、`v*` tag push または manual dispatch で shaded runtime jar を GitHub Release asset へ添付
+- 命名差分:
+  - release asset は `miku-xlsx2md/target/miku-xlsx2md-*.jar` を対象にし、`original-*.jar` は除外
+- 未移植差分:
+  - upstream に対応する release workflow は未確認
+  - actual GitHub tag 上での release workflow 実行は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn package` pass
+
+## 2026-04-23 Verbose Processing Diagnostics and 0.9.0 Version
+
+upstream file:
+- none
+
+java classes:
+- `CliOptions`
+- `MikuXlsx2mdCli`
+- `DirectoryConverter`
+- `MikuXlsx2mdMojo`
+- `ConvertDirectoryMojo`
+
+tests:
+- `MikuXlsx2mdCliTest`
+- `DirectoryConverterTest`
+- `MikuXlsx2mdMojoTest`
+- `ConvertDirectoryMojoTest`
+
+diff summary:
+- 挙動差分:
+  - Java CLI に `--verbose` を追加し、処理中 workbook path を stderr へ出力
+  - `DirectoryConverter` に progress listener を追加し、directory batch conversion の処理中 workbook path を通知
+  - Maven plugin の `convert` / `convert-directory` goal に `miku-xlsx2md.verbose` を追加し、処理中 workbook path を Maven log へ出力
+  - Maven project version と README / smoke script の利用例を `0.9.0` へ更新
+- 命名差分:
+  - CLI は `--verbose`、Maven plugin は `miku-xlsx2md.verbose` を使用
+- 未移植差分:
+  - upstream に対応する verbose option は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass
+  - `mvn test` pass
+
+## 2026-04-23 Fixture Parity Expansion
+
+upstream file:
+- `tests/fixtures/display/display-format-sample01.xlsx`
+- `tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `tests/fixtures/rich/rich-usecase-sample01.xlsx`
+- `tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
+- `tests/fixtures/merge/merge-multiline-sample01.xlsx`
+- `tests/fixtures/merge/merge-pattern-sample01.xlsx`
+- `tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `tests/fixtures/formula/formula-spill-sample01.xlsx`
+- `tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `tests/fixtures/chart/chart-mixed-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - upstream fixture parity coverage を `SheetMarkdownTest` へ display / hyperlink / rich / merge / formula / chart 方向に拡張
+  - CLI / Maven plugin fixture conversion coverage を rich markdown escape / formula basic / formula spill / chart mixed 方向へ拡張
+- 命名差分:
+  - `rich-markdown-escape-sample01.xlsx` の sheet name `rich_escape` に合わせ、Java 側 sanitized markdown filename は `rich-markdown-escape-sample01_001_rich_escape.md`
+- 未移植差分:
+  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty の CLI / Maven plugin 横展開は後続の `Formula and Edge Fixture Follow-up` で対応済み
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
+
+## 2026-04-23 Formula and Edge Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `tests/fixtures/image/image-basic-sample01.xlsx`
+- `tests/fixtures/edge/edge-empty-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `WorksheetParserTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `WorksheetParserTest` の upstream formula fixture coverage に value type / raw value / formula type / cached value metadata assertions を追加
+  - CLI / Maven plugin fixture conversion coverage を formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty へ拡張
+- 命名差分:
+  - なし
+- 未移植差分:
+  - 追加の CLI / Maven plugin fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
+
+## 2026-04-23 Sheet Markdown and Smoke Follow-up
+
+upstream file:
+- `tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `tests/fixtures/image/image-basic-sample01.xlsx`
+- `tests/fixtures/edge/edge-empty-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `SheetMarkdownTest`
+- `scripts/smoke-maven-plugin.sh`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `SheetMarkdownTest` の upstream fixture parity coverage を formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty へ拡張
+  - Maven plugin smoke script に full-coordinate `convert-directory` coverage を追加
+  - local upstream fixture inventory を確認し、この時点の追加 fixture 候補は未確認
+- 命名差分:
+  - なし
+- 未移植差分:
+  - 追加の fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass
+  - `mvn test` pass
+
 ## 2026-04-23 Shared Directory Batch Conversion
 
 upstream file:
@@ -217,7 +488,7 @@ diff summary:
 - 未移植差分:
   - worksheet parser shared / cross-sheet formula fixture coverage expansion beyond the current focused regression subset
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
-  - broader CLI / Maven plugin fixture coverage beyond the current subset
+  - broader CLI / Maven plugin fixture coverage for future upstream fixture additions
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 - Java 側独自拡張:
   - immutable value objects for equality-based tests

@@ -205,7 +205,7 @@ focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
 
 notes:
-- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
+- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, value type / raw value / formula type / cached value metadata assertions for those formula fixtures, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
 
 ### upstream test / intent:
 connected workbook parsing path through the Java core facade
@@ -476,9 +476,29 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.suppressesUnderlineMarkupForHyperlinkCellsInGithubMode`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsBlankLineBetweenShapeItemsWhenSvgOutputIsPresent`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesHyperlinksInRawModeAndAppendsRawOnlyWhenValuesDifferInBothMode`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamDisplayFixtureIntoDisplayRawAndBothMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamHyperlinkFixtureIntoGithubMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamRichUsecaseFixtureIntoPlainAndGithubMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamMergeMultilineFixtureIntoMergedTableMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamRichMarkdownEscapeFixtureIntoPlainAndGithubMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamMergePatternFixtureIntoMergeTokenMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaBasicFixtureIntoFormulaMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaSpillFixtureIntoSpillMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaCrossSheetFixtureIntoMultiSheetMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaSharedFixtureIntoTranslatedSharedFormulaMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamChartMixedFixtureIntoCombinedChartMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamChartBasicFixtureIntoChartMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamNamedRangeFixtureIntoMultiSheetMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamNarrativeFixtureIntoNarrativeAndTableMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBorderPriorityFixtureDifferentlyBetweenBalancedAndBorderModesWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicShapeFixtureIntoSvgBackedShapeBlockMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamCalloutShapeFixtureIntoRawDetailShapeBlockMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFlowchartShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBlockArrowShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample01FixtureIntoSeparatedVerticalTablesWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample02FixtureIntoSeparatedHorizontalTablesWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample03FixtureIntoSeparatedQuadTablesWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample11FixtureIntoGridHeavyMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample12FixtureIntoTwoSectionGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample13FixtureIntoDenseMultiTableMarkdownWhenAvailable`
@@ -486,28 +506,52 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample15FixtureIntoMergedGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample16FixtureIntoMultiValueMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamGridLayoutFixtureIntoWideGridMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample01IntoImageMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample02IntoImageAndChartMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamEdgeEmptyFixtureIntoNarrativeOnlyMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamWeirdSheetNameFixtureIntoSanitizedMarkdownFileWhenAvailable`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / named-range / display / hyperlink / rich / merge / formula / formula-crosssheet / formula-shared / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname parity checks.
 - Current Java coverage also includes planner-aware suppression for repeated narrow calendar layouts so those bands remain narrative instead of becoming small tables.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
@@ -519,13 +563,29 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.failsForUnknownOption`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.printsProcessingFileToStderrWhenVerbose`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.printsDirectoryProcessingFilesToStderrWhenVerbose`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsZipWhenConvertingDirectoryInputs`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamDisplayFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamNamedRangeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamNarrativeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamHyperlinkFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamRichUsecaseFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamRichTextGithubFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamMergeMultilineFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamMergePatternFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamChartBasicFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamRichMarkdownEscapeFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFormulaBasicFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFormulaSpillFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamChartMixedFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFormulaCrossSheetFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFormulaSharedFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamImageFixtureSample01WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamEdgeEmptyFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsBorderPriorityAsCompatibilityAliasWhenUsingUpstreamTableFixture`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsIncludeShapeDetailsAsCompatibilityAliasWhenUsingUpstreamShapeFixture`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
@@ -533,19 +593,44 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamTableBasicAndGridFixturesWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-text-github-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
@@ -554,6 +639,7 @@ focused regression:
 notes:
 - CLI help now reflects upstream GUI-aligned defaults, including `formatting-mode=github` and the additional `planner-aware` table detection mode.
 - Java CLI also includes a Java-side directory batch conversion extension backed by the shared runtime directory converter.
+- Java CLI `--verbose` prints processing workbook paths to stderr.
 
 ### upstream test / intent:
 Maven plugin option mapping, skip behavior, and initial conversion I/O
@@ -566,12 +652,26 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamNarrativeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamHyperlinkFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichUsecaseFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichTextGithubFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamMergeMultilineFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamMergePatternFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamChartBasicFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichMarkdownEscapeFixtureInGithubModeWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaBasicFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaSpillFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamChartMixedFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaCrossSheetFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaSharedFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample01WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamEdgeEmptyFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample02WhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamTableBasicAndGridFixturesWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.skipsWhenRequested`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
@@ -580,19 +680,43 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.notifiesProcessingWorkbookThroughProgressListener`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-usecase-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-text-github-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/rich/rich-markdown-escape-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample03.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
@@ -600,5 +724,6 @@ focused regression:
 - `sh scripts/smoke-maven-plugin.sh`
 
 notes:
-- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
+- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`, covering both `convert` and `convert-directory`.
 - The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.
+- Maven plugin goals accept `miku-xlsx2md.verbose` to log processing workbook paths.

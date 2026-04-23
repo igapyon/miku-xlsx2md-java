@@ -12,35 +12,62 @@ Document version: `2026-04-23`
 
 ## Current Queue
 
+- Node / Java Markdown byte-level parity を段階的に導入する
+  - `scripts/compare-node-java-markdown.sh` で Markdown 出力比較を開始
+  - 初期対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`
+  - ZIP / assets の byte-level parity は Markdown 比較後の follow-up
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
   - rich text / markdown escape fixture coverage は追加済み
   - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
+  - display / hyperlink / rich-usecase / rich-markdown-escape fixture coverage は追加済み
+  - merge-pattern / formula-basic / formula-spill / chart-mixed fixture coverage は追加済み
+  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
   - xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout fixture coverage は追加済み
   - table-basic-sample01 / table-basic-sample02 / table-basic-sample03 fixture coverage は追加済み
   - table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage は追加済み
   - table-basic-sample13 / table-basic-sample15 / grid-layout / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
+  - named-range / narrative / chart-basic / table-border-priority fixture coverage は追加済み
 - worksheet parser の shared / cross-sheet formula fixture coverage を upstream fixture focused regression からさらに広げる
   - formula-crosssheet / formula-shared fixture assertion expansion は追加済み
+  - formula-crosssheet / formula-shared の value type / raw value / formula type / cached value metadata assertion expansion は追加済み
 
 ## Next Queue
 
 - CLI / Maven plugin の fixture coverage をさらに広げる
+  - local upstream fixture inventory を再棚卸しし、CLI 側に残っていた hyperlink fixture coverage を追加済み
   - xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
   - shape-flowchart / shape-block-arrow fixture coverage は追加済み
   - shape-callout fixture coverage は追加済み
+  - rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture coverage は追加済み
+  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
+  - rich-text-github / merge-pattern fixture coverage は追加済み
+  - table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture coverage は追加済み
+  - この時点の local upstream fixture inventory では CLI / Maven plugin の未横展開 fixture 候補は未確認
 - Maven plugin smoke coverage を必要に応じて広げる
+  - full-coordinate `convert-directory` smoke coverage は追加済み
+- Release Page の添付 asset 改善
+  - GitHub Actions で `mvn -B package` により runtime jar を生成し、Release asset に添付する workflow は追加済み
 
 ## Restart Memo
 
-- 次回の再開点は `advanced sheet-markdown parity coverage` の続き
+- 次回の再開点は `advanced sheet-markdown parity coverage` と CLI / Maven plugin fixture 横展開の続き
 - `table-basic` / shape 系の `SheetMarkdownTest` coverage は sample01-03 / sample11-16 / `shape-basic-sample01` / `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` まで追加済み
-- 次の候補は `display-format-sample01` / `hyperlink-basic-sample01` / `rich-usecase-sample01` などの sheet-markdown fixture parity 横展開
+- `display-format-sample01` / `hyperlink-basic-sample01` / `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-pattern-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-mixed-sample01` の `SheetMarkdownTest` coverage は追加済み
+- `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` の `SheetMarkdownTest` coverage は追加済み
+- `named-range-sample01` / `narrative-vs-table-sample01` / `chart-basic-sample01` / `table-border-priority-sample01` の `SheetMarkdownTest` coverage は追加済み
 - CLI / Maven plugin 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` を優先
 - CLI / Maven plugin 側の `shape-flowchart-sample01` / `shape-block-arrow-sample01` は追加済み
 - CLI / Maven plugin 側の `shape-callout-sample01` は追加済み
-- 次の横展開候補は未確認
-- worksheet parser 側は `formula-crosssheet` / `formula-shared` の focused regression をさらに具体 assertion で広げる余地あり
-- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- CLI / Maven plugin 側の `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-basic-sample01` / `chart-mixed-sample01` は追加済み
+- CLI / Maven plugin 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
+- CLI / Maven plugin 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
+- CLI / Maven plugin 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
+- CLI 側の `hyperlink-basic-sample01` は追加済み。Maven plugin 側は追加済みであることを再確認済み
+- Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により `mvn -B package` を実行し、runtime jar を GitHub Release asset へ添付する
+- Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
+- worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
+- local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
+- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` と `mvn package` と `sh scripts/smoke-maven-plugin.sh`
 
 ## Done In This Step
 
@@ -91,7 +118,11 @@ Document version: `2026-04-23`
 - `SheetMarkdownTest` に upstream table-basic-sample01 / table-basic-sample02 / table-basic-sample03 fixture coverage を追加した
 - `SheetMarkdownTest` に upstream table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage を追加した
 - `SheetMarkdownTest` に upstream table-basic-sample13 / table-basic-sample15 / grid-layout / image-basic-sample02 / weird-sheetname fixture coverage を追加した
+- `SheetMarkdownTest` に upstream display / hyperlink / rich-usecase / rich-markdown-escape / merge-multiline / merge-pattern / formula-basic / formula-spill / chart-mixed fixture coverage を追加した
+- `SheetMarkdownTest` に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage を追加した
+- `SheetMarkdownTest` に upstream named-range / narrative / chart-basic / table-border-priority fixture coverage を追加した
 - `WorksheetParserTest` に upstream formula-crosssheet / formula-shared fixture coverage を追加した
+- `WorksheetParserTest` の upstream formula-crosssheet / formula-shared fixture coverage に value type / raw value / formula type / cached value metadata assertion を追加した
 - markdown conversion を core facade へ接続した
 - workbook-to-markdown conversion の focused fixture regression を追加した
 - formula basic / chart basic fixture を使う workbook-to-markdown focused regression を追加した
@@ -113,13 +144,23 @@ Document version: `2026-04-23`
 - CLI に upstream xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture conversion coverage を追加した
 - CLI に upstream shape-flowchart / shape-block-arrow fixture conversion coverage を追加した
 - CLI に upstream shape-callout fixture conversion coverage を追加した
+- CLI に upstream rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture conversion coverage を追加した
+- CLI に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture conversion coverage を追加した
+- CLI に upstream rich-text-github / merge-pattern fixture conversion coverage を追加した
+- CLI に upstream table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture conversion coverage を追加した
 - Maven plugin に upstream shape fixture conversion coverage を追加した
 - Maven plugin に upstream table fixture を使う `border-priority` coverage を追加した
 - Maven plugin に upstream display / named-range / narrative fixture conversion coverage を追加した
 - Maven plugin に upstream xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture conversion coverage を追加した
 - Maven plugin に upstream shape-flowchart / shape-block-arrow fixture conversion coverage を追加した
 - Maven plugin に upstream shape-callout fixture conversion coverage を追加した
+- Maven plugin に upstream rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture conversion coverage を追加した
+- Maven plugin に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture conversion coverage を追加した
+- Maven plugin に upstream rich-text-github / merge-pattern fixture conversion coverage を追加した
+- Maven plugin に upstream table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
+- Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
+- GitHub Actions release workflow で runtime jar を Release Page の添付 asset に追加するようにした
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
