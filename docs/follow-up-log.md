@@ -2,6 +2,32 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 CLI Hyperlink Fixture Inventory Follow-up
+
+upstream file:
+- `tests/fixtures/link/hyperlink-basic-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `MikuXlsx2mdCliTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - CLI fixture conversion coverage を hyperlink fixture へ拡張
+  - local upstream fixture inventory を再棚卸しし、この時点の CLI / Maven plugin 未横展開 fixture 候補は未確認
+- 命名差分:
+  - なし
+- 未移植差分:
+  - actual GitHub tag 上での release workflow 実行は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn test` pass
+
 ## 2026-04-23 CLI and Maven Table Fixture Follow-up
 
 upstream file:
@@ -430,7 +456,7 @@ diff summary:
 - 未移植差分:
   - worksheet parser shared / cross-sheet formula fixture coverage expansion beyond the current focused regression subset
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
-  - broader CLI / Maven plugin fixture coverage beyond the current subset
+  - broader CLI / Maven plugin fixture coverage for future upstream fixture additions
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
