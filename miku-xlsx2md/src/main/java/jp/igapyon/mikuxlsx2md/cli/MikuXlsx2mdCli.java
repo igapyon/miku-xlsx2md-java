@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import jp.igapyon.mikuxlsx2md.core.Core;
+import jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverter;
 import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.textencoding.TextEncoding;
@@ -29,12 +30,16 @@ public final class MikuXlsx2mdCli {
   public static int run(final String[] args, final PrintStream out, final PrintStream err) {
     try {
       final CliOptions options = CliOptions.parse(args);
-      if (options.isHelp() || options.getInputPath() == null) {
+      if (options.isHelp() || (options.getInputPath() == null && options.getInputDirectory() == null)) {
         printHelp(out);
         return options.isHelp() ? 0 : 1;
       }
 
-      convertWorkbook(options, out);
+      if (options.getInputDirectory() != null) {
+        convertDirectory(options, out);
+      } else {
+        convertWorkbook(options, out);
+      }
       return 0;
     } catch (final IllegalArgumentException ex) {
       err.println(ex.getMessage());
@@ -98,6 +103,25 @@ public final class MikuXlsx2mdCli {
     }
   }
 
+  private static void convertDirectory(final CliOptions options, final PrintStream out) throws IOException {
+    final List<DirectoryConverter.DirectoryConversionResult> results;
+    try {
+      results = DirectoryConverter.convertDirectory(new DirectoryConverter.DirectoryConversionOptions(
+          Paths.get(options.getInputDirectory()),
+          options.getOutputDirectory() == null ? null : Paths.get(options.getOutputDirectory()),
+          options.isRecursive(),
+          createMarkdownOptions(options),
+          new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom())));
+    } catch (final IllegalArgumentException ex) {
+      throw ex;
+    }
+    for (final DirectoryConverter.DirectoryConversionResult result : results) {
+      if (options.isSummary()) {
+        printWorkbookSummary(out, result.getWorkbookName(), result.getMarkdownFiles());
+      }
+    }
+  }
+
   private static MarkdownOptions createMarkdownOptions(final CliOptions options) {
     return new MarkdownOptions(
         Boolean.valueOf(options.isTreatFirstRowAsHeader()),
@@ -137,15 +161,19 @@ public final class MikuXlsx2mdCli {
   static void printHelp(final PrintStream out) {
     out.println("Usage:");
     out.println("  java -jar miku-xlsx2md-java.jar <input.xlsx> [options]");
+    out.println("  java -jar miku-xlsx2md-java.jar --input-directory <dir> [options]");
     out.println();
     out.println("Options:");
+    out.println("  --input-directory <dir>       Convert .xlsx files under this directory");
+    out.println("  --output-directory <dir>      Write directory conversion output under this directory");
+    out.println("  --recursive                   Scan input directory recursively");
     out.println("  --out <file>                  Write combined Markdown to this file");
     out.println("  --zip <file>                  Write ZIP export to this file");
     out.println("  --encoding <value>            utf-8 | shift_jis | utf-16le | utf-16be | utf-32le | utf-32be (default: utf-8)");
     out.println("  --bom <value>                 off | on (default: off; shift_jis does not allow on)");
     out.println("  --output-mode <mode>          display | raw | both (default: display)");
-    out.println("  --formatting-mode <mode>      plain | github (default: plain)");
-    out.println("  --table-detection-mode <mode> balanced | border (default: balanced)");
+    out.println("  --formatting-mode <mode>      plain | github (default: github)");
+    out.println("  --table-detection-mode <mode> balanced | border | planner-aware (default: balanced)");
     out.println("  --shape-details <mode>        include | exclude (default: exclude)");
     out.println("  --include-shape-details       Alias for --shape-details include");
     out.println("  --no-header-row               Do not treat the first row as a table header");
@@ -154,6 +182,9 @@ public final class MikuXlsx2mdCli {
     out.println("  --keep-empty-columns          Keep empty columns");
     out.println("  --summary                     Print per-sheet summary to stdout");
     out.println("  --help                        Show help and exit");
+    out.println();
+    out.println("GUI-aligned defaults:");
+    out.println("  output-mode=display, formatting-mode=github, table-detection-mode=balanced, shape-details=exclude");
     out.println();
     out.println("Exit codes:");
     out.println("  0                             Success");

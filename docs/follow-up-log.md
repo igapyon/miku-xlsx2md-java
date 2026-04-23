@@ -1,6 +1,111 @@
 # Follow-up Log
 
-Document version: `2026-04-22`
+Document version: `2026-04-23`
+
+## 2026-04-23 Shared Directory Batch Conversion
+
+upstream file:
+- none
+
+java classes:
+- `DirectoryConverter`
+- `CliOptions`
+- `MikuXlsx2mdCli`
+- `ConvertDirectoryMojo`
+
+tests:
+- `DirectoryConverterTest`
+- `MikuXlsx2mdCliTest`
+- `ConvertDirectoryMojoTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - directory batch conversion を runtime helper `DirectoryConverter` へ共通化
+  - Java CLI に `--input-directory`, `--output-directory`, `--recursive` を追加
+  - CLI directory mode は `--out` / `--zip` 併用を禁止
+  - Maven plugin `convert-directory` goal は `DirectoryConverter` へ委譲
+  - `.xlsx` のみを探索し、`outputDirectory` 省略時は入力ディレクトリへ `.md` を出力
+- 命名差分:
+  - CLI は upstream Node 版にない Java-side extension として directory mode を追加
+- 未移植差分:
+  - upstream に対応する CLI directory batch option は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+
+## 2026-04-23 Maven Plugin Directory Goal
+
+upstream file:
+- none
+
+java classes:
+- `ConvertDirectoryMojo`
+
+tests:
+- `ConvertDirectoryMojoTest`
+
+diff summary:
+- 挙動差分:
+  - Maven plugin に `convert-directory` goal を追加
+  - `inputDirectory` 配下の `.xlsx` を一括変換し、`outputDirectory` 省略時は入力ディレクトリへ `.md` を出力
+  - `recursive` は既定 `false` とし、再帰有効時は入力相対ディレクトリ構造を出力側へ維持
+  - directory goal では ZIP 出力を扱わず、combined markdown のみを出力
+- 命名差分:
+  - 既存の単一ファイル goal `convert` は維持
+- 未移植差分:
+  - upstream に対応する同名 directory batch goal は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest,ConvertDirectoryMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+
+## 2026-04-23 Upstream Sync (`e67f2bc`)
+
+upstream file:
+- `src/ts/markdown-options.ts`
+- `src/ts/table-detector.ts`
+- `src/ts/sheet-markdown.ts`
+- `src/ts/core.ts`
+- `src/ts/markdown-export.ts`
+- `src/ts/main.ts`
+- `src/ts/module-registry-access.ts`
+- `scripts/miku-xlsx2md-cli.mjs`
+- `tests/xlsx2md-table-detector.test.js`
+- `tests/xlsx2md-main.test.js`
+- `tests/xlsx2md-cli.test.js`
+- `tests/xlsx2md-node-runtime.test.js`
+
+java classes:
+- `MarkdownOptions`
+- `TableDetector`
+- `SheetMarkdown`
+- `CliOptions`
+- `MikuXlsx2mdCli`
+
+tests:
+- `MarkdownOptionsTest`
+- `TableDetectorTest`
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+
+diff summary:
+- 挙動差分:
+  - upstream `planner-aware` table detection mode を Java 側 `MarkdownOptions` / `TableDetector` / `SheetMarkdown` へ反映
+  - planner/calendar 向け抑制 heuristics は `planner-aware` 選択時だけ適用し、`balanced` / `border` 既存挙動は維持
+  - CLI help は upstream と同様に `planner-aware` を表示し、GUI-aligned defaults 表記を追加
+  - Java CLI 既定の `formattingMode` を `github` へ同期
+- 命名差分:
+  - `border-priority` compatibility alias は引き続き Java 側で `border` へ正規化
+- 未移植差分:
+  - upstream GUI HTML / browser runtime 表示変更は Java CLI / runtime の対象外
+
+follow-up:
+- 実施した確認:
+  - `workplace/miku-xlsx2md` を `origin/devel` `e67f2bc` へ fast-forward
+  - `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest,TableDetectorTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest,TableDetectorTest,SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
 
 ## 2026-04-22 Initial Straight Conversion Setup
 
@@ -96,10 +201,10 @@ diff summary:
   - CLI は option validation / help / initial workbook conversion を実装
   - Maven plugin は runtime core conversion へ接続済み
   - Maven plugin は full-coordinate smoke 実行を `scripts/smoke-maven-plugin.sh` として固定済み
-  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済みで、`xlsx2md-basic` / `image-basic-sample02` / weird-sheetname まで横展開済み
+  - CLI / Maven plugin は upstream fixture conversion coverage subset を追加済みで、`xlsx2md-basic` / `image-basic-sample02` / weird-sheetname / `shape-flowchart` / `shape-block-arrow` / `shape-callout` まで横展開済み
   - core fixture regression は formula basic / formula cross-sheet / formula shared / formula spill / chart basic / chart mixed / rich usecase / rich-text-github / rich-markdown-escape / merge pattern / merge-multiline / narrative / edge-empty / edge-weird-sheetname / border-priority / table-basic / grid-layout / image-basic-sample02 fixture coverage subset を追加済み
   - `sheet-markdown` は最小変換導線を実装し、sheet asset rendering / shape block grouping は `SheetAssets` へ分割・接続済み
-  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname cases の subset を追加済み
+  - advanced `sheet-markdown` parity coverage は calendar narrative / calendar sidebar ordering / empty fallback / table detection compatibility alias / line break / literal escaping / hyperlink output mode / GitHub hyperlink underline suppression / SVG-backed shape item spacing / shape details toggle / fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout / image-basic-sample02 / weird-sheetname cases の subset を追加済み
   - table detection は `TableDetector` に分割し、normalized border 判定は `BorderGrid` に分離
   - `sheet-assets` は Java では rendering / shape block grouping / drawing parse helper 範囲を移植済み
   - `WorksheetParser` は drawing relationships から image / chart / shape assets を収集する導線へ接続済み
@@ -163,6 +268,12 @@ follow-up:
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest test` pass after xlsx2md-basic / shape-flowchart / shape-block-arrow / formula fixture coverage expansion
   - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass after broader sheet-markdown / CLI fixture coverage expansion
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI shape-flowchart / shape-block-arrow fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin shape-flowchart / shape-block-arrow fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after table-basic-sample11 / 12 / 14 / 16 fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass after table-basic-sample01 / 02 / 03 and shape-basic / shape-callout fixture coverage expansion
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass after CLI shape-callout fixture coverage expansion
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass after Maven plugin shape-callout fixture coverage expansion
 - fixture:
   - `workplace/miku-xlsx2md/tests/fixtures/named-range/named-range-sample01.xlsx`
   - `workplace/miku-xlsx2md/tests/fixtures/link/hyperlink-basic-sample01.xlsx`

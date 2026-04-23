@@ -1,6 +1,6 @@
 # Upstream Test Mapping
 
-Document version: `2026-04-22`
+Document version: `2026-04-23`
 
 ## Current Coverage
 
@@ -67,6 +67,7 @@ focused regression:
 java tests:
 - `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.normalizesModesAndBooleanDefaults`
 - `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.keepsCompatibilityAliasForBorderPriority`
+- `jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptionsTest.acceptsPlannerAwareTableDetectionMode`
 
 fixtures:
 - none
@@ -350,6 +351,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.prunesRedundantAndCalendarLikeCandidates`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.borderModeExcludesDenseBorderlessBlocksButKeepsBorderedTables`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.doesNotTreatMergeHeavyFormBlocksAsTables`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDropsCalendarLikeColumnCandidatesWhileBorderKeepsThem`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDoesNotKeepHugeFallbackCandidateForMergeHeavyMixedLayoutSheet`
 
 fixtures:
 - none
@@ -464,6 +467,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.reordersCalendarLikeSectionsWithSidebar`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.plannerAwareDoesNotTurnRepeatedNarrowCalendarColumnsIntoTables`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.createsEmptyBodyFallbackSummary`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.normalizesTableDetectionCompatibilityAliasInCoreConversion`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.preservesPlainAndGithubLineBreakDifferences`
@@ -475,8 +479,12 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFlowchartShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBlockArrowShapeFixtureIntoShapeBlockMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample11FixtureIntoGridHeavyMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample12FixtureIntoTwoSectionGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample13FixtureIntoDenseMultiTableMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample14FixtureIntoSparseMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample15FixtureIntoMergedGridMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample16FixtureIntoMultiValueMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamGridLayoutFixtureIntoWideGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample02IntoImageAndChartMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamWeirdSheetNameFixtureIntoSanitizedMarkdownFileWhenAvailable`
@@ -485,8 +493,12 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample11.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample12.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample13.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample14.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
@@ -496,6 +508,7 @@ focused regression:
 
 notes:
 - Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname parity checks.
+- Current Java coverage also includes planner-aware suppression for repeated narrow calendar layouts so those bands remain narrative instead of becoming small tables.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
 ### upstream test / intent:
@@ -506,6 +519,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.failsForUnknownOption`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsZipWhenConvertingDirectoryInputs`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamDisplayFixtureWhenAvailable`
@@ -515,6 +530,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.keepsIncludeShapeDetailsAsCompatibilityAliasWhenUsingUpstreamShapeFixture`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamImageFixtureSample02WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
 
 fixtures:
@@ -525,10 +543,17 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
+
+notes:
+- CLI help now reflects upstream GUI-aligned defaults, including `formatting-mode=github` and the additional `planner-aware` table detection mode.
+- Java CLI also includes a Java-side directory batch conversion extension backed by the shared runtime directory converter.
 
 ### upstream test / intent:
 Maven plugin option mapping, skip behavior, and initial conversion I/O
@@ -544,7 +569,17 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample02WhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.skipsWhenRequested`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
@@ -555,11 +590,15 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-border-priority-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/xlsx2md-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-flowchart-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-block-arrow-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
 - `sh scripts/smoke-maven-plugin.sh`
 
 notes:
 - Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
+- The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.

@@ -158,6 +158,63 @@ class TableDetectorTest {
     assertEquals(0, TableDetector.detectTableCandidates(sheet).size());
   }
 
+  @Test
+  void plannerAwareDropsCalendarLikeColumnCandidatesWhileBorderKeepsThem() {
+    final WorksheetParser.ParsedSheet sheet = TestCells.sheet(Arrays.asList(
+        TestCells.cell(1, 1, "月", true, true, true, false),
+        TestCells.cell(1, 2, "予定", true, true, false, true),
+        TestCells.cell(2, 1, "1", false, true, true, false),
+        TestCells.cell(2, 2, "A", false, true, false, true),
+        TestCells.cell(3, 1, "2", false, true, true, false),
+        TestCells.cell(3, 2, "B", false, true, false, true),
+        TestCells.cell(4, 1, "3", false, true, true, false),
+        TestCells.cell(4, 2, "C", false, true, false, true),
+        TestCells.cell(1, 4, "火", true, true, true, false),
+        TestCells.cell(1, 5, "予定", true, true, false, true),
+        TestCells.cell(2, 4, "1", false, true, true, false),
+        TestCells.cell(2, 5, "D", false, true, false, true),
+        TestCells.cell(3, 4, "2", false, true, true, false),
+        TestCells.cell(3, 5, "E", false, true, false, true),
+        TestCells.cell(4, 4, "3", false, true, true, false),
+        TestCells.cell(4, 5, "F", false, true, false, true),
+        TestCells.cell(1, 7, "水", true, true, true, false),
+        TestCells.cell(1, 8, "予定", true, true, false, true),
+        TestCells.cell(2, 7, "1", false, true, true, false),
+        TestCells.cell(2, 8, "G", false, true, false, true),
+        TestCells.cell(3, 7, "2", false, true, true, false),
+        TestCells.cell(3, 8, "H", false, true, false, true),
+        TestCells.cell(4, 7, "3", false, true, true, false),
+        TestCells.cell(4, 8, "I", false, true, false, true)));
+
+    assertEquals(3, TableDetector.detectTableCandidates(sheet, null, "border").size());
+    assertEquals(0, TableDetector.detectTableCandidates(sheet, null, "planner-aware").size());
+  }
+
+  @Test
+  void plannerAwareDoesNotKeepHugeFallbackCandidateForMergeHeavyMixedLayoutSheet() {
+    final java.util.ArrayList<WorksheetParser.ParsedCell> cells = new java.util.ArrayList<WorksheetParser.ParsedCell>();
+    for (int row = 1; row <= 24; row += 1) {
+      for (int col = 1; col <= 9; col += 1) {
+        String value = "";
+        if (row <= 6 && col == 1) {
+          value = "見出し" + row;
+        }
+        if (row >= 7 && row <= 24) {
+          value = row + "-" + col;
+        }
+        cells.add(TestCells.cell(row, col, value));
+      }
+    }
+    final WorksheetParser.ParsedSheet sheet = TestCells.sheet(cells, Arrays.asList(
+        new AddressUtils.MergeRange(1, 1, 1, 9, "A1:I1"),
+        new AddressUtils.MergeRange(2, 2, 2, 4, "B2:D2"),
+        new AddressUtils.MergeRange(2, 5, 2, 7, "E2:G2"),
+        new AddressUtils.MergeRange(3, 2, 3, 4, "B3:D3")));
+
+    assertEquals(1, TableDetector.detectTableCandidates(sheet, null, "balanced").size());
+    assertEquals(0, TableDetector.detectTableCandidates(sheet, null, "planner-aware").size());
+  }
+
   private static List<String> positions(final List<WorksheetParser.ParsedCell> cells) {
     final java.util.ArrayList<String> positions = new java.util.ArrayList<String>();
     for (final WorksheetParser.ParsedCell cell : cells) {

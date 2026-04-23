@@ -64,11 +64,12 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - `SheetMarkdownTest` includes GitHub hyperlink rendering coverage that suppresses underline markup on linked cells
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered
 - `SheetMarkdownTest` includes table detection compatibility alias coverage for `border-priority`
-- `SheetMarkdownTest` includes upstream `xlsx2md-basic`, `shape-flowchart`, `shape-block-arrow`, `table-basic-sample13`, `table-basic-sample15`, `grid-layout`, `image-basic-sample02`, and weird-sheetname fixture parity coverage
+- `SheetMarkdownTest` includes planner-aware calendar layout suppression coverage so repeated narrow calendar columns stay narrative instead of becoming small tables
+- `SheetMarkdownTest` includes upstream `xlsx2md-basic`, `shape-basic`, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, `table-basic-sample01`, `table-basic-sample02`, `table-basic-sample03`, `table-basic-sample11`, `table-basic-sample12`, `table-basic-sample13`, `table-basic-sample14`, `table-basic-sample15`, `table-basic-sample16`, `grid-layout`, `image-basic-sample02`, and weird-sheetname fixture parity coverage
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
-- Java CLI is implemented with Node-compatible option vocabulary and initial end-to-end conversion
-- Maven plugin is connected to runtime core conversion
-- CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample02`, weird-sheetname, table alias, narrative/display/named-range fixtures, shape fixture, and compatibility alias cases
+- Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
+- Maven plugin is connected to runtime core conversion, including a directory batch conversion goal with optional recursive scan shared with the CLI runtime helper
+- CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample02`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table alias, narrative/display/named-range fixtures, shape fixture, and compatibility alias cases
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`
 - Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending, but the current subset now covers additional table/grid/image edge cases
 
@@ -94,6 +95,17 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar --help
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
 
+Directory batch conversion is available as a Java-side CLI extension:
+
+```bash
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar \
+  --input-directory docs/xlsx \
+  --output-directory docs/md \
+  --recursive
+```
+
+When `--output-directory` is omitted, Markdown files are written next to the input `.xlsx` files. `--out` and `--zip` are not available with `--input-directory`.
+
 ## Maven Plugin
 
 Full-coordinate smoke check:
@@ -107,6 +119,17 @@ The smoke script installs the local SNAPSHOT artifacts and invokes:
 ```bash
 mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert
 ```
+
+Directory batch conversion is also available:
+
+```bash
+mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert-directory \
+  -Dmiku-xlsx2md.inputDirectory=docs/xlsx \
+  -Dmiku-xlsx2md.outputDirectory=docs/md \
+  -Dmiku-xlsx2md.recursive=false
+```
+
+When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output.
 
 ## Documents
 

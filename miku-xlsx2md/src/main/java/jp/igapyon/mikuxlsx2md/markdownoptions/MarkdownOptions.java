@@ -15,7 +15,8 @@ import java.util.Objects;
 public final class MarkdownOptions {
   public static final List<String> OUTPUT_MODES = Collections.unmodifiableList(Arrays.asList("display", "raw", "both"));
   public static final List<String> FORMATTING_MODES = Collections.unmodifiableList(Arrays.asList("plain", "github"));
-  public static final List<String> TABLE_DETECTION_MODES = Collections.unmodifiableList(Arrays.asList("balanced", "border"));
+  public static final List<String> TABLE_DETECTION_MODES =
+      Collections.unmodifiableList(Arrays.asList("balanced", "border", "planner-aware"));
   public static final Map<String, String> TABLE_DETECTION_MODE_ALIASES;
 
   static {

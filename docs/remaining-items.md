@@ -1,10 +1,10 @@
 # Remaining Items
 
-Document version: `2026-04-22`
+Document version: `2026-04-23`
 
 ## Current Position
 
-Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, and Maven plugin full-coordinate smoke execution is fixed as a script.
+Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, Maven plugin full-coordinate smoke execution is fixed as a script, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, and both the Java CLI and Maven plugin now share directory batch conversion.
 
 ## Status
 
@@ -34,6 +34,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `narrative-structure`
   - `border-grid`
   - `table-detector`
+  - `planner-aware` table detection mode with planner/calendar-specific suppression heuristics
   - `sheet-assets` rendering / shape block grouping subset
   - `SheetMarkdown` shape block rendering connection
   - `sheet-assets` parseDrawingImages / parseDrawingCharts / parseDrawingShapes subset
@@ -45,7 +46,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-flowchart / shape-block-arrow / image-basic-sample02 / weird-sheetname cases
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout / image-basic-sample02 / weird-sheetname cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -56,8 +57,11 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - image fixture regression now includes `image-basic-sample02`
   - edge fixture regression now includes weird sheet name filename sanitization coverage
   - CLI option vocabulary and initial conversion
+  - CLI GUI-aligned default formatting mode `github` and help text sync
+  - CLI directory batch conversion backed by shared runtime helper
   - Maven plugin initial conversion
-  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname
+  - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring backed by shared runtime helper
+  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command
 - 保守確認
   - help text compatibility
@@ -101,7 +105,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Last Known Result
 
-- `mvn test` passed on `2026-04-22`
+- `mvn test` passed on `2026-04-23`
 
 ## Next Unit
 

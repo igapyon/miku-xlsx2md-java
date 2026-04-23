@@ -37,8 +37,14 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--include-shape-details"));
     assertTrue(asString(stdout).contains("--encoding"));
     assertTrue(asString(stdout).contains("--bom"));
+    assertTrue(asString(stdout).contains("--input-directory"));
+    assertTrue(asString(stdout).contains("--output-directory"));
+    assertTrue(asString(stdout).contains("--recursive"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
+    assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
+    assertTrue(asString(stdout).contains("formatting-mode=github"));
+    assertTrue(asString(stdout).contains("shape-details=exclude"));
     assertTrue(asString(stdout).contains("Exit codes:"));
     assertEquals("", asString(stderr));
   }
@@ -110,6 +116,54 @@ class MikuXlsx2mdCliTest {
     assertEquals("", asString(stderr));
     assertTrue(Files.isRegularFile(zipPath));
     assertTrue(ZipIo.unzipEntries(Files.readAllBytes(zipPath)).containsKey("output/sample.md"));
+  }
+
+  @Test
+  void convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    final Path nestedDirectory = inputDirectory.resolve("nested");
+    final Path outputDirectory = tempDir.resolve("out");
+    Files.createDirectories(nestedDirectory);
+    Files.write(inputDirectory.resolve("root.xlsx"), createWorkbookBytes());
+    Files.write(nestedDirectory.resolve("child.xlsx"), createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--output-directory", outputDirectory.toString(),
+            "--recursive",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("root.md")));
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("nested").resolve("child.md")));
+    assertTrue(asString(stdout).contains("[workbook] root.xlsx"));
+    assertTrue(asString(stdout).contains("[workbook] child.xlsx"));
+    assertEquals("", asString(stderr));
+  }
+
+  @Test
+  void rejectsZipWhenConvertingDirectoryInputs() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    Files.createDirectories(inputDirectory);
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--zip", tempDir.resolve("out.zip").toString()
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(1, exitCode);
+    assertTrue(asString(stderr).contains("--zip cannot be used with --input-directory."));
   }
 
   @Test
@@ -333,6 +387,90 @@ class MikuXlsx2mdCliTest {
     assertTrue(markdown.contains("| 2024年 | 13,568 | 9,072 |"));
     assertTrue(markdown.contains("### Chart: 001 (B9)"));
     assertTrue(markdown.contains("### Image: 001 (H3)"));
+  }
+
+  @Test
+  void convertsUpstreamFlowchartShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-flowchart-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("shape-flowchart.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--shape-details", "include",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] shape-flowchart-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: shape-flowchart-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001 (K3-AB7)"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `flowChartTerminator`"));
+    assertTrue(markdown.contains("![shape_005.svg](assets/shape-flowchart/shape_005.svg)"));
+  }
+
+  @Test
+  void convertsUpstreamBlockArrowShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-block-arrow-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("shape-block-arrow.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--shape-details", "include",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] shape-block-arrow-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: shape-block-arrow-sample01.xlsx"));
+    assertTrue(markdown.contains("### Shape Block: 001 (K3-AA14)"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `rightArrow`"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `quadArrow`"));
+  }
+
+  @Test
+  void convertsUpstreamCalloutShapeFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("shape", "shape-callout-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("shape-callout.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--shape-details", "include",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] shape-callout-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: shape-callout-sample01.xlsx"));
+    assertTrue(markdown.contains("## Sheet: shape-callout"));
+    assertTrue(markdown.contains("- `a:prstGeom@prst`: `wedgeRoundRectCallout`"));
+    assertTrue(markdown.contains("- `a:t#text`: `角四角`"));
   }
 
   @Test
