@@ -107,6 +107,38 @@ follow-up:
   - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
   - `mvn test` pass
 
+## 2026-04-23 Sheet Markdown and Smoke Follow-up
+
+upstream file:
+- `tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `tests/fixtures/formula/formula-shared-sample01.xlsx`
+- `tests/fixtures/image/image-basic-sample01.xlsx`
+- `tests/fixtures/edge/edge-empty-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `SheetMarkdownTest`
+- `scripts/smoke-maven-plugin.sh`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `SheetMarkdownTest` の upstream fixture parity coverage を formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty へ拡張
+  - Maven plugin smoke script に full-coordinate `convert-directory` coverage を追加
+  - local upstream fixture inventory を確認し、この時点の追加 fixture 候補は未確認
+- 命名差分:
+  - なし
+- 未移植差分:
+  - 追加の fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass
+  - `mvn test` pass
+
 ## 2026-04-23 Shared Directory Batch Conversion
 
 upstream file:

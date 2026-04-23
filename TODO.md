@@ -17,6 +17,7 @@ Document version: `2026-04-23`
   - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
   - display / hyperlink / rich-usecase / rich-markdown-escape fixture coverage は追加済み
   - merge-pattern / formula-basic / formula-spill / chart-mixed fixture coverage は追加済み
+  - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
   - xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout fixture coverage は追加済み
   - table-basic-sample01 / table-basic-sample02 / table-basic-sample03 fixture coverage は追加済み
   - table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage は追加済み
@@ -34,20 +35,22 @@ Document version: `2026-04-23`
   - rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture coverage は追加済み
   - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
 - Maven plugin smoke coverage を必要に応じて広げる
+  - full-coordinate `convert-directory` smoke coverage は追加済み
 
 ## Restart Memo
 
 - 次回の再開点は `advanced sheet-markdown parity coverage` と CLI / Maven plugin fixture 横展開の続き
 - `table-basic` / shape 系の `SheetMarkdownTest` coverage は sample01-03 / sample11-16 / `shape-basic-sample01` / `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` まで追加済み
 - `display-format-sample01` / `hyperlink-basic-sample01` / `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-pattern-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-mixed-sample01` の `SheetMarkdownTest` coverage は追加済み
+- `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` の `SheetMarkdownTest` coverage は追加済み
 - CLI / Maven plugin 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` を優先
 - CLI / Maven plugin 側の `shape-flowchart-sample01` / `shape-block-arrow-sample01` は追加済み
 - CLI / Maven plugin 側の `shape-callout-sample01` は追加済み
 - CLI / Maven plugin 側の `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-basic-sample01` / `chart-mixed-sample01` は追加済み
 - CLI / Maven plugin 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
-- 次の横展開候補は未確認
-- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
+- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` と `sh scripts/smoke-maven-plugin.sh`
 
 ## Done In This Step
 
@@ -99,6 +102,7 @@ Document version: `2026-04-23`
 - `SheetMarkdownTest` に upstream table-basic-sample11 / table-basic-sample12 / table-basic-sample14 / table-basic-sample16 fixture coverage を追加した
 - `SheetMarkdownTest` に upstream table-basic-sample13 / table-basic-sample15 / grid-layout / image-basic-sample02 / weird-sheetname fixture coverage を追加した
 - `SheetMarkdownTest` に upstream display / hyperlink / rich-usecase / rich-markdown-escape / merge-multiline / merge-pattern / formula-basic / formula-spill / chart-mixed fixture coverage を追加した
+- `SheetMarkdownTest` に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage を追加した
 - `WorksheetParserTest` に upstream formula-crosssheet / formula-shared fixture coverage を追加した
 - `WorksheetParserTest` の upstream formula-crosssheet / formula-shared fixture coverage に value type / raw value / formula type / cached value metadata assertion を追加した
 - markdown conversion を core facade へ接続した
@@ -133,6 +137,7 @@ Document version: `2026-04-23`
 - Maven plugin に upstream rich-usecase / rich-markdown-escape / merge-multiline / formula-basic / formula-spill / chart-basic / chart-mixed fixture conversion coverage を追加した
 - Maven plugin に upstream formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
+- Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した

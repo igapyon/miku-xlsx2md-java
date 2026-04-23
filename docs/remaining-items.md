@@ -46,7 +46,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / display / hyperlink / rich / merge / formula / chart / shape / image-basic-sample02 / weird-sheetname cases
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / display / hyperlink / rich / merge / formula / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -65,15 +65,15 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - Maven plugin `miku-xlsx2md.verbose` processing diagnostics
   - release version updated to `0.9.0`
   - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / merge / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
-  - Maven plugin full-coordinate smoke execution command
+  - Maven plugin full-coordinate smoke execution command, including `convert` and `convert-directory`
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
-  - advanced `sheet-markdown` fixture parity coverage beyond the current subset, especially remaining formula/cross-sheet and image/edge fixture assertions
+  - advanced `sheet-markdown` fixture parity coverage beyond the current subset
   - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions plus value type / raw value / formula type / cached value metadata assertions
   - broader CLI / Maven plugin fixture coverage beyond the current subset
-  - broader Maven plugin smoke coverage beyond the fixed minimum command
+  - broader Maven plugin smoke coverage beyond the fixed `convert` / `convert-directory` commands
 
 ## Focused Regression
 

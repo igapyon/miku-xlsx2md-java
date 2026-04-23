@@ -573,6 +573,50 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void convertsUpstreamFormulaCrossSheetFixtureIntoMultiSheetMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-crosssheet-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-crosssheet-sample01.xlsx");
+    final MarkdownExport.MarkdownFile sheet1 = SheetMarkdown.convertSheetToMarkdown(workbook, workbook.getSheets().get(0), new MarkdownOptions());
+    final MarkdownExport.MarkdownFile sheet2 = SheetMarkdown.convertSheetToMarkdown(workbook, workbook.getSheets().get(1), new MarkdownOptions());
+    final MarkdownExport.MarkdownFile sheet3 = SheetMarkdown.convertSheetToMarkdown(workbook, workbook.getSheets().get(2), new MarkdownOptions());
+
+    assertEquals("formula-crosssheet-sample01_001_Sheet1.md", sheet1.getFileName());
+    assertEquals(3, sheet1.getSummary().getFormulaDiagnostics().size());
+    assertTrue(sheet1.getSummary().getFormulaDiagnostics().stream()
+        .allMatch((diagnostic) -> "cached_value".equals(diagnostic.getSource())));
+    assertTrue(sheet1.getMarkdown().contains("| sheet2\\_ref | CrossValue |"));
+    assertTrue(sheet1.getMarkdown().contains("| jp\\_sheet\\_ref | 日本語参照値 |"));
+    assertTrue(sheet1.getMarkdown().contains("| sum\\_range | 10 |"));
+    assertEquals("formula-crosssheet-sample01_002_Sheet2.md", sheet2.getFileName());
+    assertTrue(sheet2.getMarkdown().contains("|  | CrossValue |"));
+    assertEquals("formula-crosssheet-sample01_003_日本語シート.md", sheet3.getFileName());
+    assertTrue(sheet3.getMarkdown().contains("日本語参照値"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaSharedFixtureIntoTranslatedSharedFormulaMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-shared-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "formula-shared-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("formula-shared-sample01_001_formula.md", file.getFileName());
+    assertEquals(9, file.getSummary().getFormulaDiagnostics().size());
+    assertTrue(file.getSummary().getFormulaDiagnostics().stream()
+        .allMatch((diagnostic) -> "cached_value".equals(diagnostic.getSource())));
+    assertTrue(file.getMarkdown().contains("| No | 連番 |"));
+    assertTrue(file.getMarkdown().contains("| 1 | 1 |"));
+    assertTrue(file.getMarkdown().contains("| 5 | 5 |"));
+    assertTrue(file.getMarkdown().contains("| 10 | 10 |"));
+  }
+
+  @Test
   void convertsUpstreamChartMixedFixtureIntoCombinedChartMarkdownWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("chart", "chart-mixed-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -935,6 +979,46 @@ class SheetMarkdownTest {
     assertTrue(file.getMarkdown().contains("### Chart: 001 (B9)"));
     assertTrue(file.getMarkdown().contains("- Type: Line Chart"));
     assertTrue(file.getMarkdown().contains("### Image: 001 (H3)"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample01IntoImageMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "image-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("image-basic-sample01_001_image.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(2, file.getSummary().getImages());
+    assertEquals(0, file.getSummary().getCharts());
+    assertTrue(file.getMarkdown().contains("画像抽出サンプル"));
+    assertTrue(file.getMarkdown().contains("### Image: 001 (C8)"));
+    assertTrue(file.getMarkdown().contains("![image_001.png](assets/image/image_001.png)"));
+    assertTrue(file.getMarkdown().contains("### Image: 002 (F8)"));
+    assertTrue(file.getMarkdown().contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void convertsUpstreamEdgeEmptyFixtureIntoNarrativeOnlyMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-empty-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "edge-empty-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("edge-empty-sample01_001_edge-empty.md", file.getFileName());
+    assertEquals(0, file.getSummary().getTables());
+    assertEquals(0, file.getSummary().getTableScores().size());
+    assertTrue(file.getMarkdown().contains("## Sheet: edge-empty"));
+    assertTrue(file.getMarkdown().contains("空系境界サンプル"));
+    assertTrue(file.getMarkdown().contains("only-value"));
+    assertFalse(file.getMarkdown().contains("### Table:"));
   }
 
   @Test
