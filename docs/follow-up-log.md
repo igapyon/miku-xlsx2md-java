@@ -2,6 +2,43 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 CLI and Maven Table Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/table/table-basic-sample01.xlsx`
+- `tests/fixtures/table/table-basic-sample02.xlsx`
+- `tests/fixtures/table/table-basic-sample03.xlsx`
+- `tests/fixtures/table/table-basic-sample11.xlsx`
+- `tests/fixtures/table/table-basic-sample12.xlsx`
+- `tests/fixtures/table/table-basic-sample13.xlsx`
+- `tests/fixtures/table/table-basic-sample14.xlsx`
+- `tests/fixtures/table/table-basic-sample15.xlsx`
+- `tests/fixtures/table/table-basic-sample16.xlsx`
+- `tests/fixtures/table/grid-layout-sample-01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - CLI fixture conversion coverage を table-basic-sample01-03 / table-basic-sample11-16 / grid-layout へ拡張
+  - Maven plugin fixture conversion coverage を table-basic-sample01-03 / table-basic-sample11-16 / grid-layout へ拡張
+- 命名差分:
+  - なし
+- 未移植差分:
+  - CLI / Maven plugin の追加 fixture 横展開候補は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn test` pass
+
 ## 2026-04-23 Release Asset Workflow and Fixture Follow-up
 
 upstream file:

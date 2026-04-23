@@ -64,7 +64,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring backed by shared runtime helper
   - Maven plugin `miku-xlsx2md.verbose` processing diagnostics
   - release version updated to `0.9.0`
-  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
+  - CLI / Maven plugin upstream fixture conversion coverage subset, including table-basic / grid-layout / table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command, including `convert` and `convert-directory`
   - GitHub Actions release workflow that attaches the shaded runtime jar to GitHub Release assets
 - 保守確認

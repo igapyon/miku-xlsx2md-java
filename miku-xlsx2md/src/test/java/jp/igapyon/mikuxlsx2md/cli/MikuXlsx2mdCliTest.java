@@ -876,6 +876,58 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void convertsUpstreamTableBasicAndGridFixturesWhenAvailable() throws java.io.IOException {
+    final String[][] fixtureCases = new String[][] {
+        {"table-basic-sample01.xlsx", "table-basic-sample01.md", "### Table: 001 (B3-F7)", "### Table: 002 (B9-F13)",
+            "| 3 | 登録日 | createdAt | 3月15日 | 登録した日 |"},
+        {"table-basic-sample02.xlsx", "table-basic-sample02.md", "### Table: 001 (B3-F7)", "### Table: 002 (H3-L7)",
+            "| 2 | 別名 | altname | Hanako | 何かの別名 |"},
+        {"table-basic-sample03.xlsx", "table-basic-sample03.md", "### Table: 001 (B3-F7)", "### Table: 004 (H9-L13)",
+            "| 2 | 別名 | altname | Sawada | 何かの別名 |"},
+        {"table-basic-sample11.xlsx", "table-basic-sample11.md", "### Table: 001 (B3-T7)",
+            "| 4 | 更新日 | updatedate | 3月14日 | 何かの更新日 |"},
+        {"table-basic-sample12.xlsx", "table-basic-sample12.md", "### Table: 001 (B3-T7)", "### Table: 002 (B10-T14)",
+            "方眼紙風のためにセル結合が多用されます"},
+        {"table-basic-sample13.xlsx", "table-basic-sample13.md", "### Table: 001 (B3-T7)", "### Table: 004 (V10-AN14)",
+            "| 2 | 名前 | name | Sabro | 何かの名前 |"},
+        {"table-basic-sample14.xlsx", "table-basic-sample14.md", "### Table: 001 (B3-T7)",
+            "たまに結合漏れのセルがある場合"},
+        {"table-basic-sample15.xlsx", "table-basic-sample15.md", "### Table: 001 (B3-T7)",
+            "※方眼紙＋結合＋さらに縦結合"},
+        {"table-basic-sample16.xlsx", "table-basic-sample16.md", "### Table: 001 (B3-T7)",
+            "たまに結合漏れのセルがあって、さらに複数文字が登場"},
+        {"grid-layout-sample-01.xlsx", "grid-layout-sample-01.md", "### Table: 001 (B2-U6)", "### Table: 002 (C8-V16)",
+            "| 8 | 更新日 | updatedate |  | システムへの更新日 |"}
+    };
+
+    for (final String[] fixtureCase : fixtureCases) {
+      final Path fixturePath = resolveFixturePath("table", fixtureCase[0]);
+      Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+      final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+      final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+      final Path outputPath = tempDir.resolve(fixtureCase[1]);
+
+      final int exitCode = MikuXlsx2mdCli.run(
+          new String[] {
+              fixturePath.toString(),
+              "--out", outputPath.toString(),
+              "--summary"
+          },
+          asPrintStream(stdout),
+          asPrintStream(stderr));
+
+      final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+      assertEquals(0, exitCode);
+      assertTrue(asString(stdout).contains("[workbook] " + fixtureCase[0]));
+      assertEquals("", asString(stderr));
+      assertTrue(markdown.contains("# Book: " + fixtureCase[0]));
+      for (int index = 2; index < fixtureCase.length; index++) {
+        assertTrue(markdown.contains(fixtureCase[index]));
+      }
+    }
+  }
+
+  @Test
   void convertsUpstreamWeirdSheetNameFixtureWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("edge", "edge-weird-sheetname-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
