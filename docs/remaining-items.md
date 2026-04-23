@@ -67,11 +67,13 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - CLI / Maven plugin upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command, including `convert` and `convert-directory`
   - GitHub Actions release workflow that attaches the shaded runtime jar to GitHub Release assets
+  - Node / Java Markdown byte-level comparison script for selected upstream fixtures
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
+  - broader Node / Java Markdown byte-level comparison beyond the initial selected fixtures
   - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions plus value type / raw value / formula type / cached value metadata assertions
   - broader CLI / Maven plugin fixture coverage for future upstream fixture additions
   - broader Maven plugin smoke coverage beyond the fixed `convert` / `convert-directory` commands
@@ -115,5 +117,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 ## Next Unit
 
 - Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
+- Expand Node / Java Markdown byte-level comparison beyond the initial selected fixtures
 - Expand worksheet parser shared / cross-sheet formula fixture coverage further if upstream adds new cases
 - Add broader CLI / Maven plugin fixture coverage when future upstream fixture additions appear

@@ -12,6 +12,10 @@ Document version: `2026-04-23`
 
 ## Current Queue
 
+- Node / Java Markdown byte-level parity を段階的に導入する
+  - `scripts/compare-node-java-markdown.sh` で Markdown 出力比較を開始
+  - 初期対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`
+  - ZIP / assets の byte-level parity は Markdown 比較後の follow-up
 - advanced `sheet-markdown` parity coverage を fixture 側へさらに広げる
   - rich text / markdown escape fixture coverage は追加済み
   - merge multiline / weird sheet name / image+chart sample02 fixture coverage は追加済み
@@ -60,6 +64,7 @@ Document version: `2026-04-23`
 - CLI / Maven plugin 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
 - CLI 側の `hyperlink-basic-sample01` は追加済み。Maven plugin 側は追加済みであることを再確認済み
 - Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により `mvn -B package` を実行し、runtime jar を GitHub Release asset へ添付する
+- Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
 - 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` と `mvn package` と `sh scripts/smoke-maven-plugin.sh`
