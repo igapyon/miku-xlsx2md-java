@@ -71,6 +71,7 @@ Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) f
 - Maven plugin is connected to runtime core conversion, including a directory batch conversion goal with optional recursive scan shared with the CLI runtime helper
 - CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table alias, narrative/display/named-range/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
 - Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`, including both `convert` and `convert-directory`
+- GitHub Actions release workflow builds the runtime jar and uploads it to the GitHub Release assets for tag releases
 - Advanced sheet-markdown parity and broader CLI / Maven plugin fixture coverage are still pending, but the current subset now covers additional rich/merge/formula/chart/table/grid/image edge cases
 
 ## Build
@@ -132,6 +133,16 @@ mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert-directory \
 ```
 
 When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output. `miku-xlsx2md.verbose=true` logs the workbook path being processed.
+
+## Release
+
+GitHub Actions release workflow:
+
+```bash
+.github/workflows/release.yml
+```
+
+When a `v*` tag is pushed, or when the workflow is started manually with a tag, the workflow runs `mvn -B package` and attaches the shaded runtime jar from `miku-xlsx2md/target/` to the GitHub Release page.
 
 ## Documents
 

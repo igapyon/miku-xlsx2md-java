@@ -2,6 +2,45 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Release Asset Workflow and Fixture Follow-up
+
+upstream file:
+- `tests/fixtures/named-range/named-range-sample01.xlsx`
+- `tests/fixtures/narrative/narrative-vs-table-sample01.xlsx`
+- `tests/fixtures/chart/chart-basic-sample01.xlsx`
+- `tests/fixtures/table/table-border-priority-sample01.xlsx`
+- `tests/fixtures/rich/rich-text-github-sample01.xlsx`
+- `tests/fixtures/merge/merge-pattern-sample01.xlsx`
+
+java classes:
+- none
+
+tests:
+- `SheetMarkdownTest`
+- `MikuXlsx2mdCliTest`
+- `MikuXlsx2mdMojoTest`
+
+release workflow:
+- `.github/workflows/release.yml`
+
+diff summary:
+- 挙動差分:
+  - runtime 実装差分はなし
+  - `SheetMarkdownTest` の upstream fixture parity coverage を named-range / narrative / chart-basic / table-border-priority へ拡張
+  - CLI / Maven plugin fixture conversion coverage を rich-text-github / merge-pattern へ拡張
+  - GitHub Actions release workflow を追加し、`v*` tag push または manual dispatch で shaded runtime jar を GitHub Release asset へ添付
+- 命名差分:
+  - release asset は `miku-xlsx2md/target/miku-xlsx2md-*.jar` を対象にし、`original-*.jar` は除外
+- 未移植差分:
+  - upstream に対応する release workflow は未確認
+  - actual GitHub tag 上での release workflow 実行は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,MikuXlsx2mdCliTest test` pass
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `mvn package` pass
+
 ## 2026-04-23 Verbose Processing Diagnostics and 0.9.0 Version
 
 upstream file:

@@ -413,6 +413,34 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void convertsUpstreamRichTextGithubFixtureInGithubModeWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("rich", "rich-text-github-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("rich-text-github.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--formatting-mode", "github",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] rich-text-github-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: rich-text-github-sample01.xlsx"));
+    assertTrue(markdown.contains("**bold whole cell**"));
+    assertTrue(markdown.contains("<ins>underline whole cell</ins>"));
+    assertTrue(markdown.contains("plain **bold** *italic* strike <ins>underline</ins>"));
+  }
+
+  @Test
   void convertsUpstreamMergeMultilineFixtureWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("merge", "merge-multiline-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
@@ -437,6 +465,34 @@ class MikuXlsx2mdCliTest {
     assertTrue(markdown.contains("### Table: 001 (A1-C4)"));
     assertTrue(markdown.contains("| 1 | 1行目<br>2行目 | [←M←] |"));
     assertTrue(markdown.contains("※結合セル内の改行確認用"));
+  }
+
+  @Test
+  void convertsUpstreamMergePatternFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("merge", "merge-pattern-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path outputPath = tempDir.resolve("merge-pattern.md");
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            fixturePath.toString(),
+            "--out", outputPath.toString(),
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertTrue(asString(stdout).contains("[workbook] merge-pattern-sample01.xlsx"));
+    assertEquals("", asString(stderr));
+    assertTrue(markdown.contains("# Book: merge-pattern-sample01.xlsx"));
+    assertTrue(markdown.contains("横結合"));
+    assertTrue(markdown.contains("2x2結合"));
+    assertTrue(markdown.contains("[←M←]"));
+    assertTrue(markdown.contains("[↑M↑]"));
   }
 
   @Test
