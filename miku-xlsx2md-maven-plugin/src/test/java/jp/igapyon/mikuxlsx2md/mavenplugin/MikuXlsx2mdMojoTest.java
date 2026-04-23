@@ -273,6 +273,78 @@ class MikuXlsx2mdMojoTest {
   }
 
   @Test
+  void convertsUpstreamFormulaCrossSheetFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-crosssheet-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("formula-crosssheet.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: formula-crosssheet-sample01.xlsx"));
+    assertTrue(markdown.contains("| sheet2\\_ref | CrossValue |"));
+    assertTrue(markdown.contains("| jp\\_sheet\\_ref | 日本語参照値 |"));
+    assertTrue(markdown.contains("| sum\\_range | 10 |"));
+  }
+
+  @Test
+  void convertsUpstreamFormulaSharedFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("formula", "formula-shared-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("formula-shared.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: formula-shared-sample01.xlsx"));
+    assertTrue(markdown.contains("| No | 連番 |"));
+    assertTrue(markdown.contains("| 1 | 1 |"));
+    assertTrue(markdown.contains("| 10 | 10 |"));
+  }
+
+  @Test
+  void convertsUpstreamImageFixtureSample01WhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("image", "image-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("image-basic-sample01.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: image-basic-sample01.xlsx"));
+    assertTrue(markdown.contains("画像抽出サンプル"));
+    assertTrue(markdown.contains("### Image: 001 (C8)"));
+    assertTrue(markdown.contains("![image_002.png](assets/image/image_002.png)"));
+  }
+
+  @Test
+  void convertsUpstreamEdgeEmptyFixtureWhenAvailable() throws java.io.IOException {
+    final Path fixturePath = resolveFixturePath("edge", "edge-empty-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+    final Path outputPath = tempDir.resolve("out").resolve("edge-empty.md");
+    final MikuXlsx2mdMojo mojo = new MikuXlsx2mdMojo();
+    mojo.setInputFile(fixturePath.toFile());
+    mojo.setOutputFile(outputPath.toFile());
+
+    assertDoesNotThrow(() -> mojo.execute());
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.contains("# Book: edge-empty-sample01.xlsx"));
+    assertTrue(markdown.contains("空系境界サンプル"));
+    assertTrue(markdown.contains("only-value"));
+    assertTrue(!markdown.contains("### Table:"));
+  }
+
+  @Test
   void convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable() throws java.io.IOException {
     final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
