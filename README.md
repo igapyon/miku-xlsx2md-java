@@ -2,6 +2,8 @@
 
 `miku-xlsx2md-java` is the Java port of [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md).
 
+This repository was created as an experimental generative-AI-driven development effort to port the original Node / browser implementation to Java. The generative AI prompts used during development are recorded in the commit log.
+
 Links:
 
 - Original web app: <https://igapyon.github.io/miku-xlsx2md/>
@@ -249,6 +251,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - [docs/upstream-test-mapping.md](docs/upstream-test-mapping.md)
 - [docs/remaining-items.md](docs/remaining-items.md)
 - [docs/follow-up-log.md](docs/follow-up-log.md)
+- [docs/generative-ai-prompt-records.md](docs/generative-ai-prompt-records.md)
 - [TODO.md](TODO.md)
 
 ## License
@@ -261,6 +264,8 @@ For implementation status and porting notes, see [docs/development-status.md](do
 # miku-xlsx2md-java
 
 `miku-xlsx2md-java` は [`igapyon/miku-xlsx2md`](https://github.com/igapyon/miku-xlsx2md) の Java 移植版です。
+
+この repository は、元の Node / browser 実装を Java へ移植する過程で、実験的に生成AI駆動開発を行って作成しました。開発時に与えた生成AIプロンプトは、すべてコミットログに記録しています。
 
 リンク:
 
@@ -509,6 +514,7 @@ scripts/compare-node-java-markdown.sh
 - [docs/upstream-test-mapping.md](docs/upstream-test-mapping.md)
 - [docs/remaining-items.md](docs/remaining-items.md)
 - [docs/follow-up-log.md](docs/follow-up-log.md)
+- [docs/generative-ai-prompt-records.md](docs/generative-ai-prompt-records.md)
 - [TODO.md](TODO.md)
 
 ## License
