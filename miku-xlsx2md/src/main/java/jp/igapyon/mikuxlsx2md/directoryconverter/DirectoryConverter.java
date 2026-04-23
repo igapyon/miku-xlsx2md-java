@@ -34,6 +34,7 @@ public final class DirectoryConverter {
     final List<Path> workbookPaths = collectWorkbookPaths(inputRoot, options.isRecursive());
     final List<DirectoryConversionResult> results = new ArrayList<DirectoryConversionResult>();
     for (final Path workbookPath : workbookPaths) {
+      options.getProgressListener().processing(workbookPath);
       results.add(convertOneWorkbook(inputRoot, outputRoot, workbookPath, options));
     }
     return results;
@@ -136,6 +137,7 @@ public final class DirectoryConverter {
     private final boolean recursive;
     private final MarkdownOptions markdownOptions;
     private final TextEncoding.MarkdownEncodingOptions encodingOptions;
+    private final ProgressListener progressListener;
 
     public DirectoryConversionOptions(
         final Path inputDirectory,
@@ -143,6 +145,16 @@ public final class DirectoryConverter {
         final boolean recursive,
         final MarkdownOptions markdownOptions,
         final TextEncoding.MarkdownEncodingOptions encodingOptions) {
+      this(inputDirectory, outputDirectory, recursive, markdownOptions, encodingOptions, null);
+    }
+
+    public DirectoryConversionOptions(
+        final Path inputDirectory,
+        final Path outputDirectory,
+        final boolean recursive,
+        final MarkdownOptions markdownOptions,
+        final TextEncoding.MarkdownEncodingOptions encodingOptions,
+        final ProgressListener progressListener) {
       this.inputDirectory = inputDirectory;
       this.outputDirectory = outputDirectory;
       this.recursive = recursive;
@@ -150,6 +162,7 @@ public final class DirectoryConverter {
       this.encodingOptions = encodingOptions == null
           ? new TextEncoding.MarkdownEncodingOptions("utf-8", "off")
           : encodingOptions;
+      this.progressListener = progressListener == null ? ProgressListener.NO_OP : progressListener;
     }
 
     public Path getInputDirectory() {
@@ -171,6 +184,20 @@ public final class DirectoryConverter {
     public TextEncoding.MarkdownEncodingOptions getEncodingOptions() {
       return encodingOptions;
     }
+
+    public ProgressListener getProgressListener() {
+      return progressListener;
+    }
+  }
+
+  public interface ProgressListener {
+    ProgressListener NO_OP = new ProgressListener() {
+      @Override
+      public void processing(final Path workbookPath) {
+      }
+    };
+
+    void processing(Path workbookPath);
   }
 
   public static final class DirectoryConversionResult {

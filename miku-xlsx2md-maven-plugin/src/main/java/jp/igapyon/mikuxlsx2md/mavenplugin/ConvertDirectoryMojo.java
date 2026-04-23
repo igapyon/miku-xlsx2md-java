@@ -47,6 +47,9 @@ public class ConvertDirectoryMojo extends AbstractMojo {
   @Parameter(property = "miku-xlsx2md.skip", defaultValue = "false")
   private boolean skip;
 
+  @Parameter(property = "miku-xlsx2md.verbose", defaultValue = "false")
+  private boolean verbose;
+
   @Override
   public void execute() throws MojoExecutionException {
     if (skip) {
@@ -61,7 +64,13 @@ public class ConvertDirectoryMojo extends AbstractMojo {
           outputDirectory == null ? null : outputDirectory.toPath(),
           recursive,
           createMarkdownOptions(),
-          new TextEncoding.MarkdownEncodingOptions(encoding, bom)));
+          new TextEncoding.MarkdownEncodingOptions(encoding, bom),
+          verbose ? new DirectoryConverter.ProgressListener() {
+            @Override
+            public void processing(final Path workbookPath) {
+              getLog().info("miku-xlsx2md processing " + workbookPath.toString());
+            }
+          } : null));
     } catch (final IllegalArgumentException ex) {
       throw new MojoExecutionException(ex.getMessage(), ex);
     } catch (final IOException ex) {
@@ -125,6 +134,10 @@ public class ConvertDirectoryMojo extends AbstractMojo {
     this.skip = skip;
   }
 
+  void setVerbose(final boolean verbose) {
+    this.verbose = verbose;
+  }
+
   File getInputDirectory() {
     return inputDirectory;
   }
@@ -155,5 +168,9 @@ public class ConvertDirectoryMojo extends AbstractMojo {
 
   String getBom() {
     return bom;
+  }
+
+  boolean isVerbose() {
+    return verbose;
   }
 }

@@ -519,7 +519,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.failsForUnknownOption`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.acceptsKnownOptionsAndWritesConvertedMarkdown`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.writesZipOnlyWhenZipPathIsSpecified`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.printsProcessingFileToStderrWhenVerbose`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive`
+- `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.printsDirectoryProcessingFilesToStderrWhenVerbose`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsZipWhenConvertingDirectoryInputs`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.rejectsShiftJisBomCombination`
 - `jp.igapyon.mikuxlsx2md.cli.MikuXlsx2mdCliTest.convertsUpstreamShapeFixtureWhenAvailable`
@@ -554,6 +556,7 @@ focused regression:
 notes:
 - CLI help now reflects upstream GUI-aligned defaults, including `formatting-mode=github` and the additional `planner-aware` table detection mode.
 - Java CLI also includes a Java-side directory batch conversion extension backed by the shared runtime directory converter.
+- Java CLI `--verbose` prints processing workbook paths to stderr.
 
 ### upstream test / intent:
 Maven plugin option mapping, skip behavior, and initial conversion I/O
@@ -580,6 +583,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
+- `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.notifiesProcessingWorkbookThroughProgressListener`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
@@ -602,3 +606,4 @@ focused regression:
 notes:
 - Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
 - The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.
+- Maven plugin goals accept `miku-xlsx2md.verbose` to log processing workbook paths.

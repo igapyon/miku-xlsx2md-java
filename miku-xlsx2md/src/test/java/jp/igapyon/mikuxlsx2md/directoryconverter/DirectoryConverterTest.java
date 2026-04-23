@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,32 @@ class DirectoryConverterTest {
 
     assertEquals(0, results.size());
     assertTrue(!Files.exists(outputDirectory.resolve("nested").resolve("child.md")));
+  }
+
+  @Test
+  void notifiesProcessingWorkbookThroughProgressListener() throws java.io.IOException {
+    final Path inputDirectory = tempDir.resolve("input");
+    Files.createDirectories(inputDirectory);
+    Files.write(inputDirectory.resolve("sample.xlsx"), createWorkbookBytes("Hello"));
+    final List<Path> processedPaths = new ArrayList<Path>();
+
+    final List<DirectoryConverter.DirectoryConversionResult> results = DirectoryConverter.convertDirectory(
+        new DirectoryConverter.DirectoryConversionOptions(
+            inputDirectory,
+            null,
+            false,
+            new MarkdownOptions(),
+            encodingOptions(),
+            new DirectoryConverter.ProgressListener() {
+              @Override
+              public void processing(final Path workbookPath) {
+                processedPaths.add(workbookPath);
+              }
+            }));
+
+    assertEquals(1, results.size());
+    assertEquals(1, processedPaths.size());
+    assertEquals(inputDirectory.resolve("sample.xlsx").toAbsolutePath().normalize(), processedPaths.get(0));
   }
 
   private static TextEncoding.MarkdownEncodingOptions encodingOptions() {

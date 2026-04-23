@@ -46,6 +46,9 @@ public class MikuXlsx2mdMojo extends AbstractMojo {
   @Parameter(property = "miku-xlsx2md.skip", defaultValue = "false")
   private boolean skip;
 
+  @Parameter(property = "miku-xlsx2md.verbose", defaultValue = "false")
+  private boolean verbose;
+
   @Override
   public void execute() throws MojoExecutionException {
     if (skip) {
@@ -58,6 +61,9 @@ public class MikuXlsx2mdMojo extends AbstractMojo {
     }
 
     final String workbookName = inputFile.getName();
+    if (verbose) {
+      getLog().info("miku-xlsx2md processing " + inputFile.getPath());
+    }
     final WorkbookLoader.ParsedWorkbook workbook;
     try {
       workbook = Core.parseWorkbook(Files.readAllBytes(inputFile.toPath()), workbookName);
@@ -146,6 +152,10 @@ public class MikuXlsx2mdMojo extends AbstractMojo {
     this.skip = skip;
   }
 
+  void setVerbose(final boolean verbose) {
+    this.verbose = verbose;
+  }
+
   File getInputFile() {
     return inputFile;
   }
@@ -172,5 +182,9 @@ public class MikuXlsx2mdMojo extends AbstractMojo {
 
   String getBom() {
     return bom;
+  }
+
+  boolean isVerbose() {
+    return verbose;
   }
 }

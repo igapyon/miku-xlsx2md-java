@@ -90,7 +90,7 @@ The shaded CLI jar is produced under `miku-xlsx2md/target/`.
 Current entrypoint:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar --help
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -98,13 +98,14 @@ The CLI validates the main option set used by the upstream Node.js CLI and can w
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.1.0-SNAPSHOT.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
-  --recursive
+  --recursive \
+  --verbose
 ```
 
-When `--output-directory` is omitted, Markdown files are written next to the input `.xlsx` files. `--out` and `--zip` are not available with `--input-directory`.
+When `--output-directory` is omitted, Markdown files are written next to the input `.xlsx` files. `--out` and `--zip` are not available with `--input-directory`. `--verbose` prints the workbook path being processed to stderr.
 
 ## Maven Plugin
 
@@ -114,22 +115,23 @@ Full-coordinate smoke check:
 sh scripts/smoke-maven-plugin.sh
 ```
 
-The smoke script installs the local SNAPSHOT artifacts and invokes:
+The smoke script installs the local artifacts and invokes:
 
 ```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert
+mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert
 ```
 
 Directory batch conversion is also available:
 
 ```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert-directory \
+mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert-directory \
   -Dmiku-xlsx2md.inputDirectory=docs/xlsx \
   -Dmiku-xlsx2md.outputDirectory=docs/md \
-  -Dmiku-xlsx2md.recursive=false
+  -Dmiku-xlsx2md.recursive=false \
+  -Dmiku-xlsx2md.verbose=true
 ```
 
-When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output.
+When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output. `miku-xlsx2md.verbose=true` logs the workbook path being processed.
 
 ## Documents
 
