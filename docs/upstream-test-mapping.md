@@ -484,6 +484,8 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamMergePatternFixtureIntoMergeTokenMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaBasicFixtureIntoFormulaMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaSpillFixtureIntoSpillMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaCrossSheetFixtureIntoMultiSheetMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamFormulaSharedFixtureIntoTranslatedSharedFormulaMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamChartMixedFixtureIntoCombinedChartMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamBasicShapeFixtureIntoSvgBackedShapeBlockMarkdownWhenAvailable`
@@ -500,7 +502,9 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample15FixtureIntoMergedGridMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamTableBasicSample16FixtureIntoMultiValueMergeMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamGridLayoutFixtureIntoWideGridMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample01IntoImageMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamImageFixtureSample02IntoImageAndChartMarkdownWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamEdgeEmptyFixtureIntoNarrativeOnlyMarkdownWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsUpstreamWeirdSheetNameFixtureIntoSanitizedMarkdownFileWhenAvailable`
 
 fixtures:
@@ -512,6 +516,8 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-multiline-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/merge/merge-pattern-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-basic-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-spill-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/chart/chart-mixed-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-basic-sample01.xlsx`
@@ -528,14 +534,16 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample15.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/table-basic-sample16.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/table/grid-layout-sample-01.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/image/image-basic-sample02.xlsx`
+- `workplace/miku-xlsx2md/tests/fixtures/edge/edge-empty-sample01.xlsx`
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / display / hyperlink / rich / merge / formula / chart / shape / image-basic-sample02 / weird-sheetname parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / display / hyperlink / rich / merge / formula / formula-crosssheet / formula-shared / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname parity checks.
 - Current Java coverage also includes planner-aware suppression for repeated narrow calendar layouts so those bands remain narrative instead of becoming small tables.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
@@ -676,6 +684,6 @@ focused regression:
 - `sh scripts/smoke-maven-plugin.sh`
 
 notes:
-- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
+- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`, covering both `convert` and `convert-directory`.
 - The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.
 - Maven plugin goals accept `miku-xlsx2md.verbose` to log processing workbook paths.
