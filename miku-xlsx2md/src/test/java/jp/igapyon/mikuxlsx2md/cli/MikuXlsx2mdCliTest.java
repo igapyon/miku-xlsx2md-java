@@ -37,6 +37,9 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--include-shape-details"));
     assertTrue(asString(stdout).contains("--encoding"));
     assertTrue(asString(stdout).contains("--bom"));
+    assertTrue(asString(stdout).contains("--input-directory"));
+    assertTrue(asString(stdout).contains("--output-directory"));
+    assertTrue(asString(stdout).contains("--recursive"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
     assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
@@ -113,6 +116,54 @@ class MikuXlsx2mdCliTest {
     assertEquals("", asString(stderr));
     assertTrue(Files.isRegularFile(zipPath));
     assertTrue(ZipIo.unzipEntries(Files.readAllBytes(zipPath)).containsKey("output/sample.md"));
+  }
+
+  @Test
+  void convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    final Path nestedDirectory = inputDirectory.resolve("nested");
+    final Path outputDirectory = tempDir.resolve("out");
+    Files.createDirectories(nestedDirectory);
+    Files.write(inputDirectory.resolve("root.xlsx"), createWorkbookBytes());
+    Files.write(nestedDirectory.resolve("child.xlsx"), createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--output-directory", outputDirectory.toString(),
+            "--recursive",
+            "--summary"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("root.md")));
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("nested").resolve("child.md")));
+    assertTrue(asString(stdout).contains("[workbook] root.xlsx"));
+    assertTrue(asString(stdout).contains("[workbook] child.xlsx"));
+    assertEquals("", asString(stderr));
+  }
+
+  @Test
+  void rejectsZipWhenConvertingDirectoryInputs() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    Files.createDirectories(inputDirectory);
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--zip", tempDir.resolve("out.zip").toString()
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(1, exitCode);
+    assertTrue(asString(stderr).contains("--zip cannot be used with --input-directory."));
   }
 
   @Test
