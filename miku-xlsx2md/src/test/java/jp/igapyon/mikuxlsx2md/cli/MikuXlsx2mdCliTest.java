@@ -40,6 +40,7 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--input-directory"));
     assertTrue(asString(stdout).contains("--output-directory"));
     assertTrue(asString(stdout).contains("--recursive"));
+    assertTrue(asString(stdout).contains("--verbose"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
     assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
@@ -119,6 +120,30 @@ class MikuXlsx2mdCliTest {
   }
 
   @Test
+  void printsProcessingFileToStderrWhenVerbose() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputPath = tempDir.resolve("sample.xlsx");
+    final Path outputPath = tempDir.resolve("out").resolve("sample.md");
+    Files.write(inputPath, createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            inputPath.toString(),
+            "--out", outputPath.toString(),
+            "--verbose"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertEquals("", asString(stdout));
+    assertTrue(asString(stderr).contains("[processing]"));
+    assertTrue(asString(stderr).contains("sample.xlsx"));
+    assertTrue(Files.isRegularFile(outputPath));
+  }
+
+  @Test
   void convertsDirectoryInputsAndPreservesRelativeDirectoriesWhenRecursive() throws java.io.IOException {
     final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
@@ -145,6 +170,31 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("[workbook] root.xlsx"));
     assertTrue(asString(stdout).contains("[workbook] child.xlsx"));
     assertEquals("", asString(stderr));
+  }
+
+  @Test
+  void printsDirectoryProcessingFilesToStderrWhenVerbose() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputDirectory = tempDir.resolve("input");
+    final Path outputDirectory = tempDir.resolve("out");
+    Files.createDirectories(inputDirectory);
+    Files.write(inputDirectory.resolve("root.xlsx"), createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            "--input-directory", inputDirectory.toString(),
+            "--output-directory", outputDirectory.toString(),
+            "--verbose"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertEquals("", asString(stdout));
+    assertTrue(asString(stderr).contains("[processing]"));
+    assertTrue(asString(stderr).contains("root.xlsx"));
+    assertTrue(Files.isRegularFile(outputDirectory.resolve("root.md")));
   }
 
   @Test

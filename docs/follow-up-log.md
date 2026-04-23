@@ -2,6 +2,41 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Verbose Processing Diagnostics and 0.9.0 Version
+
+upstream file:
+- none
+
+java classes:
+- `CliOptions`
+- `MikuXlsx2mdCli`
+- `DirectoryConverter`
+- `MikuXlsx2mdMojo`
+- `ConvertDirectoryMojo`
+
+tests:
+- `MikuXlsx2mdCliTest`
+- `DirectoryConverterTest`
+- `MikuXlsx2mdMojoTest`
+- `ConvertDirectoryMojoTest`
+
+diff summary:
+- 挙動差分:
+  - Java CLI に `--verbose` を追加し、処理中 workbook path を stderr へ出力
+  - `DirectoryConverter` に progress listener を追加し、directory batch conversion の処理中 workbook path を通知
+  - Maven plugin の `convert` / `convert-directory` goal に `miku-xlsx2md.verbose` を追加し、処理中 workbook path を Maven log へ出力
+  - Maven project version と README / smoke script の利用例を `0.9.0` へ更新
+- 命名差分:
+  - CLI は `--verbose`、Maven plugin は `miku-xlsx2md.verbose` を使用
+- 未移植差分:
+  - upstream に対応する verbose option は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+  - `sh scripts/smoke-maven-plugin.sh` pass
+  - `mvn test` pass
+
 ## 2026-04-23 Shared Directory Batch Conversion
 
 upstream file:

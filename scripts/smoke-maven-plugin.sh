@@ -20,7 +20,7 @@ printf '%s' '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://sche
 ( cd "$XLSX_DIR" && jar cf "$INPUT_FILE" xl )
 
 ( cd "$ROOT_DIR" && mvn -DskipTests install )
-( cd "$ROOT_DIR" && mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.1.0-SNAPSHOT:convert \
+( cd "$ROOT_DIR" && mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert \
   -Dmiku-xlsx2md.inputFile="$INPUT_FILE" \
   -Dmiku-xlsx2md.outputFile="$OUTPUT_FILE" \
   -Dmiku-xlsx2md.outputMode=both \

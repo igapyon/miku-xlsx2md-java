@@ -63,6 +63,7 @@ class ConvertDirectoryMojoTest {
     mojo.setOutputDirectory(outputDirectory.toFile());
     mojo.setRecursive(true);
     mojo.setOutputMode("both");
+    mojo.setVerbose(true);
 
     assertDoesNotThrow(() -> mojo.execute());
 
@@ -71,6 +72,7 @@ class ConvertDirectoryMojoTest {
     assertEquals(outputDirectory.toFile(), mojo.getOutputDirectory());
     assertEquals(true, mojo.isRecursive());
     assertEquals("both", mojo.getOutputMode());
+    assertEquals(true, mojo.isVerbose());
     assertTrue(Files.isRegularFile(rootOutput));
     assertTrue(Files.isRegularFile(childOutput));
     assertTrue(new String(Files.readAllBytes(rootOutput), StandardCharsets.UTF_8).contains("# Book: root.xlsx"));

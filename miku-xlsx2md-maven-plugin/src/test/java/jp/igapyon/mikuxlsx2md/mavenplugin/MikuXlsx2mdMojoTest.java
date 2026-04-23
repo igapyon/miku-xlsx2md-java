@@ -45,6 +45,7 @@ class MikuXlsx2mdMojoTest {
     mojo.setTableDetectionMode("border");
     mojo.setEncoding("utf-8");
     mojo.setBom("off");
+    mojo.setVerbose(true);
 
     assertDoesNotThrow(() -> mojo.execute());
     assertEquals(inputPath.toFile(), mojo.getInputFile());
@@ -54,6 +55,7 @@ class MikuXlsx2mdMojoTest {
     assertEquals("border", mojo.getTableDetectionMode());
     assertEquals("utf-8", mojo.getEncoding());
     assertEquals("off", mojo.getBom());
+    assertEquals(true, mojo.isVerbose());
     assertTrue(Files.isRegularFile(outputPath));
     assertTrue(new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8).contains("# Book: sample.xlsx"));
     assertTrue(new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8).contains("Hello [raw=0]"));
