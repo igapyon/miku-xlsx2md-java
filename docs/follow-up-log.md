@@ -2,6 +2,32 @@
 
 Document version: `2026-04-23`
 
+## 2026-04-23 Maven Plugin Directory Goal
+
+upstream file:
+- none
+
+java classes:
+- `ConvertDirectoryMojo`
+
+tests:
+- `ConvertDirectoryMojoTest`
+
+diff summary:
+- 挙動差分:
+  - Maven plugin に `convert-directory` goal を追加
+  - `inputDirectory` 配下の `.xlsx` を一括変換し、`outputDirectory` 省略時は入力ディレクトリへ `.md` を出力
+  - `recursive` は既定 `false` とし、再帰有効時は入力相対ディレクトリ構造を出力側へ維持
+  - directory goal では ZIP 出力を扱わず、combined markdown のみを出力
+- 命名差分:
+  - 既存の単一ファイル goal `convert` は維持
+- 未移植差分:
+  - upstream に対応する同名 directory batch goal は未確認
+
+follow-up:
+- 実施した確認:
+  - `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest,ConvertDirectoryMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` pass
+
 ## 2026-04-23 Upstream Sync (`e67f2bc`)
 
 upstream file:

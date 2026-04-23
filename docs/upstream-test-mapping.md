@@ -570,6 +570,10 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.skipsWhenRequested`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
+- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/display/display-format-sample01.xlsx`
@@ -586,8 +590,9 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
+- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest,ConvertDirectoryMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
 - `sh scripts/smoke-maven-plugin.sh`
 
 notes:
 - Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`.
+- The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, and it scans `.xlsx` files only.
