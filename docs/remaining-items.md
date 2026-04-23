@@ -46,7 +46,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
-  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / shape-basic / shape-flowchart / shape-block-arrow / shape-callout / image-basic-sample02 / weird-sheetname cases
+  - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / display / hyperlink / rich / merge / formula / chart / shape / image-basic-sample02 / weird-sheetname cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
   - workbook-to-markdown fixture regression
@@ -64,15 +64,15 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring backed by shared runtime helper
   - Maven plugin `miku-xlsx2md.verbose` processing diagnostics
   - release version updated to `0.9.0`
-  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
+  - CLI / Maven plugin upstream fixture conversion coverage subset, including table alias / shape details compatibility aliases and non-link fixtures such as display / named-range / narrative / rich / merge / formula / chart / xlsx2md-basic / image-basic-sample02 / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin full-coordinate smoke execution command
 - 保守確認
   - help text compatibility
   - focused regression command layout
 - 保留
-  - advanced `sheet-markdown` fixture parity coverage beyond the current subset
+  - advanced `sheet-markdown` fixture parity coverage beyond the current subset, especially remaining formula/cross-sheet and image/edge fixture assertions
   - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions, but further expansion is still pending
-  - broader CLI / Maven plugin fixture coverage beyond the current subset
+  - broader CLI / Maven plugin fixture coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
   - broader Maven plugin smoke coverage beyond the fixed minimum command
 
 ## Focused Regression
@@ -112,6 +112,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 
 ## Next Unit
 
-- Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
+- Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
 - Expand worksheet parser shared / cross-sheet formula fixture coverage beyond the current focused regression subset
-- Add broader CLI / Maven plugin fixture coverage beyond the current subset
+- Add broader CLI / Maven plugin fixture coverage beyond the current subset, especially formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty cases
