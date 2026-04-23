@@ -231,6 +231,7 @@ public final class TableDetector {
       final TableScoreWeights scoreWeights,
       final String tableDetectionMode) {
     final String normalizedMode = MarkdownOptions.normalizeTableDetectionMode(tableDetectionMode);
+    final boolean plannerAwareMode = "planner-aware".equals(normalizedMode);
     final Map<String, WorksheetParser.ParsedCell> cellMap = buildCellMap(sheet);
     final List<WorksheetParser.ParsedCell> allSeedCells = collectTableSeedCells(sheet);
     final List<WorksheetParser.ParsedCell> borderSeedCells = collectBorderSeedCells(sheet);
@@ -239,7 +240,7 @@ public final class TableDetector {
     final TableScoreWeights weights = scoreWeights == null ? DEFAULT_TABLE_SCORE_WEIGHTS : scoreWeights;
 
     for (final List<WorksheetParser.ParsedCell> component : collectConnectedComponents(borderSeedCells, "border".equals(normalizedMode) ? "border" : "grid")) {
-      maybePushCandidate(sheet, cellMap, component, "border", weights, candidates, candidateKeys);
+      maybePushCandidate(sheet, cellMap, component, "border", plannerAwareMode, weights, candidates, candidateKeys);
     }
     if (!"border".equals(normalizedMode)) {
       for (final List<WorksheetParser.ParsedCell> component : collectConnectedComponents(allSeedCells)) {
@@ -263,11 +264,14 @@ public final class TableDetector {
         if (shadowedByBorderCandidate || shadowedByMultipleBorderCandidates) {
           continue;
         }
-        maybePushCandidate(sheet, cellMap, component, "fallback", weights, candidates, candidateKeys);
+        maybePushCandidate(sheet, cellMap, component, "fallback", plannerAwareMode, weights, candidates, candidateKeys);
       }
     }
 
-    final List<TableCandidate> pruned = pruneCalendarLikeColumnCandidates(pruneRedundantCandidates(candidates));
+    final List<TableCandidate> prunedCandidates = pruneRedundantCandidates(candidates);
+    final List<TableCandidate> pruned = plannerAwareMode
+        ? pruneCalendarLikeColumnCandidates(prunedCandidates)
+        : prunedCandidates;
     Collections.sort(pruned, new Comparator<TableCandidate>() {
       @Override
       public int compare(final TableCandidate left, final TableCandidate right) {
@@ -441,6 +445,7 @@ public final class TableDetector {
       final Map<String, WorksheetParser.ParsedCell> cellMap,
       final List<WorksheetParser.ParsedCell> component,
       final String sourceKind,
+      final boolean plannerAwareMode,
       final TableScoreWeights scoreWeights,
       final List<TableCandidate> candidates,
       final Set<String> candidateKeys) {
@@ -500,25 +505,29 @@ public final class TableDetector {
       if (mergedArea >= 2 && density < 0.25d && headerishCount < 2) {
         return;
       }
-      final boolean looksLikeWideSparseMergeForm = colCount >= 8
-          && rowCount >= 4
-          && density < 0.45d
-          && mergedArea >= Math.max(4, rowCount - 1)
-          && sparseRowCount >= Math.ceil(rowCount * 0.7d);
-      if (looksLikeWideSparseMergeForm) {
-        return;
+      if (plannerAwareMode) {
+        final boolean looksLikeWideSparseMergeForm = colCount >= 8
+            && rowCount >= 4
+            && density < 0.45d
+            && mergedArea >= Math.max(4, rowCount - 1)
+            && sparseRowCount >= Math.ceil(rowCount * 0.7d);
+        if (looksLikeWideSparseMergeForm) {
+          return;
+        }
       }
     } else {
       if (mergedArea >= 2 && rowCount <= 6 && colCount >= 10 && density < 0.25d) {
         return;
       }
-      final boolean looksLikeMixedLayoutSheet = rowCount >= 20
-          && colCount >= 8
-          && mergedArea >= 4
-          && sparseRowCount >= 4
-          && density < 0.8d;
-      if (looksLikeMixedLayoutSheet) {
-        return;
+      if (plannerAwareMode) {
+        final boolean looksLikeMixedLayoutSheet = rowCount >= 20
+            && colCount >= 8
+            && mergedArea >= 4
+            && sparseRowCount >= 4
+            && density < 0.8d;
+        if (looksLikeMixedLayoutSheet) {
+          return;
+        }
       }
     }
 

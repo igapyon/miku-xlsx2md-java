@@ -28,4 +28,9 @@ class MarkdownOptionsTest {
   void keepsCompatibilityAliasForBorderPriority() {
     assertEquals("border", MarkdownOptions.normalizeTableDetectionMode("border-priority"));
   }
+
+  @Test
+  void acceptsPlannerAwareTableDetectionMode() {
+    assertEquals("planner-aware", MarkdownOptions.normalizeTableDetectionMode("planner-aware"));
+  }
 }
