@@ -636,6 +636,89 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void convertsUpstreamChartBasicFixtureIntoChartMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("chart", "chart-basic-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "chart-basic-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("chart-basic-sample01_001_chart-basic.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(1, file.getSummary().getCharts());
+    assertTrue(file.getMarkdown().contains("## Sheet: chart-basic"));
+    assertTrue(file.getMarkdown().contains("### Chart: 001 (B10)"));
+    assertTrue(file.getMarkdown().contains("- Title: 棒グラフのグラフ"));
+    assertTrue(file.getMarkdown().contains("    - values: 'chart-basic'!$D$4:$D$7"));
+  }
+
+  @Test
+  void convertsUpstreamNamedRangeFixtureIntoMultiSheetMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("named-range", "named-range-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "named-range-sample01.xlsx");
+    final MarkdownExport.MarkdownFile summary = SheetMarkdown.convertSheetToMarkdown(workbook, workbook.getSheets().get(0), new MarkdownOptions());
+    final MarkdownExport.MarkdownFile other = SheetMarkdown.convertSheetToMarkdown(workbook, workbook.getSheets().get(1), new MarkdownOptions());
+
+    assertEquals("named-range-sample01_001_Summary.md", summary.getFileName());
+    assertEquals(2, summary.getSummary().getFormulaDiagnostics().size());
+    assertTrue(summary.getMarkdown().contains("definedNames サンプル"));
+    assertTrue(summary.getMarkdown().contains("| BaseName元 | Base |"));
+    assertTrue(summary.getMarkdown().contains("30"));
+    assertEquals("named-range-sample01_002_Other.md", other.getFileName());
+    assertTrue(other.getMarkdown().contains("### LocalCross元"));
+    assertTrue(other.getMarkdown().contains("- CrossRef CrossRef"));
+  }
+
+  @Test
+  void convertsUpstreamNarrativeFixtureIntoNarrativeAndTableMarkdownWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("narrative", "narrative-vs-table-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "narrative-vs-table-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertEquals("narrative-vs-table-sample01_001_narrative-vs-table.md", file.getFileName());
+    assertEquals(1, file.getSummary().getTables());
+    assertEquals(2, file.getSummary().getFormulaDiagnostics().size());
+    assertTrue(file.getMarkdown().contains("地の文と表の判定"));
+    assertTrue(file.getMarkdown().contains("この設計書は受注入力画面を説明する。"));
+    assertTrue(file.getMarkdown().contains("### Table: 001 (B8-F11)"));
+    assertTrue(file.getMarkdown().contains("| 1 | コード | code | 101 | 何かのコード |"));
+    assertTrue(file.getMarkdown().contains("※注記: この表はサンプルです。"));
+  }
+
+  @Test
+  void convertsUpstreamBorderPriorityFixtureDifferentlyBetweenBalancedAndBorderModesWhenAvailable() throws IOException {
+    final Path fixturePath = resolveFixturePath("table", "table-border-priority-sample01.xlsx");
+    Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
+
+    final WorkbookLoader.ParsedWorkbook workbook =
+        jp.igapyon.mikuxlsx2md.core.Core.parseWorkbook(Files.readAllBytes(fixturePath), "table-border-priority-sample01.xlsx");
+    final WorksheetParser.ParsedSheet sheet = workbook.getSheets().get(0);
+    final MarkdownExport.MarkdownFile balanced = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, null, null, "balanced"));
+    final MarkdownExport.MarkdownFile border = SheetMarkdown.convertSheetToMarkdown(workbook, sheet,
+        new MarkdownOptions(null, null, null, null, null, null, null, "border"));
+
+    assertEquals("table-border-priority-sample01_001_border-priority.md", balanced.getFileName());
+    assertEquals(1, balanced.getSummary().getTables());
+    assertEquals("balanced", balanced.getSummary().getTableDetectionMode());
+    assertTrue(balanced.getMarkdown().contains("### Table: 001 (A3-B4)"));
+    assertTrue(balanced.getMarkdown().contains("| 項目 | 値 |"));
+    assertEquals(0, border.getSummary().getTables());
+    assertEquals("border", border.getSummary().getTableDetectionMode());
+    assertTrue(border.getMarkdown().contains("※罫線優先モード確認用"));
+    assertFalse(border.getMarkdown().contains("### Table: 001"));
+  }
+
+  @Test
   void convertsUpstreamBasicFixtureIntoPlainRawAndBothMarkdownWhenAvailable() throws IOException {
     final Path fixturePath = resolveFixturePath("", "xlsx2md-basic-sample01.xlsx");
     Assumptions.assumeTrue(Files.isRegularFile(fixturePath), "upstream fixture is not available in workplace/");
