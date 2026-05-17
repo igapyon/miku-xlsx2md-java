@@ -59,7 +59,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
+- `mvn -Dtest=MarkdownExportTest test`
 
 ### upstream test / intent:
 `src/ts/markdown-options.ts` option normalization behavior
@@ -73,7 +73,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=MarkdownOptionsTest test`
+- `mvn -Dtest=MarkdownOptionsTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-text-encoding.test.js`
@@ -89,7 +89,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=TextEncodingTest test`
+- `mvn -Dtest=TextEncodingTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-xml-utils.test.js`
@@ -103,7 +103,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=XmlUtilsTest test`
+- `mvn -Dtest=XmlUtilsTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-zip-io.test.js`
@@ -121,7 +121,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=ZipIoTest test`
+- `mvn -Dtest=ZipIoTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-rels-parser.test.js`
@@ -136,7 +136,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=RelsParserTest test`
+- `mvn -Dtest=RelsParserTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-workbook-loader.test.js`
@@ -150,7 +150,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=WorkbookLoaderTest test`
+- `mvn -Dtest=WorkbookLoaderTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-shared-strings.test.js`
@@ -165,7 +165,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=SharedStringsTest test`
+- `mvn -Dtest=SharedStringsTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-styles-parser.test.js`
@@ -180,7 +180,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=StylesParserTest test`
+- `mvn -Dtest=StylesParserTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-worksheet-parser.test.js`
@@ -202,7 +202,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-shared-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=WorksheetParserTest test`
+- `mvn -Dtest=WorksheetParserTest test`
 
 notes:
 - Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, value type / raw value / formula type / cached value metadata assertions for those formula fixtures, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
@@ -217,7 +217,7 @@ fixtures:
 - synthetic stored ZIP built in test
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=CoreTest test`
+- `mvn -Dtest=CoreTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-main.test.js` fixture-based workbook parsing and workbook-to-markdown expectations
@@ -293,7 +293,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/shape/shape-callout-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=CoreFixtureRegressionTest test`
+- `mvn -Dtest=CoreFixtureRegressionTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-cell-format.test.js`
@@ -308,7 +308,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=CellFormatTest test`
+- `mvn -Dtest=CellFormatTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-worksheet-tables.test.js`
@@ -323,7 +323,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=WorksheetTablesTest test`
+- `mvn -Dtest=WorksheetTablesTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-border-grid.test.js`
@@ -338,7 +338,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=BorderGridTest test`
+- `mvn -Dtest=BorderGridTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-table-detector.test.js`
@@ -358,7 +358,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=TableDetectorTest test`
+- `mvn -Dtest=TableDetectorTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-sheet-assets.test.js`
@@ -375,7 +375,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=SheetAssetsTest test`
+- `mvn -Dtest=SheetAssetsTest test`
 
 notes:
 - Current Java coverage ports asset drawing parsing, rendering, shape block grouping, and parsed shape SVG helper connection intent.
@@ -392,7 +392,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=OfficeDrawingTest test`
+- `mvn -Dtest=OfficeDrawingTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-markdown-export.test.js`
@@ -413,7 +413,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=MarkdownExportTest test`
+- `mvn -Dtest=MarkdownExportTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-narrative-structure.test.js`
@@ -430,7 +430,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=NarrativeStructureTest test`
+- `mvn -Dtest=NarrativeStructureTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-rich-text-parser.test.js`
@@ -453,7 +453,7 @@ fixtures:
 - none
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest test`
+- `mvn -Dtest=RichTextRendererTest test`
 
 ### upstream test / intent:
 `tests/xlsx2md-sheet-markdown.test.js`
@@ -548,7 +548,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
+- `mvn -Dtest=SheetMarkdownTest test`
 
 notes:
 - Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / named-range / display / hyperlink / rich / merge / formula / formula-crosssheet / formula-shared / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname parity checks.
@@ -688,7 +688,7 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest test`
+- `mvn -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest test`
 
 notes:
 - The runtime directory helper scans `.xlsx` files only and is used by the Java CLI directory mode.

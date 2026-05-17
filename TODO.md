@@ -6,7 +6,7 @@ Document version: `2026-04-23`
 
 - miku-soft 共通原則は `docs/miku-soft-reference.md` から共有 skill 側を参照する
 - Java 版は runtime / CLI repository として維持する
-- runtime / CLI は `miku-xlsx2md` module に置く
+- runtime / CLI は repository root に置く
 - Maven plugin は分離済み `miku-xlsx2md-java-maven` repository で扱う
 - straight conversion の過程では新機能を追加しない
 
@@ -63,7 +63,7 @@ Document version: `2026-04-23`
 - Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
-- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn package`
+- 再開時の確認コマンドは `mvn -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn package`
 
 ## Done In This Step
 
@@ -157,6 +157,7 @@ Document version: `2026-04-23`
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
 - Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
 - Maven plugin module を分離済み `miku-xlsx2md-java-maven` repository へ移したため、この runtime repository から削除した
+- `miku-xlsx2md` module 階層を repository root へ flatten した
 - GitHub Actions release workflow で runtime jar を Release Page の添付 asset に追加するようにした
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した

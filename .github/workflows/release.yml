@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p target/release-assets
-          cp miku-xlsx2md/target/miku-xlsx2md-*.jar target/release-assets/
+          cp target/miku-xlsx2md-*.jar target/release-assets/
           rm -f target/release-assets/original-*.jar
           ls -l target/release-assets
 

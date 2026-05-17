@@ -36,7 +36,7 @@ find_java_jar() {
     return 0
   fi
 
-  for candidate in "$ROOT_DIR"/miku-xlsx2md/target/miku-xlsx2md-*.jar; do
+  for candidate in "$ROOT_DIR"/target/miku-xlsx2md-*.jar; do
     [ -f "$candidate" ] || continue
     case "$(basename "$candidate")" in
       original-*) continue ;;
