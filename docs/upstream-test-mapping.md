@@ -642,41 +642,9 @@ notes:
 - Java CLI `--verbose` prints processing workbook paths to stderr.
 
 ### upstream test / intent:
-Maven plugin option mapping, skip behavior, and initial conversion I/O
+Java-side directory conversion helper used by CLI and separated adapters
 
 java tests:
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.skipsWhenRequested`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.writesMarkdownThroughCoreConversion`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamDisplayFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamNamedRangeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamNarrativeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamHyperlinkFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamShapeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichUsecaseFixtureInGithubModeWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichTextGithubFixtureInGithubModeWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamMergeMultilineFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamMergePatternFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamChartBasicFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamRichMarkdownEscapeFixtureInGithubModeWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaBasicFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaSpillFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamChartMixedFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaCrossSheetFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFormulaSharedFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample01WhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamEdgeEmptyFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBorderPriorityFixtureInBorderModeWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBasicFixtureInBothModeWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamImageFixtureSample02WhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamFlowchartShapeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamBlockArrowShapeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamCalloutShapeFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamTableBasicAndGridFixturesWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.MikuXlsx2mdMojoTest.convertsUpstreamWeirdSheetNameFixtureWhenAvailable`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.skipsWhenRequested`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
-- `jp.igapyon.mikuxlsx2md.mavenplugin.ConvertDirectoryMojoTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.writesMarkdownNextToInputFilesWhenOutputDirectoryIsOmitted`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.preservesRelativeDirectoriesWhenRecursiveOutputDirectoryIsSpecified`
 - `jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverterTest.doesNotDescendIntoSubdirectoriesWhenRecursiveIsDisabled`
@@ -720,10 +688,8 @@ fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/edge/edge-weird-sheetname-sample01.xlsx`
 
 focused regression:
-- `mvn -pl miku-xlsx2md,miku-xlsx2md-maven-plugin -am -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest,ConvertDirectoryMojoTest,MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
-- `sh scripts/smoke-maven-plugin.sh`
+- `mvn -pl miku-xlsx2md -Dtest=DirectoryConverterTest,MikuXlsx2mdCliTest test`
 
 notes:
-- Full-coordinate Maven plugin execution is fixed through `scripts/smoke-maven-plugin.sh`, covering both `convert` and `convert-directory`.
-- The directory goal uses `inputDirectory`, optional `outputDirectory`, and `recursive=false` by default, scans `.xlsx` files only, and delegates to the same runtime helper used by the Java CLI directory mode.
-- Maven plugin goals accept `miku-xlsx2md.verbose` to log processing workbook paths.
+- The runtime directory helper scans `.xlsx` files only and is used by the Java CLI directory mode.
+- Maven plugin coverage moved to the separated `miku-xlsx2md-java-maven` repository.

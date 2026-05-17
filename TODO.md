@@ -4,10 +4,10 @@ Document version: `2026-04-23`
 
 ## Fixed Direction
 
-- `docs/miku-straight-conversion-guide.md` を正本の共通原則として扱う
-- Java 版は Maven multi-module 構成で進める
+- miku-soft 共通原則は `docs/miku-soft-reference.md` から共有 skill 側を参照する
+- Java 版は runtime / CLI repository として維持する
 - runtime / CLI は `miku-xlsx2md` module に置く
-- Maven plugin は `miku-xlsx2md-maven-plugin` module に置く
+- Maven plugin は分離済み `miku-xlsx2md-java-maven` repository で扱う
 - straight conversion の過程では新機能を追加しない
 
 ## Current Queue
@@ -33,7 +33,7 @@ Document version: `2026-04-23`
 
 ## Next Queue
 
-- CLI / Maven plugin の fixture coverage をさらに広げる
+- CLI fixture coverage をさらに広げる
   - local upstream fixture inventory を再棚卸しし、CLI 側に残っていた hyperlink fixture coverage を追加済み
   - xlsx2md-basic / image-basic-sample02 / weird-sheetname fixture coverage は追加済み
   - shape-flowchart / shape-block-arrow fixture coverage は追加済み
@@ -42,32 +42,28 @@ Document version: `2026-04-23`
   - formula-crosssheet / formula-shared / image-basic-sample01 / edge-empty fixture coverage は追加済み
   - rich-text-github / merge-pattern fixture coverage は追加済み
   - table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture coverage は追加済み
-  - この時点の local upstream fixture inventory では CLI / Maven plugin の未横展開 fixture 候補は未確認
-- Maven plugin smoke coverage を必要に応じて広げる
-  - full-coordinate `convert-directory` smoke coverage は追加済み
+  - この時点の local upstream fixture inventory では CLI の未横展開 fixture 候補は未確認
 - Release Page の添付 asset 改善
   - GitHub Actions で `mvn -B package` により runtime jar を生成し、Release asset に添付する workflow は追加済み
 
 ## Restart Memo
 
-- 次回の再開点は `advanced sheet-markdown parity coverage` と CLI / Maven plugin fixture 横展開の続き
+- 次回の再開点は `advanced sheet-markdown parity coverage` と CLI fixture 横展開の続き
 - `table-basic` / shape 系の `SheetMarkdownTest` coverage は sample01-03 / sample11-16 / `shape-basic-sample01` / `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` まで追加済み
 - `display-format-sample01` / `hyperlink-basic-sample01` / `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-pattern-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-mixed-sample01` の `SheetMarkdownTest` coverage は追加済み
 - `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` の `SheetMarkdownTest` coverage は追加済み
 - `named-range-sample01` / `narrative-vs-table-sample01` / `chart-basic-sample01` / `table-border-priority-sample01` の `SheetMarkdownTest` coverage は追加済み
-- CLI / Maven plugin 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` を優先
-- CLI / Maven plugin 側の `shape-flowchart-sample01` / `shape-block-arrow-sample01` は追加済み
-- CLI / Maven plugin 側の `shape-callout-sample01` は追加済み
-- CLI / Maven plugin 側の `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-basic-sample01` / `chart-mixed-sample01` は追加済み
-- CLI / Maven plugin 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
-- CLI / Maven plugin 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
-- CLI / Maven plugin 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
-- CLI 側の `hyperlink-basic-sample01` は追加済み。Maven plugin 側は追加済みであることを再確認済み
+- CLI 側の横展開は `shape-flowchart-sample01` / `shape-block-arrow-sample01` / `shape-callout-sample01` まで追加済み
+- CLI 側の `rich-usecase-sample01` / `rich-markdown-escape-sample01` / `merge-multiline-sample01` / `formula-basic-sample01` / `formula-spill-sample01` / `chart-basic-sample01` / `chart-mixed-sample01` は追加済み
+- CLI 側の `formula-crosssheet-sample01` / `formula-shared-sample01` / `image-basic-sample01` / `edge-empty-sample01` は追加済み
+- CLI 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
+- CLI 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
+- CLI 側の `hyperlink-basic-sample01` は追加済み
 - Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により `mvn -B package` を実行し、runtime jar を GitHub Release asset へ添付する
 - Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
-- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test` と `mvn package` と `sh scripts/smoke-maven-plugin.sh`
+- 再開時の確認コマンドは `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn package`
 
 ## Done In This Step
 
@@ -160,6 +156,7 @@ Document version: `2026-04-23`
 - Maven plugin に upstream table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture conversion coverage を追加した
 - Maven plugin smoke 実行方法を full-coordinate script として固定した
 - Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
+- Maven plugin module を分離済み `miku-xlsx2md-java-maven` repository へ移したため、この runtime repository から削除した
 - GitHub Actions release workflow で runtime jar を Release Page の添付 asset に追加するようにした
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
@@ -170,4 +167,4 @@ Document version: `2026-04-23`
 ## Notes
 
 - `.mvn/jvm.config` は sibling repo の設定を参考に通信安定化の前提として置く
-- plugin 化は runtime 実装を core として呼び出す構成を前提に進める
+- 分離済み plugin は runtime 実装を core として呼び出す構成を前提に進める

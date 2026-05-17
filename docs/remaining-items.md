@@ -4,7 +4,7 @@ Document version: `2026-04-23`
 
 ## Current Position
 
-Java port scaffolding is ready as a Maven multi-module project, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from both the CLI and Maven plugin, Maven plugin full-coordinate smoke execution is fixed as a script, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, both the Java CLI and Maven plugin now share directory batch conversion, and verbose processing diagnostics are available for CLI and Maven plugin execution.
+Java runtime scaffolding is ready under the `miku-xlsx2md` module, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository.
 
 ## Status
 
@@ -60,12 +60,9 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - CLI GUI-aligned default formatting mode `github` and help text sync
   - CLI directory batch conversion backed by shared runtime helper
   - CLI `--verbose` processing diagnostics
-  - Maven plugin initial conversion
-  - Maven plugin directory batch conversion goal with optional recursive scan and output-directory mirroring backed by shared runtime helper
-  - Maven plugin `miku-xlsx2md.verbose` processing diagnostics
-  - release version updated to `0.9.0`
-  - CLI / Maven plugin upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
-  - Maven plugin full-coordinate smoke execution command, including `convert` and `convert-directory`
+  - release version updated to `0.8.0`
+  - CLI upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
+  - Maven plugin module removed from this runtime repository after separation to `miku-xlsx2md-java-maven`
   - GitHub Actions release workflow that attaches the shaded runtime jar to GitHub Release assets
   - Node / Java Markdown byte-level comparison script for selected upstream fixtures
 - 保守確認
@@ -75,8 +72,7 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
   - broader Node / Java Markdown byte-level comparison beyond the initial selected fixtures
   - worksheet parser shared / cross-sheet formula fixture coverage now includes broader upstream `formula-crosssheet` / `formula-shared` assertions plus value type / raw value / formula type / cached value metadata assertions
-  - broader CLI / Maven plugin fixture coverage for future upstream fixture additions
-  - broader Maven plugin smoke coverage beyond the fixed `convert` / `convert-directory` commands
+  - broader CLI fixture coverage for future upstream fixture additions
   - actual GitHub tag 上での release workflow 実行は未確認
 
 ## Focused Regression
@@ -107,8 +103,6 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - `mvn -pl miku-xlsx2md -Dtest=RichTextRendererTest test`
 - `mvn -pl miku-xlsx2md -Dtest=SheetMarkdownTest test`
 - `mvn -pl miku-xlsx2md -Dtest=MikuXlsx2mdCliTest test`
-- `mvn -pl miku-xlsx2md-maven-plugin -am -Dtest=MikuXlsx2mdMojoTest -Dsurefire.failIfNoSpecifiedTests=false test`
-- `sh scripts/smoke-maven-plugin.sh`
 
 ## Last Known Result
 
@@ -119,4 +113,4 @@ Java port scaffolding is ready as a Maven multi-module project, workbook parsing
 - Expand advanced `sheet-markdown` fixture parity coverage beyond the current subset
 - Expand Node / Java Markdown byte-level comparison beyond the initial selected fixtures
 - Expand worksheet parser shared / cross-sheet formula fixture coverage further if upstream adds new cases
-- Add broader CLI / Maven plugin fixture coverage when future upstream fixture additions appear
+- Add broader CLI fixture coverage when future upstream fixture additions appear

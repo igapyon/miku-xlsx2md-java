@@ -14,7 +14,7 @@ This document keeps the development-oriented status notes that were previously i
 ## Current Status
 
 - Upstream source / test / CLI inventory completed from `workplace/miku-xlsx2md`
-- Initial Java multi-module scaffolding is in place
+- Java runtime scaffolding is in place under the `miku-xlsx2md` module
 - Straight-converted utility modules implemented:
   - `address-utils.ts`
   - `markdown-normalize.ts`
@@ -68,11 +68,10 @@ This document keeps the development-oriented status notes that were previously i
 - `SheetMarkdownTest` includes upstream `xlsx2md-basic`, display, hyperlink, rich text / markdown escape, merge, formula, chart, shape, table, grid, image, and weird-sheetname fixture parity coverage
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
-- Maven plugin is connected to runtime core conversion, including a directory batch conversion goal with optional recursive scan shared with the CLI runtime helper
-- CLI / Maven plugin fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table-basic / grid-layout / table alias, narrative/display/named-range/hyperlink/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
-- Maven plugin full-coordinate smoke command is fixed in `scripts/smoke-maven-plugin.sh`, including both `convert` and `convert-directory`
+- CLI fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table-basic / grid-layout / table alias, narrative/display/named-range/hyperlink/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
+- Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository
 - GitHub Actions release workflow builds the runtime jar and uploads it to the GitHub Release assets for tag releases
-- Advanced sheet-markdown parity and future upstream fixture additions remain follow-up work; the current local upstream fixture inventory is covered by CLI / Maven plugin conversion tests.
+- Advanced sheet-markdown parity and future upstream fixture additions remain follow-up work; the current local upstream fixture inventory is covered by CLI conversion tests.
 
 ## Build
 
@@ -91,7 +90,7 @@ The shaded CLI jar is produced under `miku-xlsx2md/target/`.
 Current entrypoint:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar --help
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -107,7 +106,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \
@@ -118,29 +117,10 @@ When `--output-directory` is omitted, Markdown files are written next to the inp
 
 ## Maven Plugin
 
-Full-coordinate smoke check:
-
-```bash
-sh scripts/smoke-maven-plugin.sh
-```
-
-The smoke script installs the local artifacts and invokes:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert
-```
-
-Directory batch conversion is also available:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert-directory \
-  -Dmiku-xlsx2md.inputDirectory=docs/xlsx \
-  -Dmiku-xlsx2md.outputDirectory=docs/md \
-  -Dmiku-xlsx2md.recursive=false \
-  -Dmiku-xlsx2md.verbose=true
-```
-
-When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output. `miku-xlsx2md.verbose=true` logs the workbook path being processed.
+Maven plugin support has moved to the separated
+`miku-xlsx2md-java-maven` repository. This repository now owns the Java
+runtime, CLI, reusable conversion APIs, runtime tests, and runtime jar
+packaging only.
 
 ## Release
 

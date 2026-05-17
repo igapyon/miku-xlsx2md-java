@@ -17,7 +17,7 @@ Links:
 - Converts a whole workbook without sheet-by-sheet manual work
 - Extracts prose, tables, images, charts, shapes, links, rich text, and formula-derived values where supported
 - Can write Markdown or ZIP output from the CLI
-- Includes a Maven plugin for build-time conversion
+- Provides a runtime artifact used by the separated Maven plugin repository
 
 The goal is the same as the Node / browser version: extract workbook content as meaningful Markdown, not reproduce Excel's visual appearance exactly.
 
@@ -36,7 +36,7 @@ The goal is the same as the Node / browser version: extract workbook content as 
 - Extracts shape source data as text and outputs SVG when supported
 - Extracts images as Markdown plus assets in ZIP output
 - Supports batch conversion from the Java CLI
-- Supports Maven plugin goals for single-file and directory conversion
+- Provides reusable runtime APIs for separated build-tool adapters
 
 ## Feature Support Overview
 
@@ -56,7 +56,7 @@ The goal is the same as the Node / browser version: extract workbook content as 
 | Handle shapes | Partially supported | Extracts source-oriented data and outputs SVG when supported |
 | Save output as ZIP | Supported | CLI can write Markdown and assets together |
 | Run batch conversion from CLI | Supported | Directory conversion is available from the Java CLI |
-| Run from Maven | Supported | Maven plugin provides `convert` and `convert-directory` goals |
+| Run from Maven | Separated | Use the `miku-xlsx2md-java-maven` repository |
 | Reproduce Excel appearance exactly | Not supported | The goal is meaningful Markdown conversion, not visual fidelity |
 
 ## Use Cases
@@ -65,12 +65,12 @@ The goal is the same as the Node / browser version: extract workbook content as 
 - Extract prose, tables, and images into a reusable text-based format
 - Process an entire workbook without manual work on each sheet
 - Run conversion locally from Java-based workflows
-- Convert `.xlsx` files during Maven builds or release processes
+- Provide the runtime dependency for separated Maven build adapters
 
 ## Requirements
 
 - Java 8 or later
-- Maven, when building from source or using the Maven plugin locally
+- Maven, when building from source
 
 ## Build
 
@@ -83,19 +83,19 @@ The executable CLI jar is produced under `miku-xlsx2md/target/`.
 ## Java CLI
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar <input.xlsx> --out output.md
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar <input.xlsx> --out output.md
 ```
 
 ZIP export is also available.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar <input.xlsx> --zip output.zip
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar <input.xlsx> --zip output.zip
 ```
 
 Directory batch conversion is available as a Java-side CLI extension.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -136,7 +136,7 @@ Exit codes:
 You can switch the Markdown output mode or include shape source details.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -146,7 +146,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 You can switch how Excel text emphasis is rendered. `github` formatting mode preserves supported rich text output and emits hyperlinks as Markdown links when supported.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -155,7 +155,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 You can also switch table detection behavior. `balanced` keeps the generic heuristic, `border` detects tables from bordered regions and suppresses borderless fallback detection, and `planner-aware` adds planner/calendar-specific suppression heuristics for layout-heavy sheets.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -164,7 +164,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 You can control output encoding and BOM. `shift_jis` does not allow BOM.
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -172,7 +172,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 ```
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis
@@ -180,44 +180,13 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 
 ## Maven Plugin
 
-The Maven plugin provides a `convert` goal for one workbook and a `convert-directory` goal for batch conversion.
+Maven plugin support has moved to the separated
+[`miku-xlsx2md-java-maven`](https://github.com/igapyon/miku-xlsx2md-java-maven)
+repository.
 
-The plugin commands below require `miku-xlsx2md-maven-plugin` to be available from the local Maven repository or another configured Maven repository.
-
-Single-file conversion:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert \
-  -Dmiku-xlsx2md.inputFile=path/to/input.xlsx \
-  -Dmiku-xlsx2md.outputFile=path/to/output.md
-```
-
-Directory conversion:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert-directory \
-  -Dmiku-xlsx2md.inputDirectory=path/to/xlsx \
-  -Dmiku-xlsx2md.outputDirectory=path/to/markdown \
-  -Dmiku-xlsx2md.recursive=false \
-  -Dmiku-xlsx2md.verbose=true
-```
-
-When `outputDirectory` is omitted, Markdown files are written next to the input `.xlsx` files. The directory goal does not support ZIP output.
-
-### Maven Plugin Parameters
-
-- `miku-xlsx2md.inputFile`: Input workbook for `convert`
-- `miku-xlsx2md.outputFile`: Output Markdown file for `convert`
-- `miku-xlsx2md.inputDirectory`: Input directory for `convert-directory`
-- `miku-xlsx2md.outputDirectory`: Output directory for `convert-directory`
-- `miku-xlsx2md.recursive`: Recursively scan directories for `convert-directory`
-- `miku-xlsx2md.outputMode`: `display`, `raw`, or `both`
-- `miku-xlsx2md.formattingMode`: `plain` or `github`
-- `miku-xlsx2md.tableDetectionMode`: `balanced`, `border`, or `planner-aware`
-- `miku-xlsx2md.encoding`: `utf-8`, `shift_jis`, `utf-16le`, `utf-16be`, `utf-32le`, or `utf-32be`
-- `miku-xlsx2md.bom`: `off` or `on`
-- `miku-xlsx2md.skip`: Skip plugin execution
-- `miku-xlsx2md.verbose`: Log workbook paths being processed
+This repository owns the Java runtime, CLI, reusable conversion APIs, runtime
+tests, and runtime jar packaging. The Maven plugin repository owns Maven goals,
+parameters, plugin tests, examples, and smoke scripts.
 
 ## Development
 
@@ -225,12 +194,6 @@ Run tests:
 
 ```bash
 mvn test
-```
-
-Run the Maven plugin smoke check:
-
-```bash
-sh scripts/smoke-maven-plugin.sh
 ```
 
 Node / Java Markdown byte-level comparison can be run after `mvn package` and upstream `npm install`:
@@ -246,7 +209,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 ## Documents
 
 - [docs/development-status.md](docs/development-status.md)
-- [docs/miku-straight-conversion-guide.md](docs/miku-straight-conversion-guide.md)
+- [docs/miku-soft-reference.md](docs/miku-soft-reference.md)
 - [docs/upstream-class-mapping.md](docs/upstream-class-mapping.md)
 - [docs/upstream-test-mapping.md](docs/upstream-test-mapping.md)
 - [docs/remaining-items.md](docs/remaining-items.md)
@@ -280,7 +243,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - Excel ブック全体を、シートごとの手作業なしで変換します
 - 対応範囲内で、地の文・表・画像・グラフ・図形・リンク・rich text・数式由来の値を抽出します
 - CLI から Markdown または ZIP を出力できます
-- Maven plugin によりビルド時変換もできます
+- 分離済み Maven plugin の runtime dependency として利用できます
 
 目的は Node / browser 版と同じく、Excel の見た目を完全再現することではなく、ブック内の情報を意味のある Markdown として取り出すことです。
 
@@ -299,7 +262,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - 図形の元データをテキストとして抽出し、対応できるものは SVG も出力
 - ZIP 出力で画像を Markdown と assets の組み合わせとして出力
 - Java CLI からのディレクトリ一括変換に対応
-- Maven plugin の single-file / directory conversion に対応
+- 分離済み build-tool adapter 向けの reusable runtime API を提供
 
 ## 主な機能の対応状況
 
@@ -319,7 +282,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 | 図形を扱える | 一部対応 | raw 寄りの情報を抽出し、対応できるものは SVG として出力 |
 | ZIP でまとめて保存できる | 対応 | CLI から Markdown と assets をまとめて保存 |
 | CLI から一括変換できる | 対応 | Java CLI でディレクトリ変換が可能 |
-| Maven から実行できる | 対応 | `convert` / `convert-directory` goal を提供 |
+| Maven から実行できる | 分離済み | `miku-xlsx2md-java-maven` repository を利用 |
 | Excel の見た目を完全再現できる | 非対応 | 目的は見た目再現ではなく、意味のある Markdown 化 |
 
 ## 用途
@@ -328,12 +291,12 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - 地の文・表・画像をまとめて抽出し、再利用しやすい形にしたい
 - シートごとの手作業なしで、ブック全体を一括処理したい
 - Java ベースの処理やバッチからローカル変換したい
-- Maven build や release process の中で `.xlsx` を Markdown 化したい
+- 分離済み Maven build adapter の runtime dependency として利用したい
 
 ## 必要環境
 
 - Java 8 以降
-- ソースから build する場合、または Maven plugin をローカル利用する場合は Maven
+- ソースから build する場合は Maven
 
 ## Build
 
@@ -346,19 +309,19 @@ mvn package
 ## Java CLI
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar <input.xlsx> --out output.md
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar <input.xlsx> --out output.md
 ```
 
 ZIP 出力も利用できます。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar <input.xlsx> --zip output.zip
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar <input.xlsx> --zip output.zip
 ```
 
 Java CLI 独自拡張として、ディレクトリ一括変換も利用できます。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -399,7 +362,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 Markdown output mode の切り替えや shape source details の出力もできます。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -409,7 +372,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 Excel text emphasis の出力方法も切り替えられます。`github` formatting mode では、対応する rich text 出力を反映し、対応できる hyperlink は Markdown link として出力します。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -418,7 +381,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 table detection behavior も切り替えられます。`balanced` は汎用 heuristic、`border` は罫線領域からの検出、`planner-aware` は planner / calendar 系 layout-heavy sheet 向けの抑制 heuristic を追加します。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -427,7 +390,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 出力 encoding と BOM も制御できます。`shift_jis` は BOM を許可しません。
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -435,7 +398,7 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 ```
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis
@@ -443,44 +406,13 @@ java -jar miku-xlsx2md/target/miku-xlsx2md-0.9.0.jar \
 
 ## Maven Plugin
 
-Maven plugin は、1 workbook 用の `convert` goal と、ディレクトリ一括変換用の `convert-directory` goal を提供します。
+Maven plugin support は、分離済みの
+[`miku-xlsx2md-java-maven`](https://github.com/igapyon/miku-xlsx2md-java-maven)
+repository へ移動しました。
 
-以下の plugin command は、`miku-xlsx2md-maven-plugin` が local Maven repository または設定済み Maven repository から解決できることを前提とします。
-
-単一ファイル変換:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert \
-  -Dmiku-xlsx2md.inputFile=path/to/input.xlsx \
-  -Dmiku-xlsx2md.outputFile=path/to/output.md
-```
-
-ディレクトリ一括変換:
-
-```bash
-mvn -N jp.igapyon:miku-xlsx2md-maven-plugin:0.9.0:convert-directory \
-  -Dmiku-xlsx2md.inputDirectory=path/to/xlsx \
-  -Dmiku-xlsx2md.outputDirectory=path/to/markdown \
-  -Dmiku-xlsx2md.recursive=false \
-  -Dmiku-xlsx2md.verbose=true
-```
-
-`outputDirectory` を省略した場合、Markdown ファイルは入力 `.xlsx` ファイルの隣に出力されます。directory goal は ZIP 出力に対応していません。
-
-### Maven Plugin Parameters
-
-- `miku-xlsx2md.inputFile`: `convert` の入力 workbook
-- `miku-xlsx2md.outputFile`: `convert` の出力 Markdown file
-- `miku-xlsx2md.inputDirectory`: `convert-directory` の入力 directory
-- `miku-xlsx2md.outputDirectory`: `convert-directory` の出力 directory
-- `miku-xlsx2md.recursive`: `convert-directory` で再帰的に走査
-- `miku-xlsx2md.outputMode`: `display` / `raw` / `both`
-- `miku-xlsx2md.formattingMode`: `plain` / `github`
-- `miku-xlsx2md.tableDetectionMode`: `balanced` / `border` / `planner-aware`
-- `miku-xlsx2md.encoding`: `utf-8` / `shift_jis` / `utf-16le` / `utf-16be` / `utf-32le` / `utf-32be`
-- `miku-xlsx2md.bom`: `off` / `on`
-- `miku-xlsx2md.skip`: plugin execution を skip
-- `miku-xlsx2md.verbose`: 処理中の workbook path を log 出力
+この repository は Java runtime、CLI、再利用可能な conversion API、runtime
+tests、runtime jar packaging を所有します。Maven plugin repository は Maven
+goals、parameters、plugin tests、examples、smoke scripts を所有します。
 
 ## 開発
 
@@ -488,12 +420,6 @@ test 実行:
 
 ```bash
 mvn test
-```
-
-Maven plugin smoke check:
-
-```bash
-sh scripts/smoke-maven-plugin.sh
 ```
 
 Node / Java Markdown byte-level comparison は、`mvn package` と upstream 側の `npm install` 後に実行できます。
@@ -509,7 +435,7 @@ scripts/compare-node-java-markdown.sh
 ## Documents
 
 - [docs/development-status.md](docs/development-status.md)
-- [docs/miku-straight-conversion-guide.md](docs/miku-straight-conversion-guide.md)
+- [docs/miku-soft-reference.md](docs/miku-soft-reference.md)
 - [docs/upstream-class-mapping.md](docs/upstream-class-mapping.md)
 - [docs/upstream-test-mapping.md](docs/upstream-test-mapping.md)
 - [docs/remaining-items.md](docs/remaining-items.md)

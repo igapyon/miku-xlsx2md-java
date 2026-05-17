@@ -488,8 +488,8 @@ diff summary:
 - 未移植差分:
   - worksheet parser shared / cross-sheet formula fixture coverage expansion beyond the current focused regression subset
   - advanced `sheet-markdown` fixture parity coverage beyond the current subset
-  - broader CLI / Maven plugin fixture coverage for future upstream fixture additions
-  - broader Maven plugin smoke coverage beyond the fixed minimum command
+  - broader CLI fixture coverage for future upstream fixture additions
+  - Maven plugin follow-up moved to the separated `miku-xlsx2md-java-maven` repository
 - Java 側独自拡張:
   - immutable value objects for equality-based tests
 
@@ -581,4 +581,4 @@ follow-up:
 - 次回の確認観点:
   - advanced `sheet-markdown` fixture parity coverage をさらに広げる
   - worksheet parser shared / cross-sheet formula fixture coverage を current focused regression からさらに広げる
-  - CLI / Maven plugin の fixture coverage をさらに広げる
+  - CLI の fixture coverage をさらに広げる
