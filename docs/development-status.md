@@ -14,7 +14,7 @@ This document keeps the development-oriented status notes that were previously i
 ## Current Status
 
 - Upstream source / test / CLI inventory completed from `workplace/miku-xlsx2md`
-- Java runtime scaffolding is in place under the `miku-xlsx2md` module
+- Java runtime scaffolding is in place at the repository root
 - Straight-converted utility modules implemented:
   - `address-utils.ts`
   - `markdown-normalize.ts`
@@ -83,14 +83,14 @@ mvn test
 mvn package
 ```
 
-The shaded CLI jar is produced under `miku-xlsx2md/target/`.
+The shaded CLI jar is produced under `target/`.
 
 ## CLI
 
 Current entrypoint:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-1.0.0.jar --help
+java -jar target/miku-xlsx2md-1.0.0.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -106,7 +106,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-1.0.0.jar \
+java -jar target/miku-xlsx2md-1.0.0.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \
@@ -130,4 +130,4 @@ GitHub Actions release workflow:
 .github/workflows/release.yml
 ```
 
-When a `v*` tag is pushed, or when the workflow is started manually with a tag, the workflow runs `mvn -B package` and attaches the shaded runtime jar from `miku-xlsx2md/target/` to the GitHub Release page.
+When a `v*` tag is pushed, or when the workflow is started manually with a tag, the workflow runs `mvn -B package` and attaches the shaded runtime jar from `target/` to the GitHub Release page.
