@@ -90,7 +90,7 @@ The shaded CLI jar is produced under `miku-xlsx2md/target/`.
 Current entrypoint:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar --help
+java -jar miku-xlsx2md/target/miku-xlsx2md-1.0.0.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -106,7 +106,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar miku-xlsx2md/target/miku-xlsx2md-0.8.0.jar \
+java -jar miku-xlsx2md/target/miku-xlsx2md-1.0.0.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \

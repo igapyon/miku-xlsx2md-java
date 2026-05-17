@@ -60,7 +60,7 @@ Java runtime scaffolding is ready under the `miku-xlsx2md` module, workbook pars
   - CLI GUI-aligned default formatting mode `github` and help text sync
   - CLI directory batch conversion backed by shared runtime helper
   - CLI `--verbose` processing diagnostics
-  - release version updated to `0.8.0`
+  - release version updated to `1.0.0`
   - CLI upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
   - Maven plugin module removed from this runtime repository after separation to `miku-xlsx2md-java-maven`
   - GitHub Actions release workflow that attaches the shaded runtime jar to GitHub Release assets
