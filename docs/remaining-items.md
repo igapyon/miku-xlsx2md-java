@@ -104,10 +104,11 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
 - `mvn -Dtest=RichTextRendererTest test`
 - `mvn -Dtest=SheetMarkdownTest test`
 - `mvn -Dtest=MikuXlsx2mdCliTest test`
+- `mvn -Dtest=DirectoryConverterTest test`
 
 ## Last Known Result
 
-- `mvn test` passed on `2026-04-23`
+- `mvn test` passed on `2026-06-28`
 
 ## Next Unit
 
