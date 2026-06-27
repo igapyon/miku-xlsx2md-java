@@ -33,6 +33,8 @@ class MikuXlsx2mdCliTest {
 
     assertEquals(0, exitCode);
     assertTrue(asString(stdout).contains("Usage:"));
+    assertTrue(asString(stdout).contains("Purpose:"));
+    assertTrue(asString(stdout).contains("AI-friendly, human-reviewable Markdown"));
     assertTrue(asString(stdout).contains("--shape-details"));
     assertTrue(asString(stdout).contains("--include-shape-details"));
     assertTrue(asString(stdout).contains("--encoding"));
@@ -41,12 +43,30 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--output-directory"));
     assertTrue(asString(stdout).contains("--recursive"));
     assertTrue(asString(stdout).contains("--verbose"));
+    assertTrue(asString(stdout).contains("--version"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
     assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
     assertTrue(asString(stdout).contains("formatting-mode=github"));
     assertTrue(asString(stdout).contains("shape-details=exclude"));
+    assertTrue(asString(stdout).contains("Output contract for agents:"));
+    assertTrue(asString(stdout).contains("Combined Markdown always starts with YAML front matter"));
+    assertTrue(asString(stdout).contains("Front matter fields:"));
+    assertTrue(asString(stdout).contains("Stable topic values:"));
+    assertTrue(asString(stdout).contains("Java-side directory extension:"));
     assertTrue(asString(stdout).contains("Exit codes:"));
+    assertEquals("", asString(stderr));
+  }
+
+  @Test
+  void printsVersionAndExitsSuccessfully() {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+    final int exitCode = MikuXlsx2mdCli.run(new String[] {"--version"}, asPrintStream(stdout), asPrintStream(stderr));
+
+    assertEquals(0, exitCode);
+    assertEquals("1.2.0\n", asString(stdout));
     assertEquals("", asString(stderr));
   }
 
@@ -92,8 +112,16 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("Output file: sample_001_Sheet1.md"));
     assertEquals("", asString(stderr));
     assertTrue(Files.isRegularFile(outputPath));
-    assertTrue(new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8).contains("# Book: sample.xlsx"));
-    assertTrue(new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8).contains("Hello [raw=0]"));
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertTrue(markdown.startsWith("---\ntitle: \"sample.xlsx\""));
+    assertTrue(markdown.contains("    path: \"" + inputPath.toString().replace("\\", "\\\\") + "\""));
+    assertTrue(markdown.contains("  version: \"1.2.0\""));
+    assertTrue(markdown.contains("  output_mode: both"));
+    assertTrue(markdown.contains("  formatting_mode: github"));
+    assertTrue(markdown.contains("  table_detection_mode: border"));
+    assertTrue(markdown.contains("  shape_details: include"));
+    assertTrue(markdown.contains("# Book: sample.xlsx"));
+    assertTrue(markdown.contains("Hello [raw=0]"));
   }
 
   @Test

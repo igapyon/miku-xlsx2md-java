@@ -407,6 +407,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsAssetEntriesWithoutMarkdownAndSkipsIncompleteShapeSvgAssets`
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsEncodedPayloadBytesForUtf16BeWithBom`
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.writesTheBookHeadingOnlyOnceInCombinedMarkdown`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.prependsWorkbookLevelFrontMatterToCombinedMarkdown`
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExportTest.createsMarkdownExportEntryWhenMarkdownExists`
 
 fixtures:

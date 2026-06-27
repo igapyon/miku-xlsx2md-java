@@ -194,6 +194,7 @@ java classes:
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.ExportShape`
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.CombinedMarkdownExportFile`
 - `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.CombinedMarkdownExportPayload`
+- `jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport.MarkdownExportOptions`
 
 notes:
 - facade: static markdown export helper methods

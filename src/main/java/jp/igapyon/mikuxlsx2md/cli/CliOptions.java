@@ -28,6 +28,7 @@ final class CliOptions {
   private boolean summary;
   private boolean verbose;
   private boolean help;
+  private boolean version;
   private String outputMode = "display";
   private String formattingMode = "github";
   private String tableDetectionMode = "balanced";
@@ -53,6 +54,10 @@ final class CliOptions {
 
       if ("--help".equals(arg)) {
         options.help = true;
+        continue;
+      }
+      if ("--version".equals(arg)) {
+        options.version = true;
         continue;
       }
       if ("--include-shape-details".equals(arg)) {
@@ -185,6 +190,10 @@ final class CliOptions {
 
   boolean isHelp() {
     return help;
+  }
+
+  boolean isVersion() {
+    return version;
   }
 
   boolean isSummary() {
