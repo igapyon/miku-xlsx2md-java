@@ -3,3 +3,5 @@ workplace/*
 
 target/
 .DS_Store
+.vscode/mcp.json
+.codex/skills/
