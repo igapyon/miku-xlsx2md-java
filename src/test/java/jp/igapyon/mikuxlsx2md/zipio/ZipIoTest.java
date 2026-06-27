@@ -110,7 +110,7 @@ class ZipIoTest {
     final String fileName = "output/test.txt";
     final byte[] original = "fallback".getBytes(StandardCharsets.UTF_8);
     final byte[] compressed = deflateRaw(original);
-    final long crc = 0xa87e4381L;
+    final long crc = crc32(original);
     final byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
 
     final byte[] localHeader = new byte[30 + fileNameBytes.length];
@@ -176,6 +176,12 @@ class ZipIoTest {
     }
     deflater.end();
     return output.toByteArray();
+  }
+
+  private static long crc32(final byte[] input) {
+    final java.util.zip.CRC32 crc32 = new java.util.zip.CRC32();
+    crc32.update(input);
+    return crc32.getValue();
   }
 
   private static int readUint16Le(final byte[] bytes, final int offset) {

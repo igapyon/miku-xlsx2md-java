@@ -16,7 +16,7 @@ Document version: `2026-04-23`
   - upstream `workplace/miku-xlsx2md` は `c67ac65` / `v1.2.0` へ fast-forward 済み
   - combined Markdown / ZIP 内 Markdown の YAML front matter は Java 側へ反映済み
   - CLI `--version` は Java 側へ反映済み
-  - Node 側の `miku-ms-office-core` ZIP 読み込み切り替えは、Java 側では既存 `ZipIo` 実装維持で対応
+  - Node 側の `miku-ms-office-core` ZIP 読み込み切り替えに対応し、Java 側も `ZipIo` wrapper から vendored `miku-ms-office-core-java` release jar へ読み込みを委譲
 - Node / Java Markdown byte-level parity を段階的に導入する
   - `scripts/compare-node-java-markdown.sh` で Markdown 出力比較を開始
   - 初期対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`
@@ -49,7 +49,7 @@ Document version: `2026-04-23`
   - table-basic-sample01-03 / table-basic-sample11-16 / grid-layout fixture coverage は追加済み
   - この時点の local upstream fixture inventory では CLI の未横展開 fixture 候補は未確認
 - Release Page の添付 asset 改善
-  - GitHub Actions で `mvn -B package` により runtime jar を生成し、Release asset に添付する workflow は追加済み
+  - GitHub Actions で tag / `pom.xml` version 整合確認、`mvn -B verify`、Java 8 runtime smoke、runtime jar / sources jar 添付を行う workflow へ更新済み
 
 ## Restart Memo
 
@@ -64,7 +64,7 @@ Document version: `2026-04-23`
 - CLI 側の `rich-text-github-sample01` / `merge-pattern-sample01` は追加済み
 - CLI 側の `table-basic-sample01-03` / `table-basic-sample11-16` / `grid-layout-sample-01` は追加済み
 - CLI 側の `hyperlink-basic-sample01` は追加済み
-- Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により `mvn -B package` を実行し、runtime jar を GitHub Release asset へ添付する
+- Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により tag / `pom.xml` version 整合確認、`mvn -B verify`、Java 8 runtime smoke を実行し、runtime jar / sources jar を GitHub Release asset へ添付する
 - Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
 - Node v1.2.0 追随として front matter / CLI `--version` は反映済み
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
@@ -77,6 +77,7 @@ Document version: `2026-04-23`
 - `miku-xlsx2md` runtime module を作成した
 - `miku-xlsx2md-maven-plugin` module を追加した
 - `.mvn/jvm.config` を追加した
+- `miku-ms-office-core-java` release jar を vendoring し、`.xlsx` package ZIP 読み込みを `ZipIo` wrapper から委譲した
 - `markdown-options.ts` を Java へ移植した
 - `text-encoding.ts` を Java へ移植した
 - `xml-utils.ts` を Java へ移植した
@@ -164,7 +165,7 @@ Document version: `2026-04-23`
 - Maven plugin smoke に full-coordinate `convert-directory` coverage を追加した
 - Maven plugin module を分離済み `miku-xlsx2md-java-maven` repository へ移したため、この runtime repository から削除した
 - `miku-xlsx2md` module 階層を repository root へ flatten した
-- GitHub Actions release workflow で runtime jar を Release Page の添付 asset に追加するようにした
+- GitHub Actions release workflow で runtime jar / sources jar を Release Page の添付 asset に追加し、tag / `pom.xml` version 整合確認と Java 8 runtime smoke を追加した
 - `WorksheetParser` の hyperlink range / hash location coverage を追加した
 - upstream fixture を使う workbook parse focused regression を追加した
 - plugin skeleton を追加した
