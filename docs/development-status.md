@@ -8,13 +8,18 @@ This document keeps the development-oriented status notes that were previously i
 - Build tool: `Maven`
 - Test framework: `JUnit Jupiter`
 - Primary test entrypoint: `mvn test`
-- Packaging: single fat jar
+- Packaging: single fat jar plus attached sources jar
 - Local upstream workspace: `workplace/`
+- Low-level Office package dependency: vendored `miku-ms-office-core-java`
+  release jar under `vendor/miku-ms-office-core-java/`
 
 ## Current Status
 
 - Upstream source / test / CLI inventory completed from `workplace/miku-xlsx2md`
 - Java runtime scaffolding is in place at the repository root
+- Low-level ZIP package reading delegates through `miku-ms-office-core-java`
+  while Markdown/assets ZIP output still uses the local deterministic stored
+  ZIP writer.
 - Straight-converted utility modules implemented:
   - `address-utils.ts`
   - `markdown-normalize.ts`
@@ -84,7 +89,7 @@ mvn test
 mvn package
 ```
 
-The shaded CLI jar is produced under `target/`.
+The shaded CLI jar and sources jar are produced under `target/`.
 
 ## CLI
 
@@ -131,4 +136,4 @@ GitHub Actions release workflow:
 .github/workflows/release.yml
 ```
 
-When a `v*` tag is pushed, or when the workflow is started manually with a tag, the workflow runs `mvn -B package` and attaches the shaded runtime jar from `target/` to the GitHub Release page.
+When a `v*` tag is pushed, or when the workflow is started manually with `tag_name`, the workflow checks the tag against `pom.xml`, runs `mvn -B verify`, smoke-tests the runtime jar with Java 8, and attaches the shaded runtime jar plus sources jar from `target/` to the GitHub Release page.

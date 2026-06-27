@@ -13,6 +13,12 @@ import java.util.zip.CRC32;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+import jp.igapyon.mikumsofficecore.DiagnosticSeverity;
+import jp.igapyon.mikumsofficecore.OfficeDiagnostic;
+import jp.igapyon.mikumsofficecore.ZipEntry;
+import jp.igapyon.mikumsofficecore.ZipPackage;
+import jp.igapyon.mikumsofficecore.ZipReadResult;
+
 public final class ZipIo {
   private static final int UTF8_FILE_NAME_FLAG = 0x0800;
   public static final ZipEntryTimestamp FIXED_ZIP_ENTRY_TIMESTAMP = toDosDateTime(2025, 1, 1, 0, 0, 0);
@@ -25,6 +31,47 @@ public final class ZipIo {
   }
 
   public static Map<String, byte[]> unzipEntries(final byte[] zipBytes) {
+    final byte[] source = zipBytes == null ? new byte[0] : zipBytes;
+    if (!hasEndOfCentralDirectory(source)) {
+      throw new IllegalArgumentException("ZIP end-of-central-directory record was not found.");
+    }
+    final ZipReadResult result = ZipPackage.readZipPackage(source);
+    final StringBuilder errors = new StringBuilder();
+    for (final OfficeDiagnostic diagnostic : result.getDiagnostics()) {
+      if (diagnostic.getSeverity() == DiagnosticSeverity.ERROR) {
+        if (errors.length() > 0) {
+          errors.append('\n');
+        }
+        if ("zip.eocd.missing".equals(diagnostic.getCode())) {
+          errors.append("ZIP end-of-central-directory record was not found.");
+        } else if (diagnostic.getPath() == null || diagnostic.getPath().isEmpty()) {
+          errors.append(diagnostic.getMessage());
+        } else {
+          errors.append(diagnostic.getPath()).append(": ").append(diagnostic.getMessage());
+        }
+      }
+    }
+    if (errors.length() > 0) {
+      throw new IllegalArgumentException(errors.toString());
+    }
+
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    for (final ZipEntry entry : result.getEntries()) {
+      files.put(entry.getPath(), entry.getData());
+    }
+    return files;
+  }
+
+  private static boolean hasEndOfCentralDirectory(final byte[] source) {
+    for (int offset = source.length - 22; offset >= Math.max(0, source.length - 0x10000 - 22); offset -= 1) {
+      if (readUint32Le(source, offset) == 0x06054b50L) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Map<String, byte[]> unzipEntriesFallback(final byte[] zipBytes) {
     final byte[] source = zipBytes == null ? new byte[0] : zipBytes;
     int eocdOffset = -1;
     for (int offset = source.length - 22; offset >= Math.max(0, source.length - 0x10000 - 22); offset -= 1) {
