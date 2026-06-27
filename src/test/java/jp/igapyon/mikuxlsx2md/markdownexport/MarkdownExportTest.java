@@ -165,7 +165,7 @@ class MarkdownExportTest {
         new TextEncoding.MarkdownEncodingOptions("utf-16be", "on"));
 
     assertEquals("text/markdown;charset=utf-16be", payload.getMimeType());
-    assertArrayEquals(new byte[] {(byte) 0xfe, (byte) 0xff, 0x00, 0x23},
+    assertArrayEquals(new byte[] {(byte) 0xfe, (byte) 0xff, 0x00, 0x2d},
         Arrays.copyOfRange(payload.getData(), 0, 4));
   }
 
@@ -192,10 +192,40 @@ class MarkdownExportTest {
                     Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))));
 
     assertEquals("sales.md", payload.getFileName());
-    assertTrue(payload.getContent().startsWith("# Book: sales.xlsx"));
+    assertTrue(payload.getContent().startsWith("---\ntitle: \"sales.xlsx\""));
     assertEquals(1, payload.getContent().split("# Book: sales\\.xlsx", -1).length - 1);
     assertTrue(payload.getContent().contains("## Sheet: Summary"));
     assertTrue(payload.getContent().contains("## Sheet: Detail"));
+  }
+
+  @Test
+  void prependsWorkbookLevelFrontMatterToCombinedMarkdown() {
+    final MarkdownExport.CombinedMarkdownExportFile payload = MarkdownExport.createCombinedMarkdownExportFile(
+        new MarkdownExport.ExportWorkbook("sales.xlsx", Arrays.asList(
+            new MarkdownExport.ExportSheet(Collections.<MarkdownExport.ExportImage>emptyList(), Collections.<MarkdownExport.ExportShape>emptyList()))),
+        Arrays.asList(new MarkdownExport.MarkdownFile(
+            "sales_001_Summary.md",
+            "Summary",
+            "# Book: sales.xlsx\n\n## Sheet: Summary\n\nSummary body",
+            new MarkdownExport.MarkdownSummary("both", "github", "border", 1, 0, 1, 0, 0, 0, 1,
+                Collections.<MarkdownExport.TableScoreDetail>emptyList(),
+                Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
+        new MarkdownExport.MarkdownExportOptions(null, null, "./fixtures/sales.xlsx", "1.2.3", "include", "2026-01-02"));
+
+    assertTrue(payload.getContent().startsWith("---\ntitle: \"sales.xlsx\""));
+    assertTrue(payload.getContent().contains("type: converted"));
+    assertTrue(payload.getContent().contains("category: converted"));
+    assertTrue(payload.getContent().contains("  - workbook-conversion"));
+    assertTrue(payload.getContent().contains("status: generated"));
+    assertTrue(payload.getContent().contains("created: \"2026-01-02\""));
+    assertTrue(payload.getContent().contains("updated: \"2026-01-02\""));
+    assertTrue(payload.getContent().contains("    path: \"./fixtures/sales.xlsx\""));
+    assertTrue(payload.getContent().contains("  version: \"1.2.3\""));
+    assertTrue(payload.getContent().contains("  output_mode: both"));
+    assertTrue(payload.getContent().contains("  formatting_mode: github"));
+    assertTrue(payload.getContent().contains("  table_detection_mode: border"));
+    assertTrue(payload.getContent().contains("  shape_details: include"));
+    assertTrue(payload.getContent().contains("---\n\n# Book: sales.xlsx"));
   }
 
   @Test

@@ -15,10 +15,11 @@ import jp.igapyon.mikuxlsx2md.core.Core;
 import jp.igapyon.mikuxlsx2md.directoryconverter.DirectoryConverter;
 import jp.igapyon.mikuxlsx2md.markdownexport.MarkdownExport;
 import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
-import jp.igapyon.mikuxlsx2md.textencoding.TextEncoding;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 
 public final class MikuXlsx2mdCli {
+  private static final String FALLBACK_VERSION = "1.2.0";
+
   private MikuXlsx2mdCli() {
   }
 
@@ -30,6 +31,10 @@ public final class MikuXlsx2mdCli {
   public static int run(final String[] args, final PrintStream out, final PrintStream err) {
     try {
       final CliOptions options = CliOptions.parse(args);
+      if (options.isVersion()) {
+        out.println(resolveToolVersion());
+        return 0;
+      }
       if (options.isHelp() || (options.getInputPath() == null && options.getInputDirectory() == null)) {
         printHelp(out);
         return options.isHelp() ? 0 : 1;
@@ -81,11 +86,12 @@ public final class MikuXlsx2mdCli {
       printWorkbookSummary(out, workbookName, files);
     }
 
-    final TextEncoding.MarkdownEncodingOptions encodingOptions =
-        new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom());
+    final MarkdownExport.MarkdownExportOptions exportOptions = createMarkdownExportOptions(
+        options,
+        options.getInputPath());
     if (options.getZipPath() != null) {
       try {
-        final byte[] archive = MarkdownExport.createWorkbookExportArchive(Core.toExportWorkbook(workbook), files, encodingOptions);
+        final byte[] archive = MarkdownExport.createWorkbookExportArchive(Core.toExportWorkbook(workbook), files, exportOptions);
         writeBinaryFile(Paths.get(options.getZipPath()).toAbsolutePath(), archive);
       } catch (final RuntimeException ex) {
         throw new IOException(formatWorkbookError(workbookName, "zip write failed", ex));
@@ -94,7 +100,7 @@ public final class MikuXlsx2mdCli {
 
     if (options.getZipPath() == null || options.getOutPath() != null) {
       final MarkdownExport.CombinedMarkdownExportPayload combined =
-          MarkdownExport.createCombinedMarkdownExportPayload(Core.toExportWorkbook(workbook), files, encodingOptions);
+          MarkdownExport.createCombinedMarkdownExportPayload(Core.toExportWorkbook(workbook), files, exportOptions);
       final Path outputPath = options.getOutPath() == null
           ? Paths.get(combined.getFileName()).toAbsolutePath()
           : Paths.get(options.getOutPath()).toAbsolutePath();
@@ -114,7 +120,7 @@ public final class MikuXlsx2mdCli {
           options.getOutputDirectory() == null ? null : Paths.get(options.getOutputDirectory()),
           options.isRecursive(),
           createMarkdownOptions(options),
-          new TextEncoding.MarkdownEncodingOptions(options.getEncoding(), options.getBom()),
+          createMarkdownExportOptions(options, null),
           options.isVerbose() ? new DirectoryConverter.ProgressListener() {
             @Override
             public void processing(final Path workbookPath) {
@@ -141,6 +147,26 @@ public final class MikuXlsx2mdCli {
         options.getOutputMode(),
         options.getFormattingMode(),
         options.getTableDetectionMode());
+  }
+
+  private static MarkdownExport.MarkdownExportOptions createMarkdownExportOptions(
+      final CliOptions options,
+      final String sourcePath) {
+    return new MarkdownExport.MarkdownExportOptions(
+        options.getEncoding(),
+        options.getBom(),
+        sourcePath,
+        resolveToolVersion(),
+        options.isIncludeShapeDetails() ? "include" : "exclude",
+        null);
+  }
+
+  private static String resolveToolVersion() {
+    final Package packageInfo = MikuXlsx2mdCli.class.getPackage();
+    if (packageInfo != null && packageInfo.getImplementationVersion() != null) {
+      return packageInfo.getImplementationVersion();
+    }
+    return FALLBACK_VERSION;
   }
 
   private static void printWorkbookSummary(
@@ -172,10 +198,12 @@ public final class MikuXlsx2mdCli {
     out.println("  java -jar miku-xlsx2md-java.jar <input.xlsx> [options]");
     out.println("  java -jar miku-xlsx2md-java.jar --input-directory <dir> [options]");
     out.println();
+    out.println("Purpose:");
+    out.println("  Convert one local Excel .xlsx workbook into AI-friendly, human-reviewable Markdown.");
+    out.println("  The conversion extracts workbook structure and semantic content; it does not try to");
+    out.println("  reproduce the exact Excel visual layout.");
+    out.println();
     out.println("Options:");
-    out.println("  --input-directory <dir>       Convert .xlsx files under this directory");
-    out.println("  --output-directory <dir>      Write directory conversion output under this directory");
-    out.println("  --recursive                   Scan input directory recursively");
     out.println("  --out <file>                  Write combined Markdown to this file");
     out.println("  --zip <file>                  Write ZIP export to this file");
     out.println("  --encoding <value>            utf-8 | shift_jis | utf-16le | utf-16be | utf-32le | utf-32be (default: utf-8)");
@@ -190,11 +218,35 @@ public final class MikuXlsx2mdCli {
     out.println("  --keep-empty-rows             Keep empty rows");
     out.println("  --keep-empty-columns          Keep empty columns");
     out.println("  --summary                     Print per-sheet summary to stdout");
-    out.println("  --verbose                     Print processing file paths to stderr");
+    out.println("  --version                     Show version and exit");
     out.println("  --help                        Show help and exit");
+    out.println();
+    out.println("Java-side directory extension:");
+    out.println("  --input-directory <dir>       Convert .xlsx files under this directory");
+    out.println("  --output-directory <dir>      Write directory conversion output under this directory");
+    out.println("  --recursive                   Scan input directory recursively");
+    out.println("  --verbose                     Print processing file paths to stderr");
     out.println();
     out.println("GUI-aligned defaults:");
     out.println("  output-mode=display, formatting-mode=github, table-detection-mode=balanced, shape-details=exclude");
+    out.println();
+    out.println("Output contract for agents:");
+    out.println("  - The primary Markdown output is one workbook-level combined Markdown document.");
+    out.println("  - ZIP output contains output/<workbook>.md plus extracted assets under output/assets/.");
+    out.println("  - Combined Markdown always starts with YAML front matter, then \"# Book: <workbook>\",");
+    out.println("    followed by \"## Sheet: <sheet>\" sections in workbook sheet order.");
+    out.println("  - sources[0].path in front matter is the input path passed to this CLI.");
+    out.println("  - created and updated are generation dates. Use the core export API generatedDate");
+    out.println("    option, not a CLI flag, when deterministic fixture output is required.");
+    out.println("  - Use --summary for machine-readable-ish progress logs; use the Markdown front");
+    out.println("    matter and body as the durable conversion artifact.");
+    out.println();
+    out.println("Front matter fields:");
+    out.println("  title, description, type, category, topics, status, audience, created, updated,");
+    out.println("  sources, conversion");
+    out.println();
+    out.println("Stable topic values:");
+    out.println("  converted, xlsx, markdown, miku-xlsx2md, workbook-conversion");
     out.println();
     out.println("Exit codes:");
     out.println("  0                             Success");

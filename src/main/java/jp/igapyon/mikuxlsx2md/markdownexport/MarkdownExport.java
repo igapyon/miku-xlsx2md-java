@@ -4,6 +4,7 @@
  */
 package jp.igapyon.mikuxlsx2md.markdownexport;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -99,6 +100,25 @@ public final class MarkdownExport {
     return "output/" + String.valueOf(relativePath == null ? "" : relativePath);
   }
 
+  public static String createLocalDateString() {
+    return LocalDate.now().toString();
+  }
+
+  public static String quoteYamlString(final String value) {
+    return "\"" + String.valueOf(value == null ? "" : value)
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\r", "\\r")
+        .replace("\n", "\\n") + "\"";
+  }
+
+  public static String normalizeGeneratedDate(final String value) {
+    if (value != null && value.matches("\\d{4}-\\d{2}-\\d{2}")) {
+      return value;
+    }
+    return createLocalDateString();
+  }
+
   public static String createOutputFileName(
       final String workbookName,
       final int sheetIndex,
@@ -159,9 +179,18 @@ public final class MarkdownExport {
   public static CombinedMarkdownExportFile createCombinedMarkdownExportFile(
       final ExportWorkbook workbook,
       final List<MarkdownFile> markdownFiles) {
+    return createCombinedMarkdownExportFile(workbook, markdownFiles, new MarkdownExportOptions());
+  }
+
+  public static CombinedMarkdownExportFile createCombinedMarkdownExportFile(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
+    final MarkdownExportOptions resolvedOptions = options == null ? new MarkdownExportOptions() : options;
     final String fileName = createCombinedMarkdownFileName(workbook.getName());
     final String bookHeading = "# Book: " + String.valueOf(workbook.getName() == null ? "workbook.xlsx" : workbook.getName());
     final List<String> parts = new ArrayList<String>();
+    parts.add(createFrontMatter(workbook, markdownFiles, resolvedOptions));
     parts.add(bookHeading);
     for (final MarkdownFile markdownFile : markdownFiles) {
       final String stripped = stripBookHeading(markdownFile.getMarkdown(), bookHeading);
@@ -180,18 +209,37 @@ public final class MarkdownExport {
       final ExportWorkbook workbook,
       final List<MarkdownFile> markdownFiles,
       final TextEncoding.MarkdownEncodingOptions options) {
-    final CombinedMarkdownExportFile combined = createCombinedMarkdownExportFile(workbook, markdownFiles);
+    final CombinedMarkdownExportPayload payload = createCombinedMarkdownExportPayload(
+        workbook,
+        markdownFiles,
+        MarkdownExportOptions.fromEncodingOptions(options));
+    return payload;
+  }
+
+  public static CombinedMarkdownExportPayload createCombinedMarkdownExportPayload(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
+    final MarkdownExportOptions resolvedOptions = options == null ? new MarkdownExportOptions() : options;
+    final CombinedMarkdownExportFile combined = createCombinedMarkdownExportFile(workbook, markdownFiles, resolvedOptions);
     return new CombinedMarkdownExportPayload(
         combined.getFileName(),
         combined.getContent(),
-        encodeMarkdownText(combined.getContent() + "\n", options),
-        TextEncoding.createTextMimeType(options));
+        encodeMarkdownText(combined.getContent() + "\n", resolvedOptions.toEncodingOptions()),
+        TextEncoding.createTextMimeType(resolvedOptions.toEncodingOptions()));
   }
 
   public static ZipIo.ExportEntry createMarkdownExportEntry(
       final ExportWorkbook workbook,
       final List<MarkdownFile> markdownFiles,
       final TextEncoding.MarkdownEncodingOptions options) {
+    return createMarkdownExportEntry(workbook, markdownFiles, MarkdownExportOptions.fromEncodingOptions(options));
+  }
+
+  public static ZipIo.ExportEntry createMarkdownExportEntry(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
     if (markdownFiles == null || markdownFiles.isEmpty()) {
       return null;
     }
@@ -219,6 +267,13 @@ public final class MarkdownExport {
       final ExportWorkbook workbook,
       final List<MarkdownFile> markdownFiles,
       final TextEncoding.MarkdownEncodingOptions options) {
+    return createExportEntries(workbook, markdownFiles, MarkdownExportOptions.fromEncodingOptions(options));
+  }
+
+  public static List<ZipIo.ExportEntry> createExportEntries(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
     final List<ZipIo.ExportEntry> entries = new ArrayList<ZipIo.ExportEntry>(createAssetExportEntries(workbook));
     final ZipIo.ExportEntry markdownEntry = createMarkdownExportEntry(workbook, markdownFiles, options);
     if (markdownEntry != null) {
@@ -231,8 +286,59 @@ public final class MarkdownExport {
       final ExportWorkbook workbook,
       final List<MarkdownFile> markdownFiles,
       final TextEncoding.MarkdownEncodingOptions options) {
+    return createWorkbookExportArchive(workbook, markdownFiles, MarkdownExportOptions.fromEncodingOptions(options));
+  }
+
+  public static byte[] createWorkbookExportArchive(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
     final List<ZipIo.ExportEntry> entries = createExportEntries(workbook, markdownFiles, options);
     return ZipIo.createStoredZip(entries.toArray(new ZipIo.ExportEntry[entries.size()]));
+  }
+
+  public static String createFrontMatter(
+      final ExportWorkbook workbook,
+      final List<MarkdownFile> markdownFiles,
+      final MarkdownExportOptions options) {
+    final MarkdownExportOptions resolvedOptions = options == null ? new MarkdownExportOptions() : options;
+    final MarkdownSummary firstSummary = markdownFiles == null || markdownFiles.isEmpty() ? null : markdownFiles.get(0).getSummary();
+    final String date = normalizeGeneratedDate(resolvedOptions.getGeneratedDate());
+    final String workbookName = String.valueOf(workbook == null || workbook.getName() == null ? "workbook.xlsx" : workbook.getName());
+    final String sourcePath = resolvedOptions.getSourcePath() == null ? workbookName : resolvedOptions.getSourcePath();
+    final String shapeDetails = resolvedOptions.getShapeDetails() == null ? "exclude" : resolvedOptions.getShapeDetails();
+    final List<String> lines = new ArrayList<String>();
+    lines.add("---");
+    lines.add("title: " + quoteYamlString(workbookName));
+    lines.add("description: \"Excel workbook converted to Markdown by miku-xlsx2md.\"");
+    lines.add("type: converted");
+    lines.add("category: converted");
+    lines.add("topics:");
+    lines.add("  - converted");
+    lines.add("  - xlsx");
+    lines.add("  - markdown");
+    lines.add("  - miku-xlsx2md");
+    lines.add("  - workbook-conversion");
+    lines.add("status: generated");
+    lines.add("audience:");
+    lines.add("  - human");
+    lines.add("  - agent");
+    lines.add("  - maintainer");
+    lines.add("created: " + quoteYamlString(date));
+    lines.add("updated: " + quoteYamlString(date));
+    lines.add("sources:");
+    lines.add("  - type: local-file");
+    lines.add("    path: " + quoteYamlString(sourcePath));
+    lines.add("    role: primary");
+    lines.add("conversion:");
+    lines.add("  tool: miku-xlsx2md");
+    lines.add("  version: " + quoteYamlString(String.valueOf(resolvedOptions.getToolVersion() == null ? "unknown" : resolvedOptions.getToolVersion())));
+    lines.add("  output_mode: " + (firstSummary == null ? "display" : firstSummary.getOutputMode()));
+    lines.add("  formatting_mode: " + (firstSummary == null ? "github" : firstSummary.getFormattingMode()));
+    lines.add("  table_detection_mode: " + (firstSummary == null ? "balanced" : firstSummary.getTableDetectionMode()));
+    lines.add("  shape_details: " + shapeDetails);
+    lines.add("---");
+    return joinLines(lines);
   }
 
   private static List<String> createBlankRow(final int columnCount) {
@@ -316,6 +422,69 @@ public final class MarkdownExport {
       }
     }
     return joinLines(lines);
+  }
+
+  public static final class MarkdownExportOptions {
+    private final String encoding;
+    private final String bom;
+    private final String sourcePath;
+    private final String toolVersion;
+    private final String shapeDetails;
+    private final String generatedDate;
+
+    public MarkdownExportOptions() {
+      this(null, null, null, null, null, null);
+    }
+
+    public MarkdownExportOptions(
+        final String encoding,
+        final String bom,
+        final String sourcePath,
+        final String toolVersion,
+        final String shapeDetails,
+        final String generatedDate) {
+      this.encoding = encoding;
+      this.bom = bom;
+      this.sourcePath = sourcePath;
+      this.toolVersion = toolVersion;
+      this.shapeDetails = shapeDetails;
+      this.generatedDate = generatedDate;
+    }
+
+    public static MarkdownExportOptions fromEncodingOptions(final TextEncoding.MarkdownEncodingOptions options) {
+      if (options == null) {
+        return new MarkdownExportOptions();
+      }
+      return new MarkdownExportOptions(options.getEncoding(), options.getBom(), null, null, null, null);
+    }
+
+    public TextEncoding.MarkdownEncodingOptions toEncodingOptions() {
+      return new TextEncoding.MarkdownEncodingOptions(encoding, bom);
+    }
+
+    public String getEncoding() {
+      return encoding;
+    }
+
+    public String getBom() {
+      return bom;
+    }
+
+    public String getSourcePath() {
+      return sourcePath;
+    }
+
+    public String getToolVersion() {
+      return toolVersion;
+    }
+
+    public String getShapeDetails() {
+      return shapeDetails;
+    }
+
+    public String getGeneratedDate() {
+      return generatedDate;
+    }
   }
 
   private static Map<String, Integer> countFormulaStatuses(final List<FormulaDiagnostic> diagnostics) {

@@ -85,7 +85,7 @@ public final class DirectoryConverter {
       payload = MarkdownExport.createCombinedMarkdownExportPayload(
           Core.toExportWorkbook(workbook),
           files,
-          options.getEncodingOptions());
+          options.getExportOptionsFor(workbookPath.toString()));
     } catch (final RuntimeException ex) {
       throw new IOException(formatWorkbookError(workbookName, "encode failed", ex), ex);
     }
@@ -136,7 +136,7 @@ public final class DirectoryConverter {
     private final Path outputDirectory;
     private final boolean recursive;
     private final MarkdownOptions markdownOptions;
-    private final TextEncoding.MarkdownEncodingOptions encodingOptions;
+    private final MarkdownExport.MarkdownExportOptions exportOptions;
     private final ProgressListener progressListener;
 
     public DirectoryConversionOptions(
@@ -155,13 +155,35 @@ public final class DirectoryConverter {
         final MarkdownOptions markdownOptions,
         final TextEncoding.MarkdownEncodingOptions encodingOptions,
         final ProgressListener progressListener) {
+      this(inputDirectory,
+          outputDirectory,
+          recursive,
+          markdownOptions,
+          MarkdownExport.MarkdownExportOptions.fromEncodingOptions(encodingOptions),
+          progressListener);
+    }
+
+    public DirectoryConversionOptions(
+        final Path inputDirectory,
+        final Path outputDirectory,
+        final boolean recursive,
+        final MarkdownOptions markdownOptions,
+        final MarkdownExport.MarkdownExportOptions exportOptions) {
+      this(inputDirectory, outputDirectory, recursive, markdownOptions, exportOptions, null);
+    }
+
+    public DirectoryConversionOptions(
+        final Path inputDirectory,
+        final Path outputDirectory,
+        final boolean recursive,
+        final MarkdownOptions markdownOptions,
+        final MarkdownExport.MarkdownExportOptions exportOptions,
+        final ProgressListener progressListener) {
       this.inputDirectory = inputDirectory;
       this.outputDirectory = outputDirectory;
       this.recursive = recursive;
       this.markdownOptions = markdownOptions == null ? new MarkdownOptions() : markdownOptions;
-      this.encodingOptions = encodingOptions == null
-          ? new TextEncoding.MarkdownEncodingOptions("utf-8", "off")
-          : encodingOptions;
+      this.exportOptions = exportOptions == null ? new MarkdownExport.MarkdownExportOptions() : exportOptions;
       this.progressListener = progressListener == null ? ProgressListener.NO_OP : progressListener;
     }
 
@@ -181,8 +203,18 @@ public final class DirectoryConverter {
       return markdownOptions;
     }
 
-    public TextEncoding.MarkdownEncodingOptions getEncodingOptions() {
-      return encodingOptions;
+    public MarkdownExport.MarkdownExportOptions getExportOptions() {
+      return exportOptions;
+    }
+
+    public MarkdownExport.MarkdownExportOptions getExportOptionsFor(final String sourcePath) {
+      return new MarkdownExport.MarkdownExportOptions(
+          exportOptions.getEncoding(),
+          exportOptions.getBom(),
+          sourcePath,
+          exportOptions.getToolVersion(),
+          exportOptions.getShapeDetails(),
+          exportOptions.getGeneratedDate());
     }
 
     public ProgressListener getProgressListener() {
