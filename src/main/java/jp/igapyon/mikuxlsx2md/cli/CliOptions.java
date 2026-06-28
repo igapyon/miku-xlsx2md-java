@@ -13,6 +13,7 @@ import jp.igapyon.mikuxlsx2md.textencoding.TextEncoding;
 
 final class CliOptions {
   private static final String[] SHAPE_DETAILS_MODES = {"include", "exclude"};
+  private static final String[] FRONT_MATTER_MODES = {"include", "exclude"};
 
   private String inputPath;
   private String inputDirectory;
@@ -25,6 +26,7 @@ final class CliOptions {
   private boolean removeEmptyRows = true;
   private boolean removeEmptyColumns = true;
   private boolean includeShapeDetails;
+  private boolean includeFrontMatter = true;
   private boolean summary;
   private boolean verbose;
   private boolean help;
@@ -126,6 +128,10 @@ final class CliOptions {
         final String value = nextValue(args, arg, index);
         index += 1;
         options.includeShapeDetails = "include".equals(normalizeEnumOption(value, SHAPE_DETAILS_MODES, "shape details mode", null));
+      } else if ("--front-matter".equals(arg)) {
+        final String value = nextValue(args, arg, index);
+        index += 1;
+        options.includeFrontMatter = "include".equals(normalizeEnumOption(value, FRONT_MATTER_MODES, "front matter mode", null));
       } else if ("--encoding".equals(arg)) {
         final String value = nextValue(args, arg, index);
         index += 1;
@@ -238,6 +244,10 @@ final class CliOptions {
 
   boolean isIncludeShapeDetails() {
     return includeShapeDetails;
+  }
+
+  boolean isIncludeFrontMatter() {
+    return includeFrontMatter;
   }
 
   String getOutputMode() {

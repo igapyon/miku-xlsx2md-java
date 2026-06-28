@@ -211,10 +211,9 @@ public final class DirectoryConverter {
       return new MarkdownExport.MarkdownExportOptions(
           exportOptions.getEncoding(),
           exportOptions.getBom(),
-          sourcePath,
           exportOptions.getToolVersion(),
           exportOptions.getShapeDetails(),
-          exportOptions.getGeneratedDate());
+          exportOptions.getFrontMatter());
     }
 
     public ProgressListener getProgressListener() {

@@ -5,6 +5,7 @@
 package jp.igapyon.mikuxlsx2md.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -46,13 +47,16 @@ class MikuXlsx2mdCliTest {
     assertTrue(asString(stdout).contains("--version"));
     assertTrue(asString(stdout).contains("--formatting-mode"));
     assertTrue(asString(stdout).contains("--table-detection-mode"));
+    assertTrue(asString(stdout).contains("--front-matter"));
     assertTrue(asString(stdout).contains("GUI-aligned defaults:"));
     assertTrue(asString(stdout).contains("formatting-mode=github"));
     assertTrue(asString(stdout).contains("shape-details=exclude"));
+    assertTrue(asString(stdout).contains("front-matter=include"));
     assertTrue(asString(stdout).contains("Output contract for agents:"));
-    assertTrue(asString(stdout).contains("Combined Markdown always starts with YAML front matter"));
+    assertTrue(asString(stdout).contains("Combined Markdown starts with YAML front matter"));
     assertTrue(asString(stdout).contains("Front matter fields:"));
-    assertTrue(asString(stdout).contains("Stable topic values:"));
+    assertTrue(asString(stdout).contains("title, type, conversion"));
+    assertTrue(asString(stdout).contains("Conversion fields:"));
     assertTrue(asString(stdout).contains("Java-side directory extension:"));
     assertTrue(asString(stdout).contains("Exit codes:"));
     assertEquals("", asString(stderr));
@@ -66,7 +70,7 @@ class MikuXlsx2mdCliTest {
     final int exitCode = MikuXlsx2mdCli.run(new String[] {"--version"}, asPrintStream(stdout), asPrintStream(stderr));
 
     assertEquals(0, exitCode);
-    assertEquals("1.2.0\n", asString(stdout));
+    assertEquals("1.2.3\n", asString(stdout));
     assertEquals("", asString(stderr));
   }
 
@@ -114,14 +118,40 @@ class MikuXlsx2mdCliTest {
     assertTrue(Files.isRegularFile(outputPath));
     final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
     assertTrue(markdown.startsWith("---\ntitle: \"sample.xlsx\""));
-    assertTrue(markdown.contains("    path: \"" + inputPath.toString().replace("\\", "\\\\") + "\""));
-    assertTrue(markdown.contains("  version: \"1.2.0\""));
+    assertTrue(markdown.contains("  version: \"1.2.3\""));
     assertTrue(markdown.contains("  output_mode: both"));
     assertTrue(markdown.contains("  formatting_mode: github"));
     assertTrue(markdown.contains("  table_detection_mode: border"));
     assertTrue(markdown.contains("  shape_details: include"));
+    assertFalse(markdown.contains("sources:"));
+    assertFalse(markdown.contains("created:"));
     assertTrue(markdown.contains("# Book: sample.xlsx"));
     assertTrue(markdown.contains("Hello [raw=0]"));
+  }
+
+  @Test
+  void omitsFrontMatterWhenRequested() throws java.io.IOException {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    final Path inputPath = tempDir.resolve("sample.xlsx");
+    final Path outputPath = tempDir.resolve("out").resolve("front-matter-exclude.md");
+    Files.write(inputPath, createWorkbookBytes());
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {
+            inputPath.toString(),
+            "--out", outputPath.toString(),
+            "--front-matter", "exclude"
+        },
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
+    assertEquals(0, exitCode);
+    assertEquals("", asString(stdout));
+    assertEquals("", asString(stderr));
+    assertFalse(markdown.startsWith("---\n"));
+    assertTrue(markdown.startsWith("# Book: sample.xlsx"));
   }
 
   @Test
@@ -256,6 +286,20 @@ class MikuXlsx2mdCliTest {
 
     assertEquals(1, exitCode);
     assertTrue(asString(stderr).contains("BOM cannot be enabled for shift_jis."));
+  }
+
+  @Test
+  void rejectsInvalidFrontMatterMode() {
+    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+
+    final int exitCode = MikuXlsx2mdCli.run(
+        new String[] {"sample.xlsx", "--front-matter", "invalid"},
+        asPrintStream(stdout),
+        asPrintStream(stderr));
+
+    assertEquals(1, exitCode);
+    assertTrue(asString(stderr).contains("Invalid front matter mode: invalid"));
   }
 
   @Test

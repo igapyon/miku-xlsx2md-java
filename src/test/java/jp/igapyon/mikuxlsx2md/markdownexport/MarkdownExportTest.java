@@ -207,25 +207,51 @@ class MarkdownExportTest {
             "sales_001_Summary.md",
             "Summary",
             "# Book: sales.xlsx\n\n## Sheet: Summary\n\nSummary body",
-            new MarkdownExport.MarkdownSummary("both", "github", "border", 1, 0, 1, 0, 0, 0, 1,
-                Collections.<MarkdownExport.TableScoreDetail>emptyList(),
-                Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
-        new MarkdownExport.MarkdownExportOptions(null, null, "./fixtures/sales.xlsx", "1.2.3", "include", "2026-01-02"));
+        new MarkdownExport.MarkdownSummary("both", "github", "border", 1, 0, 1, 0, 0, 0, 1,
+            Collections.<MarkdownExport.TableScoreDetail>emptyList(),
+            Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
+        new MarkdownExport.MarkdownExportOptions(null, null, "1.2.3", "include", null));
 
-    assertTrue(payload.getContent().startsWith("---\ntitle: \"sales.xlsx\""));
+    assertTrue(payload.getContent().startsWith(
+        "---\n"
+            + "title: \"sales.xlsx\"\n"
+            + "type: converted\n"
+            + "conversion:\n"
+            + "  tool: miku-xlsx2md\n"
+            + "  version: \"1.2.3\"\n"
+            + "  output_mode: both\n"
+            + "  formatting_mode: github\n"
+            + "  table_detection_mode: border\n"
+            + "  shape_details: include\n"
+            + "---\n\n# Book: sales.xlsx"));
     assertTrue(payload.getContent().contains("type: converted"));
-    assertTrue(payload.getContent().contains("category: converted"));
-    assertTrue(payload.getContent().contains("  - workbook-conversion"));
-    assertTrue(payload.getContent().contains("status: generated"));
-    assertTrue(payload.getContent().contains("created: \"2026-01-02\""));
-    assertTrue(payload.getContent().contains("updated: \"2026-01-02\""));
-    assertTrue(payload.getContent().contains("    path: \"./fixtures/sales.xlsx\""));
     assertTrue(payload.getContent().contains("  version: \"1.2.3\""));
     assertTrue(payload.getContent().contains("  output_mode: both"));
     assertTrue(payload.getContent().contains("  formatting_mode: github"));
     assertTrue(payload.getContent().contains("  table_detection_mode: border"));
     assertTrue(payload.getContent().contains("  shape_details: include"));
-    assertTrue(payload.getContent().contains("---\n\n# Book: sales.xlsx"));
+    assertFalse(payload.getContent().contains("category: converted"));
+    assertFalse(payload.getContent().contains("sources:"));
+    assertFalse(payload.getContent().contains("created:"));
+    assertFalse(payload.getContent().contains("updated:"));
+  }
+
+  @Test
+  void omitsWorkbookLevelFrontMatterWhenRequested() {
+    final MarkdownExport.CombinedMarkdownExportFile payload = MarkdownExport.createCombinedMarkdownExportFile(
+        new MarkdownExport.ExportWorkbook("sales.xlsx", Arrays.asList(
+            new MarkdownExport.ExportSheet(Collections.<MarkdownExport.ExportImage>emptyList(), Collections.<MarkdownExport.ExportShape>emptyList()))),
+        Arrays.asList(new MarkdownExport.MarkdownFile(
+            "sales_001_Summary.md",
+            "Summary",
+            "# Book: sales.xlsx\n\n## Sheet: Summary\n\nSummary body",
+            new MarkdownExport.MarkdownSummary("display", "github", "balanced", 1, 0, 1, 0, 0, 0, 1,
+                Collections.<MarkdownExport.TableScoreDetail>emptyList(),
+                Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
+        new MarkdownExport.MarkdownExportOptions(null, null, "1.2.3", "exclude", "exclude"));
+
+    assertFalse(payload.getContent().startsWith("---\n"));
+    assertEquals("# Book: sales.xlsx\n\n## Sheet: Summary\n\nSummary body", payload.getContent());
   }
 
   @Test

@@ -4,7 +4,7 @@ Document version: `2026-04-23`
 
 ## Current Position
 
-Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.2.0 front matter output and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
+Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.2.3 simplified front matter output, `--front-matter include|exclude`, and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
 
 ## Status
 
@@ -59,10 +59,11 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - CLI option vocabulary and initial conversion
   - CLI GUI-aligned default formatting mode `github` and help text sync
   - CLI `--version` metadata command
-  - workbook-level YAML front matter in combined Markdown and ZIP Markdown output
+  - simplified workbook-level YAML front matter in combined Markdown and ZIP Markdown output
+  - CLI `--front-matter include|exclude`
   - CLI directory batch conversion backed by shared runtime helper
   - CLI `--verbose` processing diagnostics
-  - release version updated to `1.2.0`
+  - release version updated to `1.2.3`
   - `miku-ms-office-core-java` release jar vendored under `vendor/miku-ms-office-core-java/`
   - `.xlsx` package ZIP reading delegated through `miku-ms-office-core-java` from the existing `ZipIo` wrapper
   - CLI upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
@@ -71,7 +72,7 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - GitHub Actions release workflow that checks tag / `pom.xml` version alignment, builds with `mvn -B verify`, Java 8 smoke-tests the runtime jar, and attaches the shaded runtime jar plus sources jar to GitHub Release assets
   - Node / Java Markdown byte-level comparison script for selected upstream fixtures
 - 保守確認
-  - upstream Node v1.2.0 switched ZIP reading to `miku-ms-office-core`; Java keeps its local `ZipIo` implementation because the Java runtime already owns ZIP read/write behavior without a Node runtime dependency
+  - upstream Node v1.2.3 switched ZIP reading to `miku-ms-office-core`; Java keeps its local `ZipIo` implementation because the Java runtime already owns ZIP read/write behavior without a Node runtime dependency
   - Java now follows the same low-level package-reading boundary by delegating read-side ZIP package handling to `miku-ms-office-core-java`; the local ZIP writer remains for non-Office Markdown/assets ZIP export
   - help text compatibility
   - focused regression command layout
