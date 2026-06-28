@@ -73,7 +73,9 @@ This document keeps the development-oriented status notes that were previously i
 - `SheetMarkdownTest` includes upstream `xlsx2md-basic`, display, hyperlink, rich text / markdown escape, merge, formula, chart, shape, table, grid, image, and weird-sheetname fixture parity coverage
 - Focused workbook-to-markdown fixture regression is in place for upstream `display-format`, `hyperlink`, rich text, and merge fixtures
 - Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
-- Java CLI supports the upstream metadata command `--version`, and combined Markdown / ZIP Markdown output includes workbook-level YAML front matter aligned with upstream `miku-xlsx2md` v1.2.0.
+- Java CLI supports the upstream metadata command `--version`, the upstream
+  `--front-matter include|exclude` option, and simplified workbook-level YAML
+  front matter aligned with upstream `miku-xlsx2md` v1.2.3.
 - CLI fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table-basic / grid-layout / table alias, narrative/display/named-range/hyperlink/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
 - Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository
 - GitHub Actions release workflow builds the runtime jar and uploads it to the GitHub Release assets for tag releases
@@ -96,7 +98,7 @@ The shaded CLI jar and sources jar are produced under `target/`.
 Current entrypoint:
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.0.jar --help
+java -jar target/miku-xlsx2md-1.2.3.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -112,7 +114,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.0.jar \
+java -jar target/miku-xlsx2md-1.2.3.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \

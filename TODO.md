@@ -12,9 +12,10 @@ Document version: `2026-04-23`
 
 ## Current Queue
 
-- Node 版 v1.2.0 追随確認
-  - upstream `workplace/miku-xlsx2md` は `c67ac65` / `v1.2.0` へ fast-forward 済み
-  - combined Markdown / ZIP 内 Markdown の YAML front matter は Java 側へ反映済み
+- Node 版 v1.2.3 追随確認
+  - upstream remote `origin/devel` は `ffb12b3` / `v1.2.3` まで確認済み
+  - combined Markdown / ZIP 内 Markdown の簡素化 YAML front matter は Java 側へ反映済み
+  - CLI `--front-matter include|exclude` は Java 側へ反映済み
   - CLI `--version` は Java 側へ反映済み
   - Node 側の `miku-ms-office-core` ZIP 読み込み切り替えに対応し、Java 側も `ZipIo` wrapper から vendored `miku-ms-office-core-java` release jar へ読み込みを委譲
 - Node / Java Markdown byte-level parity を段階的に導入する
@@ -66,7 +67,7 @@ Document version: `2026-04-23`
 - CLI 側の `hyperlink-basic-sample01` は追加済み
 - Release workflow は `.github/workflows/release.yml` で tag push / manual dispatch により tag / `pom.xml` version 整合確認、`mvn -B verify`、Java 8 runtime smoke を実行し、runtime jar / sources jar を GitHub Release asset へ添付する
 - Node / Java Markdown byte-level comparison は `scripts/compare-node-java-markdown.sh` で開始し、upstream `node_modules` と Java runtime jar が前提
-- Node v1.2.0 追随として front matter / CLI `--version` は反映済み
+- Node v1.2.3 追随として simplified front matter / CLI `--front-matter` / CLI `--version` は反映済み
 - worksheet parser 側は `formula-crosssheet` / `formula-shared` の value type / raw value / formula type / cached value metadata assertion expansion を追加済み
 - local upstream fixture inventory は確認済みで、この時点の追加 fixture 候補は未確認
 - 再開時の確認コマンドは `mvn -Dtest=SheetMarkdownTest,WorksheetParserTest,MikuXlsx2mdCliTest test` と `mvn package`

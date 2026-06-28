@@ -6,7 +6,7 @@
 
   <groupId>jp.igapyon</groupId>
   <artifactId>miku-xlsx2md</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.3</version>
   <packaging>jar</packaging>
 
   <name>miku-xlsx2md</name>
