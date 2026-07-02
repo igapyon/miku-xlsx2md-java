@@ -280,7 +280,8 @@ public final class SheetMarkdown {
         body,
         SheetAssets.renderImageSection(sheet),
         SheetAssets.renderChartSection(safeCharts(sheet)),
-        SheetAssets.renderShapeSection(shapes, shapeBlocks, resolvedOptions.isIncludeShapeDetails()));
+        SheetAssets.renderShapeSection(shapes, shapeBlocks, resolvedOptions.isIncludeShapeDetails()),
+        renderCommentSection(safeComments(sheet)));
   }
 
   public static String createSheetMarkdownText(
@@ -293,6 +294,7 @@ public final class SheetMarkdown {
         "## Sheet: " + sheet.getName(),
         "",
         state.getBody().isEmpty() ? "_No extractable body content was found._" : state.getBody(),
+        state.getCommentSection(),
         state.getChartSection(),
         state.getShapeSection(),
         state.getImageSection()));
@@ -318,6 +320,7 @@ public final class SheetMarkdown {
         safeMerges(sheet).size(),
         safeImages(sheet).size(),
         safeCharts(sheet).size(),
+        safeComments(sheet).size(),
         safeCells(sheet).size(),
         tableScores,
         state.getFormulaDiagnostics());
@@ -352,6 +355,38 @@ public final class SheetMarkdown {
       }
     }
     return diagnostics;
+  }
+
+  public static String renderCommentSection(final List<WorksheetParser.ParsedCellComment> comments) {
+    final List<WorksheetParser.ParsedCellComment> safeComments =
+        comments == null ? Collections.<WorksheetParser.ParsedCellComment>emptyList() : comments;
+    if (safeComments.isEmpty()) {
+      return "";
+    }
+    final List<String> lines = new ArrayList<String>();
+    lines.add("");
+    lines.add("### Comments");
+    lines.add("");
+    for (int index = 0; index < safeComments.size(); index += 1) {
+      lines.add(createCommentSectionEntry(safeComments.get(index), index));
+      if (index + 1 < safeComments.size()) {
+        lines.add("");
+      }
+    }
+    return joinLines(lines);
+  }
+
+  private static String createCommentSectionEntry(final WorksheetParser.ParsedCellComment comment, final int index) {
+    final List<String> metadata = new ArrayList<String>();
+    metadata.add(stringValue(comment.getAddress()));
+    metadata.add(stringValue(comment.getKind()));
+    if (!stringValue(comment.getAuthor()).isEmpty()) {
+      metadata.add("author=" + comment.getAuthor());
+    }
+    if (!stringValue(comment.getDateTime()).isEmpty()) {
+      metadata.add("date=" + comment.getDateTime());
+    }
+    return "- [comment-" + (index + 1) + "] (" + join(metadata, "; ") + ") " + stringValue(comment.getText());
   }
 
   private static String renderCellDisplayText(final WorksheetParser.ParsedCell cell, final String formattingMode) {
@@ -611,6 +646,10 @@ public final class SheetMarkdown {
     return sheet == null || sheet.getShapes() == null ? Collections.<WorksheetParser.ParsedShapeAsset>emptyList() : sheet.getShapes();
   }
 
+  private static List<WorksheetParser.ParsedCellComment> safeComments(final WorksheetParser.ParsedSheet sheet) {
+    return sheet == null || sheet.getComments() == null ? Collections.<WorksheetParser.ParsedCellComment>emptyList() : sheet.getComments();
+  }
+
   private static List<TableCandidate> safeTableCandidates(final List<TableCandidate> tables) {
     return tables == null ? Collections.<TableCandidate>emptyList() : tables;
   }
@@ -829,6 +868,7 @@ public final class SheetMarkdown {
     private final String imageSection;
     private final String chartSection;
     private final String shapeSection;
+    private final String commentSection;
 
     public SheetRenderState(
         final MarkdownOptions.ResolvedMarkdownOptions resolvedOptions,
@@ -840,6 +880,20 @@ public final class SheetMarkdown {
         final String imageSection,
         final String chartSection,
         final String shapeSection) {
+      this(resolvedOptions, tables, narrativeBlocks, formulaDiagnostics, sections, body, imageSection, chartSection, shapeSection, "");
+    }
+
+    public SheetRenderState(
+        final MarkdownOptions.ResolvedMarkdownOptions resolvedOptions,
+        final List<TableCandidate> tables,
+        final List<NarrativeBlock> narrativeBlocks,
+        final List<MarkdownExport.FormulaDiagnostic> formulaDiagnostics,
+        final List<ContentSection> sections,
+        final String body,
+        final String imageSection,
+        final String chartSection,
+        final String shapeSection,
+        final String commentSection) {
       this.resolvedOptions = resolvedOptions;
       this.tables = tables;
       this.narrativeBlocks = narrativeBlocks;
@@ -849,6 +903,7 @@ public final class SheetMarkdown {
       this.imageSection = imageSection;
       this.chartSection = chartSection;
       this.shapeSection = shapeSection;
+      this.commentSection = commentSection;
     }
 
     public MarkdownOptions.ResolvedMarkdownOptions getResolvedOptions() {
@@ -885,6 +940,10 @@ public final class SheetMarkdown {
 
     public String getShapeSection() {
       return shapeSection;
+    }
+
+    public String getCommentSection() {
+      return commentSection;
     }
   }
 

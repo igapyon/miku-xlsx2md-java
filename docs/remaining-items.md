@@ -1,10 +1,10 @@
 # Remaining Items
 
-Document version: `2026-04-23`
+Document version: `2026-07-02`
 
 ## Current Position
 
-Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.2.3 simplified front matter output, `--front-matter include|exclude`, and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
+Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.3.0 comment output, simplified front matter output, `--front-matter include|exclude`, and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
 
 ## Status
 
@@ -25,6 +25,7 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - `styles-parser`
   - worksheet parser minimum scope
   - `WorksheetParser` richTextRuns / formula metadata / hyperlink range / sheet-qualified shared formula translation coverage subset
+  - `WorksheetParser` legacy note / threaded comment parsing from worksheet relationships
   - connected workbook parse facade
   - workbook parse fixture regression
   - `markdown-table-escape`
@@ -46,6 +47,7 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - `SheetMarkdown` table detection / matrix rendering delegation to `TableDetector`
   - `SheetMarkdown` cell display rendering delegation to `RichTextRenderer`
   - `SheetMarkdown` asset section rendering delegation to `SheetAssets`
+  - `SheetMarkdown` comment section rendering and summary comments count
   - advanced `sheet-markdown` parity coverage subset for calendar narrative, calendar sidebar ordering, empty fallback, line breaks, literal escaping, hyperlink output modes, shape details toggle, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / named-range / display / hyperlink / rich / merge / formula / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname cases
   - idempotent table pipe escaping for rich text rendered cells
   - core markdown conversion facade
@@ -63,7 +65,7 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - CLI `--front-matter include|exclude`
   - CLI directory batch conversion backed by shared runtime helper
   - CLI `--verbose` processing diagnostics
-  - release version updated to `1.2.3`
+  - release version updated to `1.3.0`
   - `miku-ms-office-core-java` release jar vendored under `vendor/miku-ms-office-core-java/`
   - `.xlsx` package ZIP reading delegated through `miku-ms-office-core-java` from the existing `ZipIo` wrapper
   - CLI upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout
@@ -72,7 +74,8 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - GitHub Actions release workflow that checks tag / `pom.xml` version alignment, builds with `mvn -B verify`, Java 8 smoke-tests the runtime jar, and attaches the shaded runtime jar plus sources jar to GitHub Release assets
   - Node / Java Markdown byte-level comparison script for selected upstream fixtures
 - 保守確認
-  - upstream Node v1.2.3 switched ZIP reading to `miku-ms-office-core`; Java keeps its local `ZipIo` implementation because the Java runtime already owns ZIP read/write behavior without a Node runtime dependency
+  - upstream Node v1.3.0 added XLSX comment / note / threaded comment Markdown output; Java reflects this in parser, sheet markdown, summary text, and focused tests
+  - upstream Node v1.3.0 switched ZIP reading to `miku-ms-office-core`; Java keeps its local `ZipIo` implementation because the Java runtime already owns ZIP read/write behavior without a Node runtime dependency
   - Java now follows the same low-level package-reading boundary by delegating read-side ZIP package handling to `miku-ms-office-core-java`; the local ZIP writer remains for non-Office Markdown/assets ZIP export
   - help text compatibility
   - focused regression command layout
@@ -116,7 +119,7 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
 
 ## Last Known Result
 
-- `mvn test` passed on `2026-06-28`
+- `mvn test` passed on `2026-07-02`
 
 ## Next Unit
 

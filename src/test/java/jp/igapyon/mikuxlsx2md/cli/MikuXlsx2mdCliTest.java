@@ -70,7 +70,7 @@ class MikuXlsx2mdCliTest {
     final int exitCode = MikuXlsx2mdCli.run(new String[] {"--version"}, asPrintStream(stdout), asPrintStream(stderr));
 
     assertEquals(0, exitCode);
-    assertEquals("1.2.3\n", asString(stdout));
+    assertEquals("1.3.0\n", asString(stdout));
     assertEquals("", asString(stderr));
   }
 
@@ -118,7 +118,7 @@ class MikuXlsx2mdCliTest {
     assertTrue(Files.isRegularFile(outputPath));
     final String markdown = new String(Files.readAllBytes(outputPath), StandardCharsets.UTF_8);
     assertTrue(markdown.startsWith("---\ntitle: \"sample.xlsx\""));
-    assertTrue(markdown.contains("  version: \"1.2.3\""));
+    assertTrue(markdown.contains("  version: \"1.3.0\""));
     assertTrue(markdown.contains("  output_mode: both"));
     assertTrue(markdown.contains("  formatting_mode: github"));
     assertTrue(markdown.contains("  table_detection_mode: border"));

@@ -5,6 +5,7 @@
 package jp.igapyon.mikuxlsx2md.worksheetparser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +188,132 @@ public final class WorksheetParser {
     return hyperlinks;
   }
 
+  public static String extractRichTextPlainText(final Element element, final WorksheetParserDependencies deps) {
+    if (element == null) {
+      return "";
+    }
+    final StringBuilder builder = new StringBuilder();
+    final List<Element> textNodes = XmlUtils.getElementsByLocalName(element, "t");
+    if (!textNodes.isEmpty()) {
+      for (final Element textNode : textNodes) {
+        builder.append(deps.getTextContent(textNode));
+      }
+      return builder.toString();
+    }
+    return deps.getTextContent(element);
+  }
+
+  public static List<ParsedCellComment> parseLegacyCommentsXml(final String xmlText, final WorksheetParserDependencies deps) {
+    final Document doc = deps.xmlToDocument(xmlText);
+    final List<String> authors = new ArrayList<String>();
+    for (final Element authorElement : XmlUtils.getElementsByLocalName(doc, "author")) {
+      authors.add(deps.getTextContent(authorElement).trim());
+    }
+    final List<ParsedCellComment> comments = new ArrayList<ParsedCellComment>();
+    for (final Element commentElement : XmlUtils.getElementsByLocalName(doc, "comment")) {
+      final int authorId = parseInt(commentElement.getAttribute("authorId"), 0);
+      final Element textElement = getFirstTag(commentElement, "text");
+      final String address = trim(commentElement.getAttribute("ref"));
+      final String text = extractRichTextPlainText(textElement, deps).trim();
+      if (address.isEmpty() || text.isEmpty()) {
+        continue;
+      }
+      comments.add(new ParsedCellComment(
+          address,
+          "note",
+          authorId >= 0 && authorId < authors.size() ? authors.get(authorId) : "",
+          text,
+          ""));
+    }
+    return comments;
+  }
+
+  public static Map<String, String> parsePersonDisplayNames(final Map<String, byte[]> files, final WorksheetParserDependencies deps) {
+    final Map<String, String> persons = new LinkedHashMap<String, String>();
+    for (final Map.Entry<String, byte[]> entry : files.entrySet()) {
+      if (!entry.getKey().matches("^xl/persons/person[^/]*\\.xml$")) {
+        continue;
+      }
+      final Document doc = deps.xmlToDocument(deps.decodeXmlText(entry.getValue()));
+      for (final Element personElement : XmlUtils.getElementsByLocalName(doc, "person")) {
+        final String id = trim(personElement.getAttribute("id"));
+        final String displayName = trim(personElement.getAttribute("displayName"));
+        if (!id.isEmpty() && !displayName.isEmpty()) {
+          persons.put(id, displayName);
+        }
+      }
+    }
+    return persons;
+  }
+
+  public static List<ParsedCellComment> parseThreadedCommentsXml(
+      final String xmlText,
+      final Map<String, String> persons,
+      final WorksheetParserDependencies deps) {
+    final Document doc = deps.xmlToDocument(xmlText);
+    final List<ParsedCellComment> comments = new ArrayList<ParsedCellComment>();
+    for (final Element commentElement : XmlUtils.getElementsByLocalName(doc, "threadedComment")) {
+      final String address = trim(commentElement.getAttribute("ref"));
+      final String personId = trim(commentElement.getAttribute("personId"));
+      final String text = extractRichTextPlainText(commentElement, deps).trim();
+      if (address.isEmpty() || text.isEmpty()) {
+        continue;
+      }
+      comments.add(new ParsedCellComment(
+          address,
+          "threaded",
+          persons.containsKey(personId) ? persons.get(personId) : personId,
+          text,
+          trim(commentElement.getAttribute("dT"))));
+    }
+    return comments;
+  }
+
+  public static List<ParsedCellComment> parseWorksheetComments(
+      final Map<String, byte[]> files,
+      final String sheetPath,
+      final WorksheetParserDependencies deps) {
+    final List<ParsedCellComment> comments = new ArrayList<ParsedCellComment>();
+    final String relsPath = deps.buildRelsPath(sheetPath);
+    final Map<String, RelationshipEntryLike> relEntries = deps.parseRelationshipEntries(files, relsPath, sheetPath);
+    final Map<String, String> persons = parsePersonDisplayNames(files, deps);
+    for (final RelationshipEntryLike entry : relEntries.values()) {
+      final byte[] bytes = files.get(entry.getTarget());
+      if (bytes == null) {
+        continue;
+      }
+      final String xmlText = deps.decodeXmlText(bytes);
+      if (isLegacyCommentRelationship(entry.getType())) {
+        comments.addAll(parseLegacyCommentsXml(xmlText, deps));
+      } else if (isThreadedCommentRelationship(entry.getType())) {
+        comments.addAll(parseThreadedCommentsXml(xmlText, persons, deps));
+      }
+    }
+    Collections.sort(comments, new java.util.Comparator<ParsedCellComment>() {
+      @Override
+      public int compare(final ParsedCellComment left, final ParsedCellComment right) {
+        final AddressUtils.CellAddress leftPos = AddressUtils.parseCellAddress(left.getAddress());
+        final AddressUtils.CellAddress rightPos = AddressUtils.parseCellAddress(right.getAddress());
+        if (leftPos.getRow() != rightPos.getRow()) {
+          return Integer.compare(leftPos.getRow(), rightPos.getRow());
+        }
+        if (leftPos.getCol() != rightPos.getCol()) {
+          return Integer.compare(leftPos.getCol(), rightPos.getCol());
+        }
+        return left.getKind().compareTo(right.getKind());
+      }
+    });
+    return comments;
+  }
+
+  private static boolean isLegacyCommentRelationship(final String type) {
+    return type != null && type.matches(".*/comments$");
+  }
+
+  private static boolean isThreadedCommentRelationship(final String type) {
+    return type != null && (type.matches(".*/threadedComment$") || type.matches(".*/threadedComments$"));
+  }
+
   public static String shiftReferenceAddress(final String addressText, final int rowOffset, final int colOffset) {
     final java.util.regex.Matcher match = java.util.regex.Pattern.compile("^(\\$?)([A-Z]+)(\\$?)(\\d+)$", java.util.regex.Pattern.CASE_INSENSITIVE)
         .matcher(String.valueOf(addressText));
@@ -330,7 +457,8 @@ public final class WorksheetParser {
     final List<ParsedImageAsset> images = SheetAssets.parseDrawingImages(files, sheetName, sheetPath);
     final List<ParsedChartAsset> charts = SheetAssets.parseDrawingCharts(files, sheetName, sheetPath);
     final List<ParsedShapeAsset> shapes = SheetAssets.parseDrawingShapes(files, sheetName, sheetPath);
-    return new ParsedSheet(sheetName, sheetIndex, sheetPath, cells, merges, images, charts, shapes, maxRow, maxCol);
+    final List<ParsedCellComment> comments = parseWorksheetComments(files, sheetPath, deps);
+    return new ParsedSheet(sheetName, sheetIndex, sheetPath, cells, merges, images, charts, shapes, comments, maxRow, maxCol);
   }
 
   private static String collectInlineText(final Element cellElement, final WorksheetParserDependencies deps) {
@@ -768,6 +896,7 @@ public final class WorksheetParser {
     private final List<ParsedImageAsset> images;
     private final List<ParsedChartAsset> charts;
     private final List<ParsedShapeAsset> shapes;
+    private final List<ParsedCellComment> comments;
     private final int maxRow;
     private final int maxCol;
 
@@ -779,7 +908,8 @@ public final class WorksheetParser {
         final List<AddressUtils.MergeRange> merges,
         final int maxRow,
         final int maxCol) {
-      this(name, index, path, cells, merges, new ArrayList<ParsedImageAsset>(), new ArrayList<ParsedChartAsset>(), new ArrayList<ParsedShapeAsset>(), maxRow, maxCol);
+      this(name, index, path, cells, merges, new ArrayList<ParsedImageAsset>(), new ArrayList<ParsedChartAsset>(),
+          new ArrayList<ParsedShapeAsset>(), new ArrayList<ParsedCellComment>(), maxRow, maxCol);
     }
 
     public ParsedSheet(
@@ -793,6 +923,21 @@ public final class WorksheetParser {
         final List<ParsedShapeAsset> shapes,
         final int maxRow,
         final int maxCol) {
+      this(name, index, path, cells, merges, images, charts, shapes, new ArrayList<ParsedCellComment>(), maxRow, maxCol);
+    }
+
+    public ParsedSheet(
+        final String name,
+        final int index,
+        final String path,
+        final List<ParsedCell> cells,
+        final List<AddressUtils.MergeRange> merges,
+        final List<ParsedImageAsset> images,
+        final List<ParsedChartAsset> charts,
+        final List<ParsedShapeAsset> shapes,
+        final List<ParsedCellComment> comments,
+        final int maxRow,
+        final int maxCol) {
       this.name = name;
       this.index = index;
       this.path = path;
@@ -801,6 +946,7 @@ public final class WorksheetParser {
       this.images = images;
       this.charts = charts;
       this.shapes = shapes;
+      this.comments = comments == null ? Collections.<ParsedCellComment>emptyList() : comments;
       this.maxRow = maxRow;
       this.maxCol = maxCol;
     }
@@ -837,12 +983,78 @@ public final class WorksheetParser {
       return shapes;
     }
 
+    public List<ParsedCellComment> getComments() {
+      return comments;
+    }
+
     public int getMaxRow() {
       return maxRow;
     }
 
     public int getMaxCol() {
       return maxCol;
+    }
+  }
+
+  public static final class ParsedCellComment {
+    private final String address;
+    private final String kind;
+    private final String author;
+    private final String text;
+    private final String dateTime;
+
+    public ParsedCellComment(
+        final String address,
+        final String kind,
+        final String author,
+        final String text,
+        final String dateTime) {
+      this.address = address;
+      this.kind = kind;
+      this.author = author;
+      this.text = text;
+      this.dateTime = dateTime;
+    }
+
+    public String getAddress() {
+      return address;
+    }
+
+    public String getKind() {
+      return kind;
+    }
+
+    public String getAuthor() {
+      return author;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public String getDateTime() {
+      return dateTime;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+      if (this == other) {
+        return true;
+      }
+      if (!(other instanceof ParsedCellComment)) {
+        return false;
+      }
+      final ParsedCellComment that = (ParsedCellComment) other;
+      return Objects.equals(address, that.address)
+          && Objects.equals(kind, that.kind)
+          && Objects.equals(author, that.author)
+          && Objects.equals(text, that.text)
+          && Objects.equals(dateTime, that.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(address, kind, author, text, dateTime);
     }
   }
 

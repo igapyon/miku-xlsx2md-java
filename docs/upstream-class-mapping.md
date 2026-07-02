@@ -160,13 +160,14 @@ java classes:
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ParsedSheet`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ParsedCell`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ParsedCellComment`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.Hyperlink`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParser.ExtractedCellOutput`
 
 notes:
 - facade: static worksheet parsing helpers
-- helper split: hyperlink parsing, shared-formula translation, inline rich text run extraction, and styled run merging kept in same class
-- Java-side extension: parsed cell getters expose formula metadata needed by downstream diagnostics/tests
+- helper split: hyperlink parsing, comment parsing, shared-formula translation, inline rich text run extraction, and styled run merging kept in same class
+- Java-side extension: parsed cell and comment getters expose formula / hyperlink / comment metadata needed by downstream diagnostics/tests
 
 ### upstream file:
 `src/ts/core.ts`
@@ -199,7 +200,7 @@ java classes:
 notes:
 - facade: static markdown export helper methods
 - helper split: archive entry creation is delegated to `ZipIo`, text encoding is delegated to `TextEncoding`
-- Java-side extension: export-side workbook and markdown summary shapes are expressed as immutable value objects
+- Java-side extension: export-side workbook and markdown summary shapes, including comment counts, are expressed as immutable value objects
 
 ### upstream file:
 `src/ts/cell-format.ts`
@@ -326,7 +327,7 @@ java classes:
 
 notes:
 - facade: static sheet / workbook markdown conversion helpers
-- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering and shape block rendering are delegated to `SheetAssets`; hyperlink formatting remains inside the same class
+- helper split: table detection / matrix rendering is delegated to `TableDetector`; narrative rendering is delegated to `NarrativeStructure`; cell display rendering is delegated to `RichTextRenderer`; asset section rendering and shape block rendering are delegated to `SheetAssets`; hyperlink and comment section formatting remain inside the same class
 - Java-side extension: `Core` now exposes `convertSheetToMarkdown`, `convertWorkbookToMarkdownFiles`, and parsed-workbook export asset adaptation
 - remaining parity gap: advanced fixture parity coverage beyond the current calendar / empty fallback / line break / literal escaping / hyperlink output mode subset is still pending
 

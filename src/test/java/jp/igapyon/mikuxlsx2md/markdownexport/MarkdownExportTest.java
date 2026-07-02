@@ -210,7 +210,7 @@ class MarkdownExportTest {
         new MarkdownExport.MarkdownSummary("both", "github", "border", 1, 0, 1, 0, 0, 0, 1,
             Collections.<MarkdownExport.TableScoreDetail>emptyList(),
             Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
-        new MarkdownExport.MarkdownExportOptions(null, null, "1.2.3", "include", null));
+        new MarkdownExport.MarkdownExportOptions(null, null, "1.3.0", "include", null));
 
     assertTrue(payload.getContent().startsWith(
         "---\n"
@@ -218,14 +218,14 @@ class MarkdownExportTest {
             + "type: converted\n"
             + "conversion:\n"
             + "  tool: miku-xlsx2md\n"
-            + "  version: \"1.2.3\"\n"
+            + "  version: \"1.3.0\"\n"
             + "  output_mode: both\n"
             + "  formatting_mode: github\n"
             + "  table_detection_mode: border\n"
             + "  shape_details: include\n"
             + "---\n\n# Book: sales.xlsx"));
     assertTrue(payload.getContent().contains("type: converted"));
-    assertTrue(payload.getContent().contains("  version: \"1.2.3\""));
+    assertTrue(payload.getContent().contains("  version: \"1.3.0\""));
     assertTrue(payload.getContent().contains("  output_mode: both"));
     assertTrue(payload.getContent().contains("  formatting_mode: github"));
     assertTrue(payload.getContent().contains("  table_detection_mode: border"));
@@ -248,7 +248,7 @@ class MarkdownExportTest {
             new MarkdownExport.MarkdownSummary("display", "github", "balanced", 1, 0, 1, 0, 0, 0, 1,
                 Collections.<MarkdownExport.TableScoreDetail>emptyList(),
                 Collections.<MarkdownExport.FormulaDiagnostic>emptyList()))),
-        new MarkdownExport.MarkdownExportOptions(null, null, "1.2.3", "exclude", "exclude"));
+        new MarkdownExport.MarkdownExportOptions(null, null, "1.3.0", "exclude", "exclude"));
 
     assertFalse(payload.getContent().startsWith("---\n"));
     assertEquals("# Book: sales.xlsx\n\n## Sheet: Summary\n\nSummary body", payload.getContent());

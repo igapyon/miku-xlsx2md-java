@@ -431,6 +431,53 @@ class WorksheetParserTest {
     assertEquals("present_nonempty", findCell(sheet, "B11").getCachedValueState());
   }
 
+  @Test
+  void parsesLegacyNotesAndThreadedCommentsFromWorksheetRelationships() {
+    final WorksheetParser.WorksheetParserDependencies deps = createDeps();
+    final String worksheetXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+        + "<sheetData><row r=\"1\"><c r=\"A1\" t=\"inlineStr\"><is><t>Cell</t></is></c></row></sheetData>"
+        + "</worksheet>";
+    final String commentsXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+        + "<authors><author>Alice</author></authors>"
+        + "<commentList><comment ref=\"A1\" authorId=\"0\"><text><r><t>Legacy note</t></r></text></comment></commentList>"
+        + "</comments>";
+    final String personsXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<personList xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\">"
+        + "<person id=\"{person-1}\" displayName=\"Bob\"/>"
+        + "</personList>";
+    final String threadedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        + "<ThreadedComments xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\">"
+        + "<threadedComment ref=\"B2\" personId=\"{person-1}\" dT=\"2026-07-02T10:00:00Z\"><text>Threaded reply</text></threadedComment>"
+        + "</ThreadedComments>";
+    final Map<String, byte[]> files = new LinkedHashMap<String, byte[]>();
+    files.put("xl/worksheets/sheet1.xml", worksheetXml.getBytes(StandardCharsets.UTF_8));
+    files.put("xl/comments1.xml", commentsXml.getBytes(StandardCharsets.UTF_8));
+    files.put("xl/persons/person.xml", personsXml.getBytes(StandardCharsets.UTF_8));
+    files.put("xl/threadedComments/threadedComment1.xml", threadedXml.getBytes(StandardCharsets.UTF_8));
+    files.put("xl/worksheets/_rels/sheet1.xml.rels", (
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+            + "<Relationship Id=\"comments\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/>"
+            + "<Relationship Id=\"threaded\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/threadedComment\" Target=\"../threadedComments/threadedComment1.xml\"/>"
+            + "</Relationships>").getBytes(StandardCharsets.UTF_8));
+
+    final WorksheetParser.ParsedSheet sheet = WorksheetParser.parseWorksheet(
+        files,
+        "Sheet1",
+        "xl/worksheets/sheet1.xml",
+        1,
+        new ArrayList<SharedStrings.SharedStringEntry>(),
+        Arrays.asList(new StylesParser.CellStyleInfo(StylesParser.EMPTY_BORDERS, 0, "General", StylesParser.EMPTY_TEXT_STYLE)),
+        deps);
+
+    assertEquals(Arrays.asList(
+        new WorksheetParser.ParsedCellComment("A1", "note", "Alice", "Legacy note", ""),
+        new WorksheetParser.ParsedCellComment("B2", "threaded", "Bob", "Threaded reply", "2026-07-02T10:00:00Z")),
+        sheet.getComments());
+  }
+
   private static WorksheetParser.ParsedCell findCell(final WorksheetParser.ParsedSheet sheet, final String address) {
     for (final WorksheetParser.ParsedCell cell : sheet.getCells()) {
       if (address.equals(cell.getAddress())) {
