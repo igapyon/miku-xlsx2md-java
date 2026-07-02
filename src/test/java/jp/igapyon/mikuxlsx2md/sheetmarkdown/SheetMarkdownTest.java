@@ -122,6 +122,32 @@ class SheetMarkdownTest {
   }
 
   @Test
+  void rendersCommentsAsSeparateSheetSectionAndCountsThemInSummary() {
+    final WorksheetParser.ParsedSheet sheet = new WorksheetParser.ParsedSheet(
+        "Sheet1",
+        1,
+        "xl/worksheets/sheet1.xml",
+        Arrays.asList(cell("A1", 1, 1, "Cell")),
+        Collections.<AddressUtils.MergeRange>emptyList(),
+        Collections.<WorksheetParser.ParsedImageAsset>emptyList(),
+        Collections.<WorksheetParser.ParsedChartAsset>emptyList(),
+        Collections.<WorksheetParser.ParsedShapeAsset>emptyList(),
+        Arrays.asList(
+            new WorksheetParser.ParsedCellComment("A1", "note", "Alice", "Legacy note", ""),
+            new WorksheetParser.ParsedCellComment("B2", "threaded", "Bob", "Threaded reply", "2026-07-02T10:00:00Z")),
+        2,
+        2);
+    final WorkbookLoader.ParsedWorkbook workbook = workbook(sheet);
+
+    final MarkdownExport.MarkdownFile file = SheetMarkdown.convertSheetToMarkdown(workbook, sheet, new MarkdownOptions());
+
+    assertTrue(file.getMarkdown().contains("### Comments"));
+    assertTrue(file.getMarkdown().contains("- [comment-1] (A1; note; author=Alice) Legacy note"));
+    assertTrue(file.getMarkdown().contains("- [comment-2] (B2; threaded; author=Bob; date=2026-07-02T10:00:00Z) Threaded reply"));
+    assertEquals(2, file.getSummary().getComments());
+  }
+
+  @Test
   void omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled() {
     final List<WorksheetParser.ParsedShapeAsset> shapes = Arrays.asList(
         shape("B3", new SheetAssets.BoundingBox(0, 0, 100, 20)));

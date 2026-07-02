@@ -18,7 +18,7 @@ import jp.igapyon.mikuxlsx2md.markdownoptions.MarkdownOptions;
 import jp.igapyon.mikuxlsx2md.workbookloader.WorkbookLoader;
 
 public final class MikuXlsx2mdCli {
-  private static final String FALLBACK_VERSION = "1.2.3";
+  private static final String FALLBACK_VERSION = "1.3.0";
 
   private MikuXlsx2mdCli() {
   }

@@ -15,7 +15,7 @@ Links:
 
 - Runs as a Java CLI jar
 - Converts a whole workbook without sheet-by-sheet manual work
-- Extracts prose, tables, images, charts, shapes, links, rich text, and formula-derived values where supported
+- Extracts prose, tables, images, charts, shapes, comments, notes, threaded comments, links, rich text, and formula-derived values where supported
 - Can write Markdown or ZIP output from the CLI
 - Provides a runtime artifact used by the separated Maven plugin repository
 
@@ -31,6 +31,7 @@ The goal is the same as the Node / browser version: extract workbook content as 
 - Handles spreadsheet-grid-style sheets with balanced, border, or planner-aware table detection
 - Preserves supported Excel rich text in `github` formatting mode
 - Preserves external links and workbook-internal links as Markdown links when supported
+- Emits supported Excel notes and threaded comments as a separate Markdown section
 - Prefers cached formula values and parses formulas when needed
 - Extracts chart configuration data
 - Extracts shape source data as text and outputs SVG when supported
@@ -51,6 +52,7 @@ The goal is the same as the Node / browser version: extract workbook content as 
 | Extract images | Supported | Available through Markdown plus assets, especially ZIP export |
 | Preserve rich text | Partially supported | `github` formatting mode preserves supported rich text output |
 | Preserve hyperlinks | Partially supported | External links and workbook-internal links are emitted as Markdown links when supported |
+| Extract comments | Partially supported | Legacy notes and threaded comments are emitted as a separate Markdown section when supported |
 | Handle formula cells | Supported | Prefers cached values and derives results by parsing formulas when needed |
 | Handle charts | Supported | Extracts semantic information rather than reproducing chart images |
 | Handle shapes | Partially supported | Extracts source-oriented data and outputs SVG when supported |
@@ -83,19 +85,19 @@ The executable CLI jar is produced under `target/`.
 ## Java CLI
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar <input.xlsx> --out output.md
+java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --out output.md
 ```
 
 ZIP export is also available.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar <input.xlsx> --zip output.zip
+java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --zip output.zip
 ```
 
 Directory batch conversion is available as a Java-side CLI extension.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -142,7 +144,7 @@ Exit codes:
 You can switch the Markdown output mode or include shape source details.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -152,7 +154,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 You can switch how Excel text emphasis is rendered. `github` formatting mode preserves supported rich text output and emits hyperlinks as Markdown links when supported.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -161,7 +163,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 You can also switch table detection behavior. `balanced` keeps the generic heuristic, `border` detects tables from bordered regions and suppresses borderless fallback detection, and `planner-aware` adds planner/calendar-specific suppression heuristics for layout-heavy sheets.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -170,7 +172,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 You can control output encoding and BOM. `shift_jis` does not allow BOM.
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -178,7 +180,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 ```
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis
@@ -247,7 +249,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 
 - Java CLI jar として実行できます
 - Excel ブック全体を、シートごとの手作業なしで変換します
-- 対応範囲内で、地の文・表・画像・グラフ・図形・リンク・rich text・数式由来の値を抽出します
+- 対応範囲内で、地の文・表・画像・グラフ・図形・コメント・メモ・スレッドコメント・リンク・rich text・数式由来の値を抽出します
 - CLI から Markdown または ZIP を出力できます
 - 分離済み Maven plugin の runtime dependency として利用できます
 
@@ -263,6 +265,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - `balanced` / `border` / `planner-aware` の table detection mode に対応
 - `github` formatting mode で対応する Excel rich text を反映
 - 外部リンクやブック内リンクを、対応できる範囲で Markdown リンクとして出力
+- 対応できる Excel メモやスレッドコメントを Markdown の独立セクションとして出力
 - 数式は保存済みの値を優先し、必要に応じて数式も解析
 - グラフ設定情報を抽出
 - 図形の元データをテキストとして抽出し、対応できるものは SVG も出力
@@ -283,6 +286,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 | 画像を抽出できる | 対応 | Markdown と assets の組み合わせ、特に ZIP 出力で利用 |
 | rich text を反映できる | 一部対応 | `github` formatting mode で対応する rich text 出力を反映 |
 | ハイパーリンクを反映できる | 一部対応 | 外部リンクやブック内リンクを Markdown リンクとして出力 |
+| コメントを抽出できる | 一部対応 | 対応できるメモやスレッドコメントを Markdown の独立セクションとして出力 |
 | 数式セルを扱える | 対応 | 保存済みの値を優先し、値がない場合は可能な範囲で解析 |
 | グラフを扱える | 対応 | 画像再現ではなく、意味情報として抽出 |
 | 図形を扱える | 一部対応 | raw 寄りの情報を抽出し、対応できるものは SVG として出力 |
@@ -315,19 +319,19 @@ mvn package
 ## Java CLI
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar <input.xlsx> --out output.md
+java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --out output.md
 ```
 
 ZIP 出力も利用できます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar <input.xlsx> --zip output.zip
+java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --zip output.zip
 ```
 
 Java CLI 独自拡張として、ディレクトリ一括変換も利用できます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -374,7 +378,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 Markdown output mode の切り替えや shape source details の出力もできます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -384,7 +388,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 Excel text emphasis の出力方法も切り替えられます。`github` formatting mode では、対応する rich text 出力を反映し、対応できる hyperlink は Markdown link として出力します。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -393,7 +397,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 table detection behavior も切り替えられます。`balanced` は汎用 heuristic、`border` は罫線領域からの検出、`planner-aware` は planner / calendar 系 layout-heavy sheet 向けの抑制 heuristic を追加します。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -402,7 +406,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 出力 encoding と BOM も制御できます。`shift_jis` は BOM を許可しません。
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -410,7 +414,7 @@ java -jar target/miku-xlsx2md-1.2.3.jar \
 ```
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis

@@ -154,6 +154,7 @@ public final class MarkdownExport {
     lines.add("Merged ranges: " + markdownFile.getSummary().getMerges());
     lines.add("Images: " + markdownFile.getSummary().getImages());
     lines.add("Charts: " + markdownFile.getSummary().getCharts());
+    lines.add("Comments: " + markdownFile.getSummary().getComments());
     lines.add("Analyzed cells: " + markdownFile.getSummary().getCells());
     for (final String status : FORMULA_STATUSES) {
       lines.add("Formula " + status + ": " + formulaCounts.get(status));
@@ -614,6 +615,7 @@ public final class MarkdownExport {
     private final int merges;
     private final int images;
     private final int charts;
+    private final int comments;
     private final int cells;
     private final List<TableScoreDetail> tableScores;
     private final List<FormulaDiagnostic> formulaDiagnostics;
@@ -628,6 +630,7 @@ public final class MarkdownExport {
         final int merges,
         final int images,
         final int charts,
+        final int comments,
         final int cells,
         final List<TableScoreDetail> tableScores,
         final List<FormulaDiagnostic> formulaDiagnostics) {
@@ -640,9 +643,27 @@ public final class MarkdownExport {
       this.merges = merges;
       this.images = images;
       this.charts = charts;
+      this.comments = comments;
       this.cells = cells;
       this.tableScores = tableScores == null ? Collections.<TableScoreDetail>emptyList() : tableScores;
       this.formulaDiagnostics = formulaDiagnostics == null ? Collections.<FormulaDiagnostic>emptyList() : formulaDiagnostics;
+    }
+
+    public MarkdownSummary(
+        final String outputMode,
+        final String formattingMode,
+        final String tableDetectionMode,
+        final int sections,
+        final int tables,
+        final int narrativeBlocks,
+        final int merges,
+        final int images,
+        final int charts,
+        final int cells,
+        final List<TableScoreDetail> tableScores,
+        final List<FormulaDiagnostic> formulaDiagnostics) {
+      this(outputMode, formattingMode, tableDetectionMode, sections, tables, narrativeBlocks, merges, images, charts, 0, cells,
+          tableScores, formulaDiagnostics);
     }
 
     public String getOutputMode() {
@@ -679,6 +700,10 @@ public final class MarkdownExport {
 
     public int getCharts() {
       return charts;
+    }
+
+    public int getComments() {
+      return comments;
     }
 
     public int getCells() {

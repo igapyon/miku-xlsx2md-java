@@ -66,7 +66,9 @@ This document keeps the development-oriented status notes that were previously i
 - Focused workbook fixture regression includes upstream image and shape fixtures, including `image-basic-sample02`, `shape-flowchart`, and `shape-block-arrow`
 - Focused workbook fixture regression includes upstream narrative, edge-empty, weird-sheetname, table border-priority, full table-basic parity subset, and grid-layout parity cases
 - `WorksheetParserTest` includes shared formula translation coverage with sheet-qualified and absolute references, plus upstream `formula-crosssheet` / `formula-shared` fixture assertions
+- `WorksheetParserTest` includes legacy note and threaded comment parsing coverage from worksheet relationships
 - `SheetMarkdownTest` includes GitHub hyperlink rendering coverage that suppresses underline markup on linked cells
+- `SheetMarkdownTest` includes comment section rendering coverage and summary comment counts
 - `SheetMarkdownTest` includes shape section spacing coverage when consecutive SVG-backed shape items are rendered
 - `SheetMarkdownTest` includes table detection compatibility alias coverage for `border-priority`
 - `SheetMarkdownTest` includes planner-aware calendar layout suppression coverage so repeated narrow calendar columns stay narrative instead of becoming small tables
@@ -75,7 +77,9 @@ This document keeps the development-oriented status notes that were previously i
 - Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
 - Java CLI supports the upstream metadata command `--version`, the upstream
   `--front-matter include|exclude` option, and simplified workbook-level YAML
-  front matter aligned with upstream `miku-xlsx2md` v1.2.3.
+  front matter aligned with upstream `miku-xlsx2md` v1.3.0.
+- Java conversion reflects upstream `miku-xlsx2md` v1.3.0 legacy note and
+  threaded comment output as `### Comments` sections.
 - CLI fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table-basic / grid-layout / table alias, narrative/display/named-range/hyperlink/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
 - Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository
 - GitHub Actions release workflow builds the runtime jar and uploads it to the GitHub Release assets for tag releases
@@ -98,7 +102,7 @@ The shaded CLI jar and sources jar are produced under `target/`.
 Current entrypoint:
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar --help
+java -jar target/miku-xlsx2md-1.3.0.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -114,7 +118,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar target/miku-xlsx2md-1.2.3.jar \
+java -jar target/miku-xlsx2md-1.3.0.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \

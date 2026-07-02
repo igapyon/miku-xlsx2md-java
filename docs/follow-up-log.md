@@ -582,3 +582,49 @@ follow-up:
   - advanced `sheet-markdown` fixture parity coverage をさらに広げる
   - worksheet parser shared / cross-sheet formula fixture coverage を current focused regression からさらに広げる
   - CLI の fixture coverage をさらに広げる
+
+## 2026-07-02 Node v1.3.0 Comments Follow-up
+
+upstream range:
+- `workplace/miku-xlsx2md` `v1.2.3..v1.3.0`
+- upstream tag `v1.3.0` / `d77a4de`
+
+upstream file:
+- `src/ts/worksheet-parser.ts`
+- `src/ts/sheet-markdown.ts`
+- `src/ts/core.ts`
+- `src/ts/markdown-export.ts`
+- `tests/xlsx2md-worksheet-parser.test.js`
+- `tests/xlsx2md-sheet-markdown.test.js`
+- `tests/xlsx2md-markdown-export.test.js`
+- `tests/xlsx2md-cli.test.js`
+
+java classes:
+- `WorksheetParser`
+- `SheetMarkdown`
+- `MarkdownExport`
+- `MikuXlsx2mdCli`
+
+tests:
+- `WorksheetParserTest`
+- `SheetMarkdownTest`
+- `MarkdownExportTest`
+- `MikuXlsx2mdCliTest`
+
+diff summary:
+- 挙動差分:
+  - XLSX legacy note / threaded comment を worksheet relationship から解析し、`ParsedCellComment` として `ParsedSheet` へ保持
+  - sheet Markdown に `### Comments` section を追加
+  - Markdown summary に `comments` count と `Comments:` summary line を追加
+  - project version / CLI fallback version / README examples を `1.3.0` へ更新
+- 命名差分:
+  - legacy comments は `kind=note`、threaded comments は `kind=threaded`
+  - Markdown section label は upstream と同じ `### Comments`
+- 未移植差分:
+  - actual GitHub tag 上での Java release workflow 実行は未確認
+  - comment fixture の実 workbook parity は upstream fixture 追加時に横展開
+
+follow-up:
+- 実施した確認:
+  - `git fetch --tags origin devel` on `workplace/miku-xlsx2md`
+  - `mvn -Dtest=WorksheetParserTest,SheetMarkdownTest,MarkdownExportTest,MikuXlsx2mdCliTest test` pass

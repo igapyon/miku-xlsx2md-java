@@ -196,6 +196,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.exposesFormulaCachedStateTypeAndSpillRef`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesUpstreamFormulaCrossSheetFixtureWithConcreteFollowerCoverageWhenAvailable`
 - `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesUpstreamFormulaSharedFixtureWithExtendedFollowerCoverageWhenAvailable`
+- `jp.igapyon.mikuxlsx2md.worksheetparser.WorksheetParserTest.parsesLegacyNotesAndThreadedCommentsFromWorksheetRelationships`
 
 fixtures:
 - `workplace/miku-xlsx2md/tests/fixtures/formula/formula-crosssheet-sample01.xlsx`
@@ -205,7 +206,7 @@ focused regression:
 - `mvn -Dtest=WorksheetParserTest test`
 
 notes:
-- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, value type / raw value / formula type / cached value metadata assertions for those formula fixtures, hyperlink range expansion with hash locations, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
+- Current Java coverage includes shared formula translation with relative / absolute / sheet-qualified references, upstream `formula-crosssheet` / `formula-shared` fixture assertions, value type / raw value / formula type / cached value metadata assertions for those formula fixtures, hyperlink range expansion with hash locations, legacy note / threaded comment parsing from worksheet relationships, richTextRuns propagation for styled shared / inline / boolean / formatted values, and formula cached state / type / spill ref metadata.
 
 ### upstream test / intent:
 connected workbook parsing path through the Java core facade
@@ -465,6 +466,7 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.formatsHyperlinksRawAndBothModes`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsWorkbookThroughCoreFacadeShape`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.convertsSheetWithShapeBlocks`
+- `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.rendersCommentsAsSeparateSheetSectionAndCountsThemInSummary`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.omitsShapeSectionsWhenIncludeShapeDetailsIsDisabled`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.keepsNearbyCalendarRowsInOneNarrativeBlock`
 - `jp.igapyon.mikuxlsx2md.sheetmarkdown.SheetMarkdownTest.reordersCalendarLikeSectionsWithSidebar`
@@ -552,7 +554,7 @@ focused regression:
 - `mvn -Dtest=SheetMarkdownTest test`
 
 notes:
-- Current Java coverage includes the core facade path, shape block rendering connection, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / named-range / display / hyperlink / rich / merge / formula / formula-crosssheet / formula-shared / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname parity checks.
+- Current Java coverage includes the core facade path, shape block rendering connection, comment section rendering and summary counts, shape details toggle, calendar narrative grouping and sidebar ordering, empty-body fallback, table detection compatibility alias normalization, plain/GitHub line break behavior, Markdown literal escaping, hyperlink output modes, GitHub hyperlink underline suppression, SVG-backed shape item spacing, and fixture-backed narrative / sparse / border-priority / broader table-basic / grid-layout / xlsx2md-basic / named-range / display / hyperlink / rich / merge / formula / formula-crosssheet / formula-shared / chart / shape / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname parity checks.
 - Current Java coverage also includes planner-aware suppression for repeated narrow calendar layouts so those bands remain narrative instead of becoming small tables.
 - More advanced upstream sheet-markdown cases remain follow-up coverage.
 
