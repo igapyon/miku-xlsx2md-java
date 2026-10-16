@@ -28,6 +28,7 @@ The goal is the same as the Node / browser version: extract workbook content as 
 - Converts workbook content without sheet-by-sheet manual copy-and-paste work
 - Extracts prose and table-like regions
 - Detects table-like regions by using borders and value groupings as cues
+- In `balanced` mode, includes qualifying borderless partial-merge headers immediately above bordered tables
 - Handles spreadsheet-grid-style sheets with balanced, border, or planner-aware table detection
 - Preserves supported Excel rich text in `github` formatting mode
 - Preserves external links and workbook-internal links as Markdown links when supported
@@ -85,19 +86,19 @@ The executable CLI jar is produced under `target/`.
 ## Java CLI
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --out output.md
+java -jar target/miku-xlsx2md-1.3.1.jar <input.xlsx> --out output.md
 ```
 
 ZIP export is also available.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --zip output.zip
+java -jar target/miku-xlsx2md-1.3.1.jar <input.xlsx> --zip output.zip
 ```
 
 Directory batch conversion is available as a Java-side CLI extension.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -144,7 +145,7 @@ Exit codes:
 You can switch the Markdown output mode or include shape source details.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -154,7 +155,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 You can switch how Excel text emphasis is rendered. `github` formatting mode preserves supported rich text output and emits hyperlinks as Markdown links when supported.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -163,7 +164,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 You can also switch table detection behavior. `balanced` keeps the generic heuristic, `border` detects tables from bordered regions and suppresses borderless fallback detection, and `planner-aware` adds planner/calendar-specific suppression heuristics for layout-heavy sheets.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -172,7 +173,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 You can control output encoding and BOM. `shift_jis` does not allow BOM.
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -180,7 +181,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 ```
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis
@@ -262,6 +263,7 @@ For implementation status and porting notes, see [docs/development-status.md](do
 - シートごとの手作業やコピペを前提にせず変換
 - 地の文と表らしい領域を抽出
 - 罫線や値のまとまりを手がかりに表らしい領域を検知
+- `balanced` mode では、条件を満たす罫線なしの部分結合見出しを直下の罫線表に含める
 - `balanced` / `border` / `planner-aware` の table detection mode に対応
 - `github` formatting mode で対応する Excel rich text を反映
 - 外部リンクやブック内リンクを、対応できる範囲で Markdown リンクとして出力
@@ -319,19 +321,19 @@ mvn package
 ## Java CLI
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --out output.md
+java -jar target/miku-xlsx2md-1.3.1.jar <input.xlsx> --out output.md
 ```
 
 ZIP 出力も利用できます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar <input.xlsx> --zip output.zip
+java -jar target/miku-xlsx2md-1.3.1.jar <input.xlsx> --zip output.zip
 ```
 
 Java CLI 独自拡張として、ディレクトリ一括変換も利用できます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   --input-directory path/to/xlsx \
   --output-directory path/to/markdown \
   --recursive \
@@ -378,7 +380,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 Markdown output mode の切り替えや shape source details の出力もできます。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/shape-workbook.xlsx \
   --out shape.md \
   --output-mode both \
@@ -388,7 +390,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 Excel text emphasis の出力方法も切り替えられます。`github` formatting mode では、対応する rich text 出力を反映し、対応できる hyperlink は Markdown link として出力します。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/rich-text-workbook.xlsx \
   --out rich.md \
   --formatting-mode github
@@ -397,7 +399,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 table detection behavior も切り替えられます。`balanced` は汎用 heuristic、`border` は罫線領域からの検出、`planner-aware` は planner / calendar 系 layout-heavy sheet 向けの抑制 heuristic を追加します。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/table-workbook.xlsx \
   --out table.md \
   --table-detection-mode border
@@ -406,7 +408,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 出力 encoding と BOM も制御できます。`shift_jis` は BOM を許可しません。
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/input.xlsx \
   --out xlsx2md-utf16be.md \
   --encoding utf-16be \
@@ -414,7 +416,7 @@ java -jar target/miku-xlsx2md-1.3.0.jar \
 ```
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   path/to/input.xlsx \
   --out xlsx2md-sjis.md \
   --encoding shift_jis

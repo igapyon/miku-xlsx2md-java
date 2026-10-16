@@ -1,10 +1,10 @@
 # Remaining Items
 
-Document version: `2026-07-02`
+Document version: `2026-10-16`
 
 ## Current Position
 
-Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.3.0 comment output, simplified front matter output, `--front-matter include|exclude`, and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
+Java runtime scaffolding is ready at the repository root, workbook parsing minimum path is connected, markdown export helper functions are straight-converted, and an initial sheet-to-markdown conversion layer is connected to the core facade. Table detection, rich text rendering, sheet asset parsing/rendering/grouping helpers, and office drawing shape SVG helper are now split out of `SheetMarkdown` / `WorksheetParser`, initial end-to-end conversion is connected from the CLI, upstream `planner-aware` table detection mode plus GUI-aligned CLI defaults are now reflected on the Java side, Java CLI directory batch conversion is available, and verbose processing diagnostics are available for CLI execution. Upstream `miku-xlsx2md` v1.3.0 comment output, v1.3.1 merged-header detection, simplified front matter output, `--front-matter include|exclude`, and `--version` metadata command are reflected on the Java side. Maven plugin support has moved to the separated `miku-xlsx2md-java-maven` repository. Low-level Office package ZIP reading now delegates through the vendored `miku-ms-office-core-java` release jar while Markdown/assets ZIP output remains local.
 
 ## Status
 
@@ -65,7 +65,10 @@ Java runtime scaffolding is ready at the repository root, workbook parsing minim
   - CLI `--front-matter include|exclude`
   - CLI directory batch conversion backed by shared runtime helper
   - CLI `--verbose` processing diagnostics
-  - release version updated to `1.3.0`
+  - upstream v1.3.1 `balanced`-mode borderless partial-merge header adjustment reflected in `TableDetector`
+  - ECMAScript trim whitespace boundaries are covered by `TableHeaderRegressionTest`
+  - pinned upstream v1.3.1 table-header fixture matrix (6 fixtures × 3 modes), output/options checks, and synthetic header-boundary cases are covered
+  - release version updated to `1.3.1`
   - `miku-ms-office-core-java` release jar vendored under `vendor/miku-ms-office-core-java/`
   - `.xlsx` package ZIP reading delegated through `miku-ms-office-core-java` from the existing `ZipIo` wrapper
   - CLI upstream fixture conversion coverage for the current local fixture inventory, including table-basic / grid-layout / table alias / shape details compatibility aliases and display / named-range / narrative / hyperlink / rich / rich-text-github / merge / merge-pattern / formula / chart / xlsx2md-basic / image-basic-sample01 / image-basic-sample02 / edge-empty / weird-sheetname / shape-flowchart / shape-block-arrow / shape-callout

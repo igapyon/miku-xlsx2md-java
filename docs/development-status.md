@@ -77,7 +77,13 @@ This document keeps the development-oriented status notes that were previously i
 - Java CLI is implemented with Node-compatible option vocabulary, GUI-aligned default formatting mode `github`, initial end-to-end conversion, and Java-side directory batch conversion
 - Java CLI supports the upstream metadata command `--version`, the upstream
   `--front-matter include|exclude` option, and simplified workbook-level YAML
-  front matter aligned with upstream `miku-xlsx2md` v1.3.0.
+  front matter aligned with upstream `miku-xlsx2md` v1.3.1.
+- Java table detection follows upstream v1.3.1 by including a qualifying
+  borderless partial-merge header row above a bordered table in `balanced`
+  mode without changing the candidate score; `border` and `planner-aware`
+  ranges remain unchanged.
+- `TableHeaderRegressionTest` covers all six upstream v1.3.1 header fixtures
+  in all three modes and validates ECMAScript trim whitespace boundaries.
 - Java conversion reflects upstream `miku-xlsx2md` v1.3.0 legacy note and
   threaded comment output as `### Comments` sections.
 - CLI fixture coverage includes upstream `xlsx2md-basic`, `image-basic-sample01`, `image-basic-sample02`, `edge-empty`, weird-sheetname, `shape-flowchart`, `shape-block-arrow`, `shape-callout`, table-basic / grid-layout / table alias, narrative/display/named-range/hyperlink/rich/merge/formula/chart fixtures, shape fixture, and compatibility alias cases
@@ -102,7 +108,7 @@ The shaded CLI jar and sources jar are produced under `target/`.
 Current entrypoint:
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar --help
+java -jar target/miku-xlsx2md-1.3.1.jar --help
 ```
 
 The CLI validates the main option set used by the upstream Node.js CLI and can write combined Markdown or ZIP export outputs.
@@ -118,7 +124,7 @@ By default, the comparison starts with `xlsx2md-basic-sample01.xlsx` and `link/h
 Directory batch conversion is available as a Java-side CLI extension:
 
 ```bash
-java -jar target/miku-xlsx2md-1.3.0.jar \
+java -jar target/miku-xlsx2md-1.3.1.jar \
   --input-directory docs/xlsx \
   --output-directory docs/md \
   --recursive \
