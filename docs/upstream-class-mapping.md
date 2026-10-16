@@ -1,6 +1,6 @@
 # Upstream Class Mapping
 
-Document version: `2026-04-22`
+Document version: `2026-10-16`
 
 ## Current Coverage
 
@@ -251,6 +251,8 @@ java classes:
 
 notes:
 - facade: static table seed collection, connected component detection, candidate scoring/pruning, bounds trimming, merge token application, and candidate matrix creation
+- upstream v1.3.1 follow-up: `balanced` may include the immediately preceding borderless partial-merge header when its labels cover the table width; the candidate score is preserved, and `border` / `planner-aware` behavior is unchanged
+- merged-header labels use the ECMAScript `String.trim()` whitespace set for label validation, blank non-anchor values, label-length checks, and adjacent-cell spill decisions; generic Java `trim()` behavior elsewhere is unchanged
 - helper split: normalized border statistics are delegated to `BorderGrid`
 - Java-side extension: `SheetMarkdown.detectTableCandidates` and `SheetMarkdown.matrixFromCandidate` delegate to this helper while preserving the existing `SheetMarkdown.TableCandidate` public shape
 

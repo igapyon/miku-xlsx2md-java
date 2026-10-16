@@ -1,6 +1,6 @@
 # TODO
 
-Document version: `2026-07-02`
+Document version: `2026-10-16`
 
 ## Fixed Direction
 
@@ -12,13 +12,16 @@ Document version: `2026-07-02`
 
 ## Current Queue
 
-- Node 版 v1.3.0 追随確認
-  - upstream remote `origin/devel` は `d77a4de` / `v1.3.0` まで確認済み
+- Node 版 v1.3.1 追随（完了）
+  - upstream tag `v1.3.1` は commit `779afb14aa1f0140e42504e73afb917e71574057`
   - combined Markdown / ZIP 内 Markdown の簡素化 YAML front matter は Java 側へ反映済み
   - CLI `--front-matter include|exclude` は Java 側へ反映済み
   - CLI `--version` は Java 側へ反映済み
   - XLSX の legacy note / threaded comment を Markdown の `### Comments` section と summary `comments` count へ反映済み
   - Node 側の `miku-ms-office-core` ZIP 読み込み切り替えに対応し、Java 側も `ZipIo` wrapper から vendored `miku-ms-office-core-java` release jar へ読み込みを委譲
+  - v1.3.1 の部分結合見出し補正を `TableDetector` に反映し、Maven / CLI fallback / README の版番号を `1.3.1` に更新
+  - ECMAScript `String.trim()` の whitespace 集合を部分結合見出し判定へ適用し、Unicode whitespace 境界と除外文字を回帰テスト
+  - pinned upstream v1.3.1 の表幅 / 部分結合見出し fixture 6 件を `balanced` / `border` / `planner-aware` の全18通りで検証
 - Node / Java Markdown byte-level parity を段階的に導入する
   - `scripts/compare-node-java-markdown.sh` で Markdown 出力比較を開始
   - 初期対象は `xlsx2md-basic-sample01.xlsx` と `link/hyperlink-basic-sample01.xlsx`

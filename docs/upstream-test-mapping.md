@@ -1,6 +1,6 @@
 # Upstream Test Mapping
 
-Document version: `2026-04-23`
+Document version: `2026-10-16`
 
 ## Current Coverage
 
@@ -344,6 +344,8 @@ focused regression:
 ### upstream test / intent:
 `tests/xlsx2md-table-detector.test.js`
 
+`tests/xlsx2md-table-header-regression.test.js` (upstream v1.3.1)
+
 java tests:
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.collectsSeedCellsFromValuesOrBorders`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.trimsBorderedTableBeforeFollowingBorderlessNoteRow`
@@ -354,12 +356,29 @@ java tests:
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.doesNotTreatMergeHeavyFormBlocksAsTables`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDropsCalendarLikeColumnCandidatesWhileBorderKeepsThem`
 - `jp.igapyon.mikuxlsx2md.tabledetector.TableDetectorTest.plannerAwareDoesNotKeepHugeFallbackCandidateForMergeHeavyMixedLayoutSheet`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.matchesPinnedUpstreamHeaderFixtureRangesInAllDetectionModes`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.mixedBorderFixtureHonorsNoHeaderAndEmptyRowColumnOptions`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.usesEcmaScriptTrimSetForMergedHeaderLabels`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.balancedExpansionPreservesScoreAndReasonAndDoesNotMutateInput`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.rejectsInvalidMergedHeaderStructuresAndSpillValues`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.requiresEcmaScriptNonEmptyCellsInBorderedBodyHeaderRow`
+- `jp.igapyon.mikuxlsx2md.tabledetector.TableHeaderRegressionTest.expandsHeaderCoveredByTwoSeparatePartialMerges`
 
 fixtures:
-- none
+- `src/test/resources/upstream-v1.3.1/table-header-width-unbordered-sample01.xlsx`
+- `src/test/resources/upstream-v1.3.1/table-header-width-bordered-sample01.xlsx`
+- `src/test/resources/upstream-v1.3.1/table-header-width-mixed-borders-sample01.xlsx`
+- `src/test/resources/upstream-v1.3.1/table-merged-header-unbordered-sample01.xlsx`
+- `src/test/resources/upstream-v1.3.1/table-merged-header-bordered-sample01.xlsx`
+- `src/test/resources/upstream-v1.3.1/table-merged-header-mixed-borders-sample01.xlsx`
 
 focused regression:
-- `mvn -Dtest=TableDetectorTest test`
+- `mvn -Dtest=TableDetectorTest,TableHeaderRegressionTest test`
+
+coverage notes:
+- The six pinned v1.3.1 fixtures are checked in balanced, border, and planner-aware modes (18 range combinations), with Markdown summary/table output checks and no-header / keep-empty-row / keep-empty-column option coverage.
+- Synthetic regression cases cover every ECMAScript trim whitespace code point, excluded U+0085 / U+180E / U+200B, UTF-16 label lengths, CR/LF, ASCII numeric labels, an NBSP-only bordered body row below the non-empty threshold, incomplete coverage, hidden non-anchor content, adjacent spill on both sides, translated coordinates, no merge, multiple partial merges covering one wide header, full-width / vertical / overlapping / out-of-bounds merges, narrow candidates, and independent side-by-side tables.
+- The upstream mixed-border fixture expands exactly one partial merged header row in balanced mode; score is unchanged, its reason appears once, inputs remain unchanged, and border / planner-aware ranges match upstream.
 
 ### upstream test / intent:
 `tests/xlsx2md-sheet-assets.test.js`

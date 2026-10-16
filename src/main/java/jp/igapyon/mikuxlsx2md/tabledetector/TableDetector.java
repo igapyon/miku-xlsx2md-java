@@ -272,7 +272,46 @@ public final class TableDetector {
     final List<TableCandidate> pruned = plannerAwareMode
         ? pruneCalendarLikeColumnCandidates(prunedCandidates)
         : prunedCandidates;
-    Collections.sort(pruned, new Comparator<TableCandidate>() {
+    final List<TableCandidate> candidatesWithMergedHeaders = new ArrayList<TableCandidate>();
+    if ("balanced".equals(normalizedMode)) {
+      for (int candidateIndex = 0; candidateIndex < pruned.size(); candidateIndex += 1) {
+        final TableCandidate candidate = pruned.get(candidateIndex);
+        final List<TableCandidate> otherCandidates = new ArrayList<TableCandidate>();
+        for (int otherIndex = 0; otherIndex < pruned.size(); otherIndex += 1) {
+          if (candidateIndex != otherIndex) {
+            otherCandidates.add(pruned.get(otherIndex));
+          }
+        }
+        final Integer headerRow = findBorderlessMergedHeaderRow(sheet, cellMap, candidate, otherCandidates);
+        if (headerRow == null) {
+          candidatesWithMergedHeaders.add(candidate);
+          continue;
+        }
+        final String reason = "Included borderless merged header row (no score change)";
+        final List<String> reasonSummary = new ArrayList<String>(candidate.getReasonSummary());
+        if (!reasonSummary.contains(reason)) {
+          reasonSummary.add(reason);
+        }
+        candidatesWithMergedHeaders.add(new TableCandidate(
+            headerRow.intValue(),
+            candidate.getStartCol(),
+            candidate.getEndRow(),
+            candidate.getEndCol(),
+            candidate.getScore(),
+            reasonSummary));
+      }
+    } else {
+      candidatesWithMergedHeaders.addAll(pruned);
+    }
+
+    final List<TableCandidate> uniqueCandidates = new ArrayList<TableCandidate>();
+    final Set<String> uniqueKeys = new HashSet<String>();
+    for (final TableCandidate candidate : candidatesWithMergedHeaders) {
+      if (uniqueKeys.add(candidateKey(candidate))) {
+        uniqueCandidates.add(candidate);
+      }
+    }
+    Collections.sort(uniqueCandidates, new Comparator<TableCandidate>() {
       @Override
       public int compare(final TableCandidate left, final TableCandidate right) {
         if (left.getStartRow() != right.getStartRow()) {
@@ -281,7 +320,198 @@ public final class TableDetector {
         return Integer.compare(left.getStartCol(), right.getStartCol());
       }
     });
-    return pruned;
+    return uniqueCandidates;
+  }
+
+  private static Integer findBorderlessMergedHeaderRow(
+      final WorksheetParser.ParsedSheet sheet,
+      final Map<String, WorksheetParser.ParsedCell> cellMap,
+      final TableCandidate candidate,
+      final List<TableCandidate> otherCandidates) {
+    final int rowCount = candidate.getEndRow() - candidate.getStartRow() + 1;
+    final int width = candidate.getEndCol() - candidate.getStartCol() + 1;
+    if (rowCount < 2 || width < 3 || candidate.getStartRow() < 2) {
+      return null;
+    }
+
+    final int minHeaderCells = Math.max(2, (int) Math.ceil(width * 0.5d));
+    final BorderGrid.EdgeStats bodyHeaderStats = BorderGrid.collectTableEdgeStats(
+        cellMap,
+        candidate.getStartRow(),
+        candidate.getStartCol(),
+        candidate.getEndCol());
+    if (bodyHeaderStats.getRawBorderCount() < minHeaderCells
+        || countEcmaScriptNonEmptyCells(
+            cellMap, candidate.getStartRow(), candidate.getStartCol(), candidate.getEndCol()) < minHeaderCells) {
+      return null;
+    }
+
+    final int headerRow = candidate.getStartRow() - 1;
+    final BorderGrid.EdgeStats headerStats = BorderGrid.collectTableEdgeStats(
+        cellMap,
+        headerRow,
+        candidate.getStartCol(),
+        candidate.getEndCol());
+    if (headerStats.getRawBorderCount() != 0) {
+      return null;
+    }
+
+    if ((candidate.getStartCol() > 1
+        && hasValueOrOwnBorder(cellMap.get(headerRow + ":" + (candidate.getStartCol() - 1))))
+        || hasValueOrOwnBorder(cellMap.get(headerRow + ":" + (candidate.getEndCol() + 1)))) {
+      return null;
+    }
+
+    for (final TableCandidate other : otherCandidates == null
+        ? Collections.<TableCandidate>emptyList()
+        : otherCandidates) {
+      if (headerRow <= other.getEndRow()
+          && candidate.getEndRow() >= other.getStartRow()
+          && candidate.getStartCol() <= other.getEndCol()
+          && candidate.getEndCol() >= other.getStartCol()) {
+        return null;
+      }
+    }
+
+    final List<AddressUtils.MergeRange> intersectingMerges = new ArrayList<AddressUtils.MergeRange>();
+    for (final AddressUtils.MergeRange merge : safeMerges(sheet)) {
+      if (merge.getStartRow() <= headerRow
+          && merge.getEndRow() >= headerRow
+          && merge.getStartCol() <= candidate.getEndCol()
+          && merge.getEndCol() >= candidate.getStartCol()) {
+        intersectingMerges.add(merge);
+      }
+    }
+    if (intersectingMerges.isEmpty()) {
+      return null;
+    }
+    Collections.sort(intersectingMerges, new Comparator<AddressUtils.MergeRange>() {
+      @Override
+      public int compare(final AddressUtils.MergeRange left, final AddressUtils.MergeRange right) {
+        return Integer.compare(left.getStartCol(), right.getStartCol());
+      }
+    });
+
+    int previousEndCol = candidate.getStartCol() - 1;
+    boolean hasPartialHorizontalMerge = false;
+    final Set<String> mergedCells = new HashSet<String>();
+    final Set<Integer> columnCoverage = new HashSet<Integer>();
+    final List<String> labels = new ArrayList<String>();
+    for (final AddressUtils.MergeRange merge : intersectingMerges) {
+      if (merge.getStartRow() != headerRow
+          || merge.getEndRow() != headerRow
+          || merge.getStartCol() < candidate.getStartCol()
+          || merge.getEndCol() > candidate.getEndCol()
+          || merge.getStartCol() > merge.getEndCol()
+          || merge.getStartCol() <= previousEndCol) {
+        return null;
+      }
+      previousEndCol = merge.getEndCol();
+      final int mergeWidth = merge.getEndCol() - merge.getStartCol() + 1;
+      if (mergeWidth >= 2 && mergeWidth < width) {
+        hasPartialHorizontalMerge = true;
+      }
+      for (int col = merge.getStartCol(); col <= merge.getEndCol(); col += 1) {
+        columnCoverage.add(Integer.valueOf(col));
+        mergedCells.add(headerRow + ":" + col);
+        final WorksheetParser.ParsedCell cell = cellMap.get(headerRow + ":" + col);
+        if (col > merge.getStartCol() && !trimEcmaScript(stringValue(cell == null ? null : cell.getOutputValue())).isEmpty()) {
+          return null;
+        }
+      }
+      final WorksheetParser.ParsedCell anchor = cellMap.get(headerRow + ":" + merge.getStartCol());
+      final String anchorValue = stringValue(anchor == null ? null : anchor.getOutputValue());
+      if (!isValidMergedHeaderLabel(anchorValue)) {
+        return null;
+      }
+      labels.add(trimEcmaScript(anchorValue));
+    }
+
+    if (!hasPartialHorizontalMerge) {
+      return null;
+    }
+
+    for (int col = candidate.getStartCol(); col <= candidate.getEndCol(); col += 1) {
+      if (mergedCells.contains(headerRow + ":" + col)) {
+        continue;
+      }
+      final WorksheetParser.ParsedCell cell = cellMap.get(headerRow + ":" + col);
+      final String value = stringValue(cell == null ? null : cell.getOutputValue());
+      if (trimEcmaScript(value).isEmpty()) {
+        continue;
+      }
+      if (!isValidMergedHeaderLabel(value)) {
+        return null;
+      }
+      columnCoverage.add(Integer.valueOf(col));
+      labels.add(trimEcmaScript(value));
+    }
+
+    if (labels.size() < 2 || columnCoverage.size() != width) {
+      return null;
+    }
+    for (int col = candidate.getStartCol(); col <= candidate.getEndCol(); col += 1) {
+      if (!columnCoverage.contains(Integer.valueOf(col))) {
+        return null;
+      }
+    }
+    return Integer.valueOf(headerRow);
+  }
+
+  private static boolean hasValueOrOwnBorder(final WorksheetParser.ParsedCell cell) {
+    return cell != null && (!trimEcmaScript(stringValue(cell.getOutputValue())).isEmpty() || BorderGrid.hasAnyRawBorder(cell));
+  }
+
+  private static int countEcmaScriptNonEmptyCells(
+      final Map<String, WorksheetParser.ParsedCell> cellMap,
+      final int row,
+      final int startCol,
+      final int endCol) {
+    int count = 0;
+    for (int col = startCol; col <= endCol; col += 1) {
+      final WorksheetParser.ParsedCell cell = cellMap.get(row + ":" + col);
+      if (!trimEcmaScript(stringValue(cell == null ? null : cell.getOutputValue())).isEmpty()) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  private static boolean isValidMergedHeaderLabel(final String value) {
+    final String raw = stringValue(value);
+    final String trimmed = trimEcmaScript(raw);
+    return trimmed.length() >= 1
+        && trimmed.length() <= 24
+        && !raw.contains("\r")
+        && !raw.contains("\n")
+        && !trimmed.matches("^\\d+(?:\\.\\d+)?$");
+  }
+
+  /** Matches ECMAScript String.trim() without depending on the Java runtime version. */
+  private static String trimEcmaScript(final String value) {
+    int start = 0;
+    int end = value.length();
+    while (start < end && isEcmaScriptTrimWhitespace(value.charAt(start))) {
+      start += 1;
+    }
+    while (end > start && isEcmaScriptTrimWhitespace(value.charAt(end - 1))) {
+      end -= 1;
+    }
+    return value.substring(start, end);
+  }
+
+  private static boolean isEcmaScriptTrimWhitespace(final char value) {
+    return (value >= 0x0009 && value <= 0x000D)
+        || value == 0x0020
+        || value == 0x00A0
+        || value == 0x1680
+        || (value >= 0x2000 && value <= 0x200A)
+        || value == 0x2028
+        || value == 0x2029
+        || value == 0x202F
+        || value == 0x205F
+        || value == 0x3000
+        || value == 0xFEFF;
   }
 
   public static Bounds trimTableCandidateBounds(

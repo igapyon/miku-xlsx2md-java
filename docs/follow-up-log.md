@@ -1,6 +1,34 @@
 # Follow-up Log
 
-Document version: `2026-04-23`
+Document version: `2026-10-16`
+
+## 2026-10-16 Node v1.3.1 Merged Header Follow-up
+
+upstream files:
+- `src/ts/table-detector.ts`
+- upstream tag `v1.3.1` / commit `779afb14aa1f0140e42504e73afb917e71574057`
+
+java classes:
+- `TableDetector`
+- `MikuXlsx2mdCli`
+
+tests:
+- `TableDetectorTest`
+- `TableHeaderRegressionTest`
+- Six pinned fixtures under `src/test/resources/upstream-v1.3.1/`
+
+diff summary:
+- `balanced` mode now includes a qualifying borderless partial-merge header row immediately above a bordered table, preserving the candidate score and avoiding overlap with neighboring cells or candidates.
+- `border` and `planner-aware` ranges remain unchanged; candidate ranges are de-duplicated after header expansion.
+- Header-label validation, blank merged non-anchor checks, and adjacent-cell spill checks use the ECMAScript `String.trim()` whitespace set, including NBSP, ideographic space, and BOM while retaining U+0085, U+180E, and U+200B.
+- The new expansion gate counts body-row labels with ECMAScript trimming while retaining `BorderGrid`'s raw-border count; a bordered row with one label plus two NBSP-only cells is rejected.
+- The six upstream v1.3.1 table-header fixtures are covered in all three detection modes; synthetic cases cover whitespace boundaries, label limits, numeric / line-break rejection, incomplete coverage, hidden merged-cell content, spill, two partial merges covering one wider header, and non-expanding structures.
+- Maven version, CLI fallback version, and README artifact examples now use `1.3.1`.
+
+verification:
+- `mvn -Dtest=TableDetectorTest,TableHeaderRegressionTest test` pass.
+- Pinned Node v1.3.1 comparison: 18 of 18 fixture/mode Markdown outputs and ranges match; no-header and preserve-empty options also match.
+- Unicode scratch comparison confirms the candidate ranges match for full-width numeric, NBSP-only, and ideographic-space-padded labels. Markdown text outside the detector range differs for those ad hoc cases because the existing general rendering path still uses Java `String.trim()`; that wider rendering trim behavior was intentionally left out of scope.
 
 ## 2026-04-23 Node Java Markdown Byte Parity Script
 
